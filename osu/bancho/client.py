@@ -1,6 +1,7 @@
 
 from typing import Optional, List
 from datetime import datetime
+from copy import copy
 
 from ..objects.collections import Players
 from ..objects.player      import Player
@@ -123,8 +124,8 @@ class BanchoClient:
         self.connect()
 
         while self.connected:
-            time.sleep(self.request_interval)
             self.dequeue()
+            time.sleep(self.request_interval)
 
         if self.retry:
             self.logger.error('Retrying in 15 seconds...')
@@ -171,7 +172,13 @@ class BanchoClient:
         else:
             self.ping_count = 0
 
-        response = self.session.post(self.url, data=b''.join(self.queue))
+        queue = copy(self.queue)
+        data  = b''.join(queue)
+
+        response = self.session.post(self.url, data=data)
+
+        for item in queue:
+            self.queue.remove(item)
 
         if not response.ok:
             # Connection was refused
@@ -181,20 +188,9 @@ class BanchoClient:
             return
 
         self.game.packets.data_received(response.content, self.game)
-
-        if len(response.content) > 10000:
-            self.fast_read = True
-        else:
-            self.fast_read = False
-        
-        # DEBUG: Should be removed
-        self.logger.debug(f'Interval: {self.request_interval}')
-        self.logger.debug(f'Ping count: {self.ping_count}')
-        self.logger.debug(f'Idle time: {self.idle_time}')
-        self.logger.debug(f'Content length: {len(response.content)}')
+        self.fast_read = False
 
         self.last_action = datetime.now().timestamp()
-        self.queue = []
 
         return response
 
@@ -205,12 +201,11 @@ class BanchoClient:
             ClientPackets.LOGOUT, 
             int(0).to_bytes(4, 'little')
         )
-        self.dequeue()
         self.connected = False
         self.retry     = False
 
-    def enqueue(self, packet: ClientPackets, data: bytes = b'') -> bytes:
-        """Send a packet to the queue
+    def enqueue(self, packet: ClientPackets, data: bytes = b'', dequeue=True) -> bytes:
+        """Send a packet to the queue and dequeue
         
         Args:
             `packet`: osu.bancho.constants.ClientPackets
@@ -233,6 +228,9 @@ class BanchoClient:
         # Append to queue
         self.queue.append(stream.get())
 
+        if dequeue:
+            self.dequeue()
+
         return stream.get()
 
     def unsilence(self):
@@ -252,11 +250,9 @@ class BanchoClient:
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_PRESENCE_REQUEST, stream.get())
-        self.dequeue()
 
     def request_stats(self, ids: List[int]):
         stream = StreamOut()
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_STATS_REQUEST, stream.get())
-        self.dequeue()
