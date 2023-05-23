@@ -201,7 +201,7 @@ class BanchoClient:
     def exit(self):
         """Send logout packet to bancho, and disconnect."""
 
-        self.send_request(
+        self.enqueue(
             ClientPackets.LOGOUT, 
             int(0).to_bytes(4, 'little')
         )
@@ -209,7 +209,7 @@ class BanchoClient:
         self.connected = False
         self.retry     = False
 
-    def send_request(self, packet: ClientPackets, data: bytes = b'') -> requests.Request:
+    def enqueue(self, packet: ClientPackets, data: bytes = b'') -> bytes:
         """Send a packet to the queue
         
         Args:
@@ -233,6 +233,8 @@ class BanchoClient:
         # Append to queue
         self.queue.append(stream.get())
 
+        return stream.get()
+
     def unsilence(self):
         if not self.silenced:
             return
@@ -243,4 +245,18 @@ class BanchoClient:
         self.logger.info('You can now talk again.')
 
     def ping(self):
-        self.send_request(ClientPackets.PING)
+        self.enqueue(ClientPackets.PING)
+
+    def request_presence(self, ids: List[int]):
+        stream = StreamOut()
+        stream.intlist(ids)
+
+        self.enqueue(ClientPackets.USER_PRESENCE_REQUEST, stream.get())
+        self.dequeue()
+
+    def request_stats(self, ids: List[int]):
+        stream = StreamOut()
+        stream.intlist(ids)
+
+        self.enqueue(ClientPackets.USER_STATS_REQUEST, stream.get())
+        self.dequeue()

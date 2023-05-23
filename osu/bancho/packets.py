@@ -166,7 +166,7 @@ def presence(stream: StreamIn, game: Game):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
-        # Add new player if not found
+        # Add new player, if not found in collection
         game.bancho.players.add(
             player := Player(user_id)
         )
@@ -196,8 +196,8 @@ def stats(stream: StreamIn, game: Game):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
-        # Add new player if not found
-        # TODO: Request presence
+        # Add new player, if not found in collection
+        game.bancho.request_presence(user_id)
         game.bancho.players.add(
             player := Player(user_id)
         )
@@ -294,8 +294,10 @@ def message(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.SPECTATOR_JOINED)
 def spectator_joined(stream: StreamIn, game: Game):
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id()):
+        game.bancho.request_presence([user_id])
         return
     
     player.cant_spectate = False
@@ -309,8 +311,10 @@ def spectator_joined(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.SPECTATOR_LEFT)
 def spectator_left(stream: StreamIn, game: Game):
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     if player not in game.bancho.player.spectators:
@@ -327,9 +331,11 @@ def spectator_left(stream: StreamIn, game: Game):
 def fellow_spectator_joined(stream: StreamIn, game: Game):
     if not game.bancho.spectating:
         return
-    
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     game.bancho.spectating.spectators.add(player)
@@ -344,8 +350,10 @@ def fellow_spectator_left(stream: StreamIn, game: Game):
     if not game.bancho.spectating:
         return
 
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     if player not in game.bancho.spectating.spectators:
@@ -384,9 +392,11 @@ def frames(stream: StreamIn, game: Game):
 def cant_spectate(stream: StreamIn, game: Game):
     if not game.bancho.spectating:
         return
-    
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     if player not in game.bancho.spectating.spectators:
@@ -445,8 +455,10 @@ def silence_info(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.USER_SILENCED)
 def user_silenced(stream: StreamIn, game: Game):
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
 
     player.silenced = True
@@ -459,8 +471,10 @@ def user_silenced(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.TARGET_IS_SILENCED)
 def target_silenced(stream: StreamIn, game: Game):
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     player.silenced = True
@@ -473,8 +487,10 @@ def target_silenced(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.USER_DM_BLOCKED)
 def dms_blocked(stream: StreamIn, game: Game):
-    if not (player := game.bancho.players.by_id(stream.s32())):
-        # TODO: Request presence
+    user_id = stream.s32()
+
+    if not (player := game.bancho.players.by_id(user_id)):
+        game.bancho.request_presence([user_id])
         return
     
     player.dms_blocked = True
