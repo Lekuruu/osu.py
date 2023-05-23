@@ -31,7 +31,10 @@ class Players(Set[Player]):
                 return p
         return None
 
-class Channel(Set[Channel]):
+    def status_update(self):
+        pass # TODO
+
+class Channels(Set[Channel]):
     def __iter__(self) -> Iterator[Channel]:
         return super().__iter__()
 

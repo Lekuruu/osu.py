@@ -3,7 +3,7 @@ from typing import Optional, List
 from datetime import datetime
 from copy import copy
 
-from ..objects.collections import Players, Channel
+from ..objects.collections import Players, Channels
 from ..objects.player      import Player
 from ..objects.status      import Status
 
@@ -74,7 +74,7 @@ class BanchoClient:
         self.spectating: Optional[Player] = None
         self.player:     Optional[Player] = None
 
-        self.channels = Channel()
+        self.channels = Channels()
         self.players = Players()
 
         self.ping_count = 0
