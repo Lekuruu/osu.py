@@ -1,6 +1,8 @@
 
-from typing import Set, Iterator, Optional
+from typing import List, Set, Iterator, Optional
+from collections.abc import Iterator
 
+from .channel import Channel
 from .player import Player
 
 class Players(Set[Player]):
@@ -27,4 +29,24 @@ class Players(Set[Player]):
         for p in self:
             if p.name == name:
                 return p
+        return None
+
+class Channel(Set[Channel]):
+    def __iter__(self) -> Iterator[Channel]:
+        return super().__iter__()
+
+    @property
+    def joined(self) -> List[Channel]:
+        return [c for c in self if c.joined]
+
+    def add(self, channel: Channel) -> None:
+        return super().add(channel)
+    
+    def remove(self, channel: Channel) -> None:
+        if channel in self: return super().remove(channel)
+
+    def get(self, name: str) -> Optional[Channel]:
+        for c in self:
+            if c.name == name:
+                return c
         return None

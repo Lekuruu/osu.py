@@ -3,6 +3,7 @@ from typing import List, Dict, Callable
 
 from ..objects.replays import ScoreFrame, ReplayFrame
 from ..objects.player import Player
+from ..objects.channel import Channel
 from ..game import Game
 
 from .streams   import StreamIn
@@ -281,19 +282,35 @@ def message(stream: StreamIn, game: Game):
     target    = stream.string()
     sender_id = stream.s32()
 
-    game.logger.info(f'<{sender}{f" ({sender_id})" if sender_id else ""}> [{target}]: "{message}"')
-
+    # Find player
     if not (player := game.bancho.players.by_id(sender_id)):
-        player = None
+        # Try to find sender by name
+        if not (player := game.bancho.players.by_name(sender)):
+            return
 
-    # TODO: Resolve target (Channel/Player)
+    sender = player
+
+    # Find target
+    if target.startswith('#'):
+        # Public message
+        if not (channel := game.bancho.channels.get(target)):
+            return
+
+        target = channel
+    else:
+        # Private message
+        if not (player := game.bancho.players.by_name(target)):
+            return
+
+        target = player
+
+    target.logger.info(f'<{sender.name}{f" ({sender_id})" if sender_id else ""}> [{target.name}]: "{message}"')
 
     game.events.call(
         ServerPackets.SEND_MESSAGE,
         sender,
         message,
-        target,
-        player
+        target
     )
 
 @Packets.register(ServerPackets.SPECTATOR_JOINED)
@@ -415,23 +432,76 @@ def cant_spectate(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.CHANNEL_INFO)
 def channel_info(stream: StreamIn, game: Game):
-    pass # TODO
+    name  = stream.string()
+    topic = stream.string()
+
+    if not (c := game.bancho.channels.get(name)):
+        game.bancho.channels.add(
+            c := Channel(
+                name,
+                topic,
+                game
+            )
+        )
+
+    c.user_count = stream.s16()
+
+    if c.name == '#osu' and not c.joined:
+        # Join #osu
+        c.join()
+
+    game.events.call(ServerPackets.CHANNEL_INFO, c)
 
 @Packets.register(ServerPackets.CHANNEL_AUTO_JOIN)
-def channel_autojoin(stream: StreamIn, game: StreamIn):
-    pass # TODO
+def channel_autojoin(stream: StreamIn, game: Game):
+    name  = stream.string()
+    topic = stream.string()
+
+    if not (c := game.bancho.channels.get(name)):
+        game.bancho.channels.add(
+            c := Channel(
+                name,
+                topic,
+                game
+            )
+        )
+
+    c.user_count = stream.s16()
+    c.join_success()
+
+    game.events.call(ServerPackets.CHANNEL_AUTO_JOIN, c)
 
 @Packets.register(ServerPackets.CHANNEL_INFO_END)
 def channel_info_end(stream: StreamIn, game: Game):
-    pass # TODO
+    game.events.call(ServerPackets.CHANNEL_INFO_END)
 
 @Packets.register(ServerPackets.CHANNEL_JOIN_SUCCESS)
 def channel_join_success(stream: StreamIn, game: Game):
-    pass # TODO
+    name = stream.string()
+
+    if not (c := game.bancho.channels.get(name)):
+        game.bancho.channels.add(
+            c := Channel(
+                name=name,
+                game=game
+            )
+        )
+
+    c.join_success()
+
+    game.events.call(ServerPackets.CHANNEL_JOIN_SUCCESS, c)
 
 @Packets.register(ServerPackets.CHANNEL_KICK)
 def channel_revoked(stream: StreamIn, game: Game):
-    pass # TODO
+    name = stream.string()
+
+    if not (c := game.bancho.channels.get(name)):
+        return
+
+    game.bancho.channels.remove(c)
+    game.logger.info(f'Kicked out of channel: {name}')
+
+    game.events.call(ServerPackets.CHANNEL_KICK, c)
 
 @Packets.register(ServerPackets.BEATMAP_INFO_REPLY)
 def beatmapinfo_reply(stream: StreamIn, game: Game):
