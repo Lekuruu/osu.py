@@ -191,8 +191,8 @@ class BanchoClient:
             self.logger.error(f'[{response.request.url}]: Connection was refused ({response.status_code})')
             return
 
-        self.game.packets.data_received(response.content, self.game)
         self.fast_read = False
+        self.game.packets.data_received(response.content, self.game)
 
         self.last_action = datetime.now().timestamp()
 
