@@ -114,7 +114,7 @@ def login_reply(stream: StreamIn, game: Game):
 
         return
 
-    game.logger.info(f'Logged in with user id: {response}')
+    game.logger.info(f'Logged in with id: {response}')
     game.bancho.user_id = response
 
     game.bancho.player = Player(response, game.username, game)
