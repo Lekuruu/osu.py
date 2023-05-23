@@ -1,17 +1,23 @@
 
-from typing import Set, List
+from typing import Set, List, Optional
 
+from .status import Status
+from ..game  import Game
+
+from ..bancho.streams import StreamOut
 from ..bancho.constants import (
+    ClientPackets,
     Privileges,
     Mode
 )
 
-from .status import Status
+import logging
 
 class Player:
-    def __init__(self, id: int, name: str = "") -> None:
+    def __init__(self, id: int, name: str = "", game: Optional[Game] = None) -> None:
         self.id = id
         self.name = name
+        self.game = game
 
         self.timezone     = 0
         self.country_code = 0
@@ -36,11 +42,13 @@ class Player:
 
         self.last_status = Status()
 
+        self.logger = logging.getLogger(self.name)
+
     def __repr__(self) -> str:
         return f'<Player "{self.name}" ({self.id})>'
 
     def __hash__(self) -> int:
         return self.id
-    
+
     def __eq__(self, other: object) -> bool:
         return self.id == other.id

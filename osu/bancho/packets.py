@@ -105,8 +105,10 @@ def login_reply(stream: StreamIn, game: Game):
     game.logger.info(f'Logged in with user id: {response}')
     game.bancho.user_id = response
 
-    game.bancho.player = Player(response, game.username)
+    game.bancho.player = Player(response, game.username, game)
     game.bancho.players.add(game.bancho.player)
+
+    game.bancho.fast_read = True
 
     game.events.call(ServerPackets.USER_ID, response)
 
@@ -168,7 +170,7 @@ def presence(stream: StreamIn, game: Game):
     if not (player := game.bancho.players.by_id(user_id)):
         # Add new player, if not found in collection
         game.bancho.players.add(
-            player := Player(user_id)
+            player := Player(user_id, game=game)
         )
 
     player.name         = stream.string()
@@ -199,7 +201,7 @@ def stats(stream: StreamIn, game: Game):
         # Add new player, if not found in collection
         game.bancho.request_presence(user_id)
         game.bancho.players.add(
-            player := Player(user_id)
+            player := Player(user_id, game=game)
         )
 
     # Status
@@ -231,8 +233,10 @@ def presence_bundle(stream: StreamIn, game: Game):
         if not (game.bancho.players.by_id(id)):
             # Add player if not found
             game.bancho.players.add(
-                Player(id)
+                Player(id, game=game)
             )
+
+    game.bancho.fast_read = True
 
     game.events.call(
         ServerPackets.USER_PRESENCE_BUNDLE,
@@ -246,7 +250,7 @@ def presence_single(stream: StreamIn, game: Game):
     if not (game.bancho.players.by_id(user_id)):
         # Add player if not found
         game.bancho.players.add(
-            Player(user_id)
+            Player(user_id, game=game)
         )
 
     game.events.call(
