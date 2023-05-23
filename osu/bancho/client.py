@@ -53,15 +53,18 @@ class BanchoClient:
     def __init__(self, game: Game) -> None:
         self.game = game
 
-        self.session = requests.Session()
-        self.session.headers = {
-            'User-Agent': 'osu!',
-            'osu-version': self.game.version
-        }
-
         self.logger = logging.getLogger(f'bancho-{game.version}')
 
-        self.url = f'https://c.{game.server}'
+        self.domain = f'c.{game.server}'
+        self.url = f'https://{self.domain}'
+
+        self.session = requests.Session()
+        self.session.headers = {
+            'osu-version': self.game.version,
+            'Accept-Encoding': 'gzip, deflate',
+            'User-Agent': 'osu!',
+            'Host': self.domain,
+        }
 
         self.user_id = -1
         self.connected = False
