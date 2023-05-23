@@ -329,6 +329,8 @@ def message(stream: StreamIn, game: Game):
 
     target.logger.info(f'<{sender.name}{f" ({sender_id})" if sender_id else ""}> [{target.name}]: "{message}"')
 
+    game.bancho.fast_read = True
+
     game.events.call(
         ServerPackets.SEND_MESSAGE,
         sender,
