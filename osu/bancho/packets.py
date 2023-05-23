@@ -328,7 +328,7 @@ def message(stream: StreamIn, game: Game):
 def spectator_joined(stream: StreamIn, game: Game):
     user_id = stream.s32()
 
-    if not (player := game.bancho.players.by_id()):
+    if not (player := game.bancho.players.by_id(user_id)):
         game.bancho.request_presence([user_id])
         return
     
