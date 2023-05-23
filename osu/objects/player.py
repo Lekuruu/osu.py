@@ -71,3 +71,9 @@ class Player:
             ClientPackets.SEND_PRIVATE_MESSAGE,
             stream.get()
         )
+
+    def request_presence(self):
+        self.game.bancho.request_presence([self.id])
+
+    def request_stats(self):
+        self.game.bancho.request_stats([self.id])
