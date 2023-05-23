@@ -200,6 +200,8 @@ def presence(stream: StreamIn, game: Game):
     player.latitude = stream.float()
     player.rank = stream.s32()
 
+    game.bancho.fast_read = True
+
     game.events.call(
         ServerPackets.USER_PRESENCE,
         player
@@ -231,6 +233,8 @@ def stats(stream: StreamIn, game: Game):
     player.tscore    = stream.s64()
     player.rank      = stream.s32()
     player.pp        = stream.s16()
+
+    game.bancho.fast_read = True
 
     game.events.call(
         ServerPackets.USER_STATS,
