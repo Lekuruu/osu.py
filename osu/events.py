@@ -17,7 +17,7 @@ class EventHandler:
     >>> game = Game(...)
     >>>
     >>> @game.events.register(ServerPackets.SEND_MESSAGE)
-    >>> def message_handler(sender: str, message: str, target: str, player: Optional[Player]):
+    >>> def message_handler(sender, message, target):
     >>>     print(message)
     """
 
