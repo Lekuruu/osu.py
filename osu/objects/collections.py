@@ -2,16 +2,26 @@
 from typing import List, Set, Iterator, Optional
 from collections.abc import Iterator
 
+from ..bancho.constants import ClientPackets
+from ..game import Game
+
 from .channel import Channel
 from .player import Player
 
 class Players(Set[Player]):
+    def __init__(self, game: Game) -> None:
+        self.game = game
+
     def __iter__(self) -> Iterator[Player]:
         return super().__iter__()
     
     @property
     def ids(self) -> Set[int]:
         return {p.id for p in self}
+    
+    @property
+    def pending(self) -> List[Player]:
+        return [p for p in self if not p.name]
     
     def add(self, player: Player) -> None:
         return super().add(player)
@@ -31,8 +41,15 @@ class Players(Set[Player]):
                 return p
         return None
 
-    def status_update(self):
-        pass # TODO
+    def load(self):
+        # Split players into chunks of 512
+        player_chunks = [
+            self.pending[i:i + 512]
+            for i in range(0, len(self.pending), 512)
+        ]
+
+        for chunk in player_chunks:
+            self.game.bancho.request_presence([p.id for p in chunk])
 
 class Channels(Set[Channel]):
     def __iter__(self) -> Iterator[Channel]:

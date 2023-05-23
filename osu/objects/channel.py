@@ -59,6 +59,10 @@ class Channel:
 
         self.logger.info(f'Joined {self.name}!')
 
+        if self.name == '#osu':
+            # Load players
+            self.game.bancho.players.load()
+
     def send_message(self, message: str, force=False):
         if not self.joined and not force:
             return

@@ -75,7 +75,7 @@ class BanchoClient:
         self.player:     Optional[Player] = None
 
         self.channels = Channels()
-        self.players = Players()
+        self.players = Players(game)
 
         self.ping_count = 0
         self.protocol   = 0
@@ -89,7 +89,7 @@ class BanchoClient:
         self.silenced = False
 
         self.min_idletime = 1
-        self.max_idletime = 2
+        self.max_idletime = 4
 
         self.queue = []
 
