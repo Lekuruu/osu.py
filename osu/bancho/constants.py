@@ -195,7 +195,7 @@ class Mods(Enum):
     def list(cls, values: int):
         return [mod for mod in Mods if cls.check_active(values, mod.value)]
 
-class Privileges(Enum): # TODO
+class Privileges(Enum):
     Restriced     = 0
     Normal        = 1
     BAT           = 2
