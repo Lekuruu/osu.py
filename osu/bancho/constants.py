@@ -130,6 +130,19 @@ class LoginError(Enum):
     PASSWORD_RESET       = -7
     VERIFICATION_NEEDED  = -8
 
+    @property
+    def description(self) -> str:
+        return {
+            LoginError.AUTHENTICATION_ERROR: 'Authentication failed. Please check your username/password!',
+            LoginError.UPDATE_NEEDED: 'It seems like this version of osu! is too old. Please check for any updates!',
+            LoginError.RESTRICTED: 'You are banned.',
+            LoginError.NOT_ACTIVATED: 'Your account was either restricted or is not activated.',
+            LoginError.SERVER_ERROR: 'A server error occured.',
+            LoginError.NEED_SUPPORTER: 'You need to be a supporter to use tourney clients.',
+            LoginError.PASSWORD_RESET: 'Your account password has been reset.',
+            LoginError.VERIFICATION_NEEDED: ''
+        }[self]
+
 class StatusAction(Enum):
     Idle         = 0
     Afk          = 1

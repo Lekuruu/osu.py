@@ -97,10 +97,21 @@ def login_reply(stream: StreamIn, game: Game):
         except ValueError:
             error = None
 
-        game.bancho.connected = False
         game.logger.error(f'Login error: {error.name}')
+        game.logger.error(error.description)
+        game.bancho.connected = False
+        game.bancho.retry = False
 
-        # TODO: Display more info
+        if error == LoginError.SERVER_ERROR:
+            game.bancho.retry = True
+        
+        elif error == LoginError.VERIFICATION_NEEDED:
+            game.api.verify(game.client.hash)
+
+        elif error == LoginError.PASSWORD_RESET:
+            # TODO
+            exit(1)
+
         return
 
     game.logger.info(f'Logged in with user id: {response}')
