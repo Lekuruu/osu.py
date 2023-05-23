@@ -298,6 +298,10 @@ def message(stream: StreamIn, game: Game):
         # Try to find sender by name
         if not (player := game.bancho.players.by_name(sender)):
             return
+        
+    if not player.name:
+        # Presence missing
+        player.request_presence()
 
     sender = player
 
@@ -312,6 +316,10 @@ def message(stream: StreamIn, game: Game):
         # Private message
         if not (player := game.bancho.players.by_name(target)):
             return
+
+        if not player.name:
+            # Presence missing
+            player.request_presence()
 
         target = player
 

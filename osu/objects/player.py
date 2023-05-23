@@ -58,6 +58,10 @@ class Player:
 
         if not (player := self.game.bancho.player):
             return
+        
+        if not self.name:
+            # Presence missing
+            self.request_presence()
 
         stream = StreamOut()
         stream.string(player.name)
