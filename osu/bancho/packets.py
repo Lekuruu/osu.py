@@ -108,10 +108,6 @@ def login_reply(stream: StreamIn, game: Game):
         elif error == LoginError.VERIFICATION_NEEDED:
             game.api.verify(game.client.hash)
 
-        elif error == LoginError.PASSWORD_RESET:
-            # TODO
-            exit(1)
-
         return
 
     game.logger.info(f'Logged in with id: {response}')

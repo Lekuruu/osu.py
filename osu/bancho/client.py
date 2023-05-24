@@ -139,8 +139,8 @@ class BanchoClient:
     def connect(self):
         data = f'{self.game.username}\r\n{self.game.password_hash}\r\n{self.game.client}\r\n'
 
-        response = self.session.post(self.url, data=data.encode())
-        
+        response = self.session.post(self.url, data=data)
+
         if not response.ok:
             # Connection was refused
             self.connected = False
