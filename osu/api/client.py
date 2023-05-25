@@ -23,11 +23,6 @@ class WebAPI:
     """
 
     def __init__(self, game: Game) -> None:
-        """
-        Args:
-            `game`: osu.game.Game
-        """
-
         self.game = game
 
         self.session = requests.Session()
@@ -60,15 +55,7 @@ class WebAPI:
         return response.json()
     
     def connect(self, retry=False) -> bool:
-        """This will perform a request on `/web/bancho_connect.php`.
-
-        Args:
-            `retry`: bool
-                Used inside the request as a parameter (optional)
-
-        Returns -> bool
-            If the connection was successful.
-        """
+        """This will perform a request on `/web/bancho_connect.php`."""
         
         self.logger.info('Connecting to bancho...')
 
@@ -98,10 +85,6 @@ class WebAPI:
     def verify(self, hash: str) -> requests.Response:
         """This will print out a url, where the user can verify this client.\n
         After that, it will exit.
-
-        Args:
-            `hash`: str
-                The client hash, that will be passed to the url.
         """
 
         self.logger.info('Verification required.')

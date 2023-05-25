@@ -468,7 +468,6 @@ def channel_info(stream: StreamIn, game: Game):
     c.user_count = stream.s16()
 
     if c.name == '#osu' and not c.joined:
-        # Join #osu
         c.join()
 
     game.events.call(ServerPackets.CHANNEL_INFO, c)

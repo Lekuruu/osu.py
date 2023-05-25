@@ -143,7 +143,6 @@ class BanchoClient:
         response = self.session.post(self.url, data=data)
 
         if not response.ok:
-            # Connection was refused
             self.connected = False
             self.retry = True
             self.logger.error(f'[{response.url}]: Connection was refused ({response.status_code})')
@@ -153,7 +152,6 @@ class BanchoClient:
             # Failed to get token
             self.connected = False
             self.retry     = False
-            # Get error message
             self.game.packets.data_received(response.content, self.game)
             return
         
@@ -186,7 +184,6 @@ class BanchoClient:
             self.queue.remove(item)
 
         if not response.ok:
-            # Connection was refused
             self.connected = False
             self.retry = True
             self.logger.error(f'[{response.request.url}]: Connection was refused ({response.status_code})')
@@ -224,8 +221,6 @@ class BanchoClient:
         stream.u16(packet.value)
         stream.bool(False)
         stream.u32(len(data))
-
-        # Write payload
         stream.write(data)
 
         self.logger.debug(f'Sending {packet.name} -> "{data}"')
@@ -331,3 +326,6 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.PART_LOBBY)
         self.in_lobby = True
+
+    def set_away_message(self, message: str):
+        raise NotImplementedError # TODO

@@ -91,7 +91,6 @@ class Game:
         self.bancho  = BanchoClient(self)
         self.api     = WebAPI(self)
 
-        # Checking for updates
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
             # TODO: Custom executable hash?
@@ -130,7 +129,6 @@ class Game:
                 self.api.get_backgrounds()
 
             if not self.api.connect(retry):
-                # Bancho connection failed
                 exit(1)
 
             self.bancho.run()
@@ -163,7 +161,6 @@ class Game:
         )
 
         if not response.ok:
-            # Request failed
             self.logger.error(f'Failed to get client version ({response.status_code}).')
             self.logger.error('Please check your release stream or provide a custom version!')
             return None
@@ -172,7 +169,6 @@ class Game:
         version = response.url.removesuffix('/').split('/')[-1]
 
         if not version.isdigit():
-            # "version" is not an integer
             self.logger.error(f'Failed to get client version ("{version}" is not an integer).')
             self.logger.error('Please provide a custom version!')
             return None
