@@ -2,7 +2,7 @@
 from typing import List, Set, Iterator, Optional
 from collections.abc import Iterator
 
-from ..bancho.constants import ClientPackets
+from ..bancho.constants import ClientPackets, PresenceFilter
 from ..game import Game
 
 from .channel import Channel
@@ -50,6 +50,12 @@ class Players(Set[Player]):
 
         for chunk in player_chunks:
             self.game.bancho.request_presence([p.id for p in chunk])
+
+    def request_updates(self, filter=PresenceFilter.All):
+        self.game.bancho.enqueue(
+            ClientPackets.RECEIVE_UPDATES,
+            int(filter.value).to_bytes(4, 'little')
+        )
 
 class Channels(Set[Channel]):
     def __iter__(self) -> Iterator[Channel]:

@@ -265,3 +265,8 @@ class ReplayAction(Enum):
     Unpause       = 6
     SongSelect    = 7
     WatchingOther = 8
+
+class PresenceFilter(Enum):
+    NoPlayers = 0
+    All = 1
+    Friends = 2
