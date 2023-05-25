@@ -22,21 +22,15 @@ class BanchoClient:
     ---------------
 
     Parameters:
-        `user_id`: int
-            User id associated with this account.
-            (Sent in logout packet)
+        `player`: osu.objects.Player
 
-        `player`: osu.objects.player.Player
-            Player associated with this account
+        `spectating`: osu.objects.Player
 
-        `spectating`: osu.objects.player.Player
-            Player that is currently being spectated
+        `players`: osu.objects.Players
 
-        `players`: osu.objects.collections.Players
-            All players that are currently online
+        `channels`: osu.objects.Channels
 
         `privileges`: list[osu.bancho.constants.Privileges]
-            Privileges for this account
 
         `friends`: list[int]
 
@@ -47,7 +41,23 @@ class BanchoClient:
         `retry`: bool
     
     Functions:
-        TODO
+        `enqueue`: Send a bancho packet to the server
+
+        `ping`: Send a ping packet
+
+        `request_presence`: Request a presence update for a list of players
+
+        `request_stats`: Request a stats update for a list of players
+
+        `request_status`: Request a status update for your account
+
+        `update_status`: Update `player.status`
+
+        `start_spectating`: Start spectating a player
+
+        `stop_spectating`: Stop spectating
+
+        `cant_spectate`: Is sent when the player does not have the beatmap for spectating
     """
 
     def __init__(self, game: Game) -> None:
@@ -207,13 +217,7 @@ class BanchoClient:
         self.retry     = False
 
     def enqueue(self, packet: ClientPackets, data: bytes = b'', dequeue=True) -> bytes:
-        """Send a packet to the queue and dequeue
-        
-        Args:
-            `packet`: osu.bancho.constants.ClientPackets
-
-            `data`: bytes
-        """
+        """Send a packet to the queue and dequeue"""
 
         stream = StreamOut()
 
