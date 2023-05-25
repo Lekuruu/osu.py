@@ -19,3 +19,11 @@ class Status:
 
     def __repr__(self) -> str:
         return f'<{self.action.name}{f" - {self.text}" if self.text else ""}>'
+    
+    def reset(self) -> None:
+        self.action = StatusAction.Idle
+        self.text = ""
+        self.checksum = ""
+        self.mods = []
+        self.mode = Mode.Osu
+        self.beatmap_id = 0
