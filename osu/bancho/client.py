@@ -87,6 +87,7 @@ class BanchoClient:
         self.fast_read = False
 
         self.silenced = False
+        self.in_lobby = False
 
         self.min_idletime = 1
         self.max_idletime = 4
@@ -316,3 +317,17 @@ class BanchoClient:
 
     def send_frames(self):
         raise NotImplementedError # TODO
+
+    def join_lobby(self):
+        if self.in_lobby:
+            return
+
+        self.enqueue(ClientPackets.JOIN_LOBBY)
+        self.in_lobby = True
+
+    def leave_lobby(self):
+        if not self.in_lobby:
+            return
+
+        self.enqueue(ClientPackets.PART_LOBBY)
+        self.in_lobby = True
