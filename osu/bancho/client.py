@@ -277,3 +277,42 @@ class BanchoClient:
         stream.s32(self.player.status.beatmap_id)
 
         self.enqueue(ClientPackets.CHANGE_ACTION, stream.get())
+
+    def start_spectating(self, target: Player):
+        if self.target:
+            self.stop_spectating()
+
+        self.enqueue(
+            ClientPackets.START_SPECTATING,
+            int(target.id).to_bytes(4, 'little'),
+            dequeue=False
+        )
+
+        target.request_presence()
+        target.request_stats()
+
+        self.status.action     = StatusAction.Watching
+        self.status.text       = target.status.text
+        self.status.checksum   = target.status.checksum
+        self.status.mods       = target.status.mods
+        self.status.mode       = target.status.mode
+        self.status.beatmap_id = target.status.beatmap_id
+
+        self.update_status()
+
+    def stop_spectating(self):
+        if not self.spectating:
+            return
+
+        self.logger.info(f'Stopped spectating {self.spectating.name}.')
+
+        self.enqueue(ClientPackets.STOP_SPECTATING, dequeue=False)
+
+        self.status.reset()
+        self.update_status()
+
+    def cant_spectate(self):
+        self.enqueue(ClientPackets.CANT_SPECTATE)
+
+    def send_frames(self):
+        raise NotImplementedError # TODO
