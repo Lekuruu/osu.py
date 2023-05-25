@@ -2,8 +2,9 @@
 from typing import List, Dict, Callable
 
 from ..objects.replays import ScoreFrame, ReplayFrame
-from ..objects.player import Player
+from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
+from ..objects.player  import Player
 from ..game import Game
 
 from .streams   import StreamIn
@@ -525,7 +526,12 @@ def channel_revoked(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.BEATMAP_INFO_REPLY)
 def beatmapinfo_reply(stream: StreamIn, game: Game):
-    pass # TODO
+    beatmaps = [BeatmapInfo.decode(stream) for beatmap in range(stream.s32())]
+
+    game.events.call(
+        ServerPackets.BEATMAP_INFO_REPLY,
+        beatmaps
+    )
 
 @Packets.register(ServerPackets.SILENCE_END)
 def silence_info(stream: StreamIn, game: Game):
