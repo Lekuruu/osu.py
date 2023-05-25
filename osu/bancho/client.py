@@ -9,7 +9,7 @@ from ..objects.status      import Status
 
 from ..game import Game
 
-from .constants import ClientPackets, Privileges
+from .constants import ClientPackets, Privileges, StatusAction
 from .streams   import StreamOut
 
 import requests
@@ -260,3 +260,20 @@ class BanchoClient:
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_STATS_REQUEST, stream.get())
+
+    def request_status(self):
+        self.enqueue(ClientPackets.REQUEST_STATUS_UPDATE)
+    
+    def update_status(self):
+        if not self.player:
+            return
+
+        stream = StreamOut()
+        stream.u8(self.player.status.action.value)
+        stream.string(self.player.status.text)
+        stream.string(self.player.status.checksum)
+        stream.u32(self.player.status.mods)
+        stream.u8(self.player.mode.value)
+        stream.s32(self.player.status.beatmap_id)
+
+        self.enqueue(ClientPackets.CHANGE_ACTION, stream.get())
