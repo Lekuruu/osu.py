@@ -42,10 +42,10 @@ class Players(Set[Player]):
         return None
 
     def load(self):
-        # Split players into chunks of 512
+        # Split players into chunks of 255
         player_chunks = [
-            self.pending[i:i + 512]
-            for i in range(0, len(self.pending), 512)
+            self.pending[i:i + 255]
+            for i in range(0, len(self.pending), 255)
         ]
 
         for chunk in player_chunks:
