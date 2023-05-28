@@ -279,7 +279,7 @@ class BanchoClient:
         self.enqueue(ClientPackets.CHANGE_ACTION, stream.get())
 
     def start_spectating(self, target: Player):
-        if self.target:
+        if self.spectating:
             self.stop_spectating()
 
         self.enqueue(
@@ -287,6 +287,8 @@ class BanchoClient:
             int(target.id).to_bytes(4, 'little'),
             dequeue=False
         )
+
+        self.spectating = target
 
         target.request_presence()
         target.request_stats()
