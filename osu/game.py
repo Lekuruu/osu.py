@@ -176,5 +176,7 @@ class Game:
             return None
         
         self.logger.debug(f"Version: b{version}{'tourney' if self.tourney else ''}")
+
+        self.version_number = int(version)
         
         return f"b{version}{'tourney' if self.tourney else ''}"
