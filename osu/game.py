@@ -58,6 +58,8 @@ class Game:
         self.version  = version
         self.tourney  = tournament
 
+        self.version_number = version
+
         self.logger = logging.getLogger('osu!')
 
         if not version:
@@ -119,7 +121,7 @@ class Game:
                 self.password,
                 self.server,
                 self.stream,
-                self.version,
+                self.version_number,
                 self.tourney
             )
 
