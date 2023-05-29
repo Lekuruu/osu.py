@@ -1,5 +1,6 @@
 
 from typing import List, Dict, Callable
+from copy import copy
 
 from ..objects.replays import ScoreFrame, ReplayFrame
 from ..objects.beatmap import BeatmapInfo
@@ -214,6 +215,8 @@ def stats(stream: StreamIn, game: Game):
         game.bancho.players.add(
             player := Player(user_id, game=game)
         )
+    
+    player.last_status = copy(player.status)
 
     # Status
     player.status.action     = StatusAction(stream.u8())
@@ -324,7 +327,7 @@ def message(stream: StreamIn, game: Game):
 
         target = player
 
-    target.logger.info(f'<{sender.name}{f" ({sender_id})" if sender_id else ""}> [{target.name}]: "{message}"')
+    # target.logger.info(f'<{sender.name}{f" ({sender_id})" if sender_id else ""}> [{target.name}]: "{message}"')
 
     game.bancho.fast_read = True
 
