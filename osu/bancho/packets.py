@@ -362,7 +362,7 @@ def spectator_left(stream: StreamIn, game: Game):
     
     if player not in game.bancho.player.spectators:
         return
-    
+
     game.bancho.player.spectators.remove(player)
 
     game.events.call(
@@ -401,8 +401,8 @@ def fellow_spectator_left(stream: StreamIn, game: Game):
     
     if player not in game.bancho.spectating.spectators:
         return
-    
-    game.bancho.player.spectators.remove(player)
+
+    game.bancho.spectating.spectators.remove(player)
 
     game.events.call(
         ServerPackets.SPECTATOR_LEFT,
@@ -440,9 +440,6 @@ def cant_spectate(stream: StreamIn, game: Game):
 
     if not (player := game.bancho.players.by_id(user_id)):
         game.bancho.request_presence([user_id])
-        return
-    
-    if player not in game.bancho.spectating.spectators:
         return
     
     player.cant_spectate = True
