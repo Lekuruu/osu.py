@@ -1,2 +1,0 @@
-
-from .osu import *
