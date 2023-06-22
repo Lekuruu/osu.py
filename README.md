@@ -30,7 +30,7 @@ game = Game(
 
 # Simple message handler
 @game.events.register(ServerPackets.SEND_MESSAGE)
-def on_message(sender, message target):
+def on_message(sender, message, target):
   if message.startswith('!ping'):
     sender.send_message('pong!')
 
