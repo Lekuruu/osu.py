@@ -1,33 +1,24 @@
 
-from setuptools import setup, find_packages
-import os
+import setuptools
 
-here = os.path.abspath(os.path.dirname(__file__))
-
-with open(os.path.join(here, "README.md")) as f:
-    long_description = "\n" + f.read()
-
-with open(os.path.join(here, "requirements.txt")) as f:
-    requirements = f.read().split('\n')
-
-version = '0.1.0'
-description = 'A python library that emulates the osu! stable client'
-
-setup(
+setuptools.setup(
     name="osu.py",
-    version=version,
-    author="Lekuru (Levi)",
-    description=description,
-    long_description=long_description,
-    long_description_content_type="text/markdown",
-    packages=find_packages(),
-    install_requires=requirements,
-    keywords=['python', 'osu', 'osugame', 'bancho'],
-    classifiers=[
-        "Intended Audience :: Developers",
-        "Programming Language :: Python :: 3",
-        "Operating System :: Unix",
-        "Operating System :: MacOS :: MacOS X",
-        "Operating System :: Microsoft :: Windows",
+    version='1.0.0',
+    author="Lekuru",
+    author_email='contact@lekuru.xyz',
+    description='A python library that emulates the osu! stable client',
+    long_description='osu.py is a python library that emulates part of the online functionality of the osu! stable client.',
+    packages=[
+        'osu'
+    ],
+    install_requires=[
+        'requests',
+        'psutil'
+    ],
+    keywords=[
+        'osu',
+        'osugame',
+        'python',
+        'bancho'
     ]
 )
