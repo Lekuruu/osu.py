@@ -14,6 +14,7 @@ Use this library at your own risk! I am not responsible for anything that can ha
 - [x] Sending/Receiving chat messages
 - [x] Up to 12 clients (Tournament Client)
 - [x] Spectating other players
+- [ ] Documentation
 - [ ] Multiplayer?
 
 ## Example
