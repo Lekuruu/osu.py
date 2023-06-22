@@ -38,3 +38,7 @@ def on_message(sender, message, target):
 # Run the game
 game.run()
 ```
+
+---
+
+If you have any questions, feel free to contact me on discord: `lekuru`
