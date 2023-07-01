@@ -31,6 +31,8 @@ python setup.py install
 
 ## Example
 
+Here is a small example of how to use this package:
+
 ```python
 from osu.constants import ServerPackets
 from osu import Game
@@ -50,6 +52,8 @@ def on_message(sender, message, target):
 # Run the game
 game.run()
 ```
+
+[This project](https://github.com/Lekuruu/osu-recorder) is also a good example.
 
 ---
 
