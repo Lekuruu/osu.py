@@ -74,7 +74,7 @@ jobs:
 
       - name: Run test script
         run: |
-          python .github/workflows/test.py
+          python test.py
 
   build:
     runs-on: ubuntu-latest
