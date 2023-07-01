@@ -77,6 +77,8 @@ jobs:
     needs: check
     if: github.event_name == 'push'
     steps:
+      - uses: actions/checkout@v2
+
       - name: Use Python 3.9
         uses: actions/setup-python@v1
         with:
