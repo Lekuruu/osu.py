@@ -1,18 +1,18 @@
-
 from typing import List, Dict, Callable
 
 from .bancho.constants import ServerPackets
+
 
 class EventHandler:
 
     """EventHandler
     ---------------
-    
+
     This class is used to make it easier to handle packets.
 
-    After a packet has been received from the server, 
+    After a packet has been received from the server,
     it will call every event associated with that packet.
-    
+
     Example of how a event can be registered and used:
     >>> game = Game(...)
     >>>
@@ -31,6 +31,7 @@ class EventHandler:
             else:
                 self.handlers[packet] = [f]
             return f
+
         return wrapper
 
     def call(self, packet: ServerPackets, *args):

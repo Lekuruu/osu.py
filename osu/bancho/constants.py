@@ -1,6 +1,6 @@
-
-from enum   import IntEnum, Enum
+from enum import IntEnum, Enum
 from typing import List
+
 
 class ClientPackets(IntEnum):
     CHANGE_ACTION = 0
@@ -55,6 +55,7 @@ class ClientPackets(IntEnum):
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.value})>"
+
 
 class ServerPackets(IntEnum):
     USER_ID = 5
@@ -120,44 +121,47 @@ class ServerPackets(IntEnum):
     def __repr__(self) -> str:
         return f"<{self.name} ({self.value})>"
 
+
 class LoginError(Enum):
     AUTHENTICATION_ERROR = -1
-    UPDATE_NEEDED        = -2
-    RESTRICTED           = -3
-    NOT_ACTIVATED        = -4
-    SERVER_ERROR         = -5
-    NEED_SUPPORTER       = -6
-    PASSWORD_RESET       = -7
-    VERIFICATION_NEEDED  = -8
+    UPDATE_NEEDED = -2
+    RESTRICTED = -3
+    NOT_ACTIVATED = -4
+    SERVER_ERROR = -5
+    NEED_SUPPORTER = -6
+    PASSWORD_RESET = -7
+    VERIFICATION_NEEDED = -8
 
     @property
     def description(self) -> str:
         return {
-            LoginError.AUTHENTICATION_ERROR: 'Authentication failed. Please check your username/password!',
-            LoginError.UPDATE_NEEDED: 'It seems like this version of osu! is too old. Please check for any updates!',
-            LoginError.RESTRICTED: 'You are banned.',
-            LoginError.NOT_ACTIVATED: 'Your account was either restricted or is not activated.',
-            LoginError.SERVER_ERROR: 'A server error occured.',
-            LoginError.NEED_SUPPORTER: 'You need to be a supporter to use tourney clients.',
-            LoginError.PASSWORD_RESET: 'Your account password has been reset.',
-            LoginError.VERIFICATION_NEEDED: ''
+            LoginError.AUTHENTICATION_ERROR: "Authentication failed. Please check your username/password!",
+            LoginError.UPDATE_NEEDED: "It seems like this version of osu! is too old. Please check for any updates!",
+            LoginError.RESTRICTED: "You are banned.",
+            LoginError.NOT_ACTIVATED: "Your account was either restricted or is not activated.",
+            LoginError.SERVER_ERROR: "A server error occured.",
+            LoginError.NEED_SUPPORTER: "You need to be a supporter to use tourney clients.",
+            LoginError.PASSWORD_RESET: "Your account password has been reset.",
+            LoginError.VERIFICATION_NEEDED: "",
         }[self]
 
+
 class StatusAction(Enum):
-    Idle         = 0
-    Afk          = 1
-    Playing      = 2
-    Editing      = 3
-    Modding      = 4
-    Multiplayer  = 5
-    Watching     = 6
-    Unknown      = 7
-    Testing      = 8
-    Submitting   = 9
-    Paused       = 10
-    Lobby        = 11
+    Idle = 0
+    Afk = 1
+    Playing = 2
+    Editing = 3
+    Modding = 4
+    Multiplayer = 5
+    Watching = 6
+    Unknown = 7
+    Testing = 8
+    Submitting = 9
+    Paused = 10
+    Lobby = 11
     Multiplaying = 12
-    OsuDirect    = 13
+    OsuDirect = 13
+
 
 class Mods(Enum):
     NoMods = 0
@@ -208,14 +212,15 @@ class Mods(Enum):
     def list(cls, values: int):
         return [mod for mod in Mods if cls.check_active(values, mod.value)]
 
+
 class Privileges(Enum):
-    Restriced     = 0
-    Normal        = 1
-    BAT           = 2
-    Supporter     = 4
-    Peppy         = 8
-    Admin         = 16
-    Tournament    = 32
+    Restriced = 0
+    Normal = 1
+    BAT = 2
+    Supporter = 4
+    Peppy = 8
+    Admin = 16
+    Tournament = 32
 
     @classmethod
     def pack(cls, values: List[Enum]):
@@ -229,13 +234,14 @@ class Privileges(Enum):
     def list(cls, values: int):
         return [p for p in Privileges if cls.check_active(values, p.value)]
 
+
 class ButtonState(Enum):
     NoButtons = 0
-    Left1     = 1
-    Right1    = 2
-    Left2     = 4
-    Right2    = 8
-    Smoke     = 16
+    Left1 = 1
+    Right1 = 2
+    Left2 = 4
+    Right2 = 8
+    Smoke = 16
 
     @classmethod
     def pack(cls, values: List[Enum]):
@@ -249,36 +255,40 @@ class ButtonState(Enum):
     def list(cls, values: int):
         return [b for b in ButtonState if cls.check_active(values, b.value)]
 
+
 class Mode(Enum):
     Osu = 0
     Taiko = 1
     CatchTheBeat = 2
     OsuMania = 3
 
+
 class ReplayAction(Enum):
-    Standard      = 0
-    NewSong       = 1
-    Skip          = 2
-    Completion    = 3
-    Fail          = 4
-    Pause         = 5
-    Unpause       = 6
-    SongSelect    = 7
+    Standard = 0
+    NewSong = 1
+    Skip = 2
+    Completion = 3
+    Fail = 4
+    Pause = 5
+    Unpause = 6
+    SongSelect = 7
     WatchingOther = 8
+
 
 class PresenceFilter(Enum):
     NoPlayers = 0
     All = 1
     Friends = 2
 
+
 class Grade(Enum):
     XH = 0
     SH = 1
-    X  = 2
-    S  = 3
-    A  = 4
-    B  = 5
-    C  = 6
-    D  = 7
-    F  = 8
-    N  = 9
+    X = 2
+    S = 3
+    A = 4
+    B = 5
+    C = 6
+    D = 7
+    F = 8
+    N = 9

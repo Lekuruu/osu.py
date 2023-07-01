@@ -1,20 +1,20 @@
-
 from typing import Optional, List
 from datetime import datetime
 from copy import copy
 
 from ..objects.collections import Players, Channels
-from ..objects.player      import Player
-from ..objects.status      import Status
+from ..objects.player import Player
+from ..objects.status import Status
 
 from ..game import Game
 
 from .constants import ClientPackets, Privileges, StatusAction
-from .streams   import StreamOut
+from .streams import StreamOut
 
 import requests
 import logging
 import time
+
 
 class BanchoClient:
 
@@ -39,7 +39,7 @@ class BanchoClient:
         `connected`: bool
 
         `retry`: bool
-    
+
     Functions:
         `enqueue`: Send a bancho packet to the server
 
@@ -63,32 +63,32 @@ class BanchoClient:
     def __init__(self, game: Game) -> None:
         self.game = game
 
-        self.logger = logging.getLogger(f'bancho-{game.version}')
+        self.logger = logging.getLogger(f"bancho-{game.version}")
 
-        self.domain = f'c.{game.server}'
-        self.url = f'https://{self.domain}'
+        self.domain = f"c.{game.server}"
+        self.url = f"https://{self.domain}"
 
         self.session = requests.Session()
         self.session.headers = {
-            'osu-version': self.game.version,
-            'Accept-Encoding': 'gzip, deflate',
-            'User-Agent': 'osu!',
-            'Host': self.domain,
+            "osu-version": self.game.version,
+            "Accept-Encoding": "gzip, deflate",
+            "User-Agent": "osu!",
+            "Host": self.domain,
         }
 
         self.user_id = -1
         self.connected = False
         self.retry = True
-        self.token = ''
+        self.token = ""
 
         self.spectating: Optional[Player] = None
-        self.player:     Optional[Player] = None
+        self.player: Optional[Player] = None
 
         self.channels = Channels()
         self.players = Players(game)
 
         self.ping_count = 0
-        self.protocol   = 0
+        self.protocol = 0
 
         self.privileges: List[Privileges] = []
         self.friends: List[int] = []
@@ -109,7 +109,7 @@ class BanchoClient:
         if not self.player:
             return Status()
         return self.player.status
-    
+
     @property
     def idle_time(self) -> float:
         """Time between now and the last request"""
@@ -134,7 +134,7 @@ class BanchoClient:
         interval = min(self.max_idletime, max(self.min_idletime, interval))
 
         return interval
-    
+
     def run(self):
         self.connect()
 
@@ -143,32 +143,34 @@ class BanchoClient:
             time.sleep(self.request_interval)
 
         if self.retry:
-            self.logger.error('Retrying in 15 seconds...')
+            self.logger.error("Retrying in 15 seconds...")
             time.sleep(15)
             self.game.run(retry=True)
 
     def connect(self):
-        data = f'{self.game.username}\r\n{self.game.password_hash}\r\n{self.game.client}\r\n'
+        data = f"{self.game.username}\r\n{self.game.password_hash}\r\n{self.game.client}\r\n"
 
         response = self.session.post(self.url, data=data)
 
         if not response.ok:
             self.connected = False
             self.retry = True
-            self.logger.error(f'[{response.url}]: Connection was refused ({response.status_code})')
+            self.logger.error(
+                f"[{response.url}]: Connection was refused ({response.status_code})"
+            )
             return
-        
-        if not (token := response.headers.get('cho-token')):
+
+        if not (token := response.headers.get("cho-token")):
             # Failed to get token
             self.connected = False
-            self.retry     = False
+            self.retry = False
             self.game.packets.data_received(response.content, self.game)
             return
-        
+
         self.connected = True
         self.token = token
 
-        self.session.headers['osu-token'] = self.token
+        self.session.headers["osu-token"] = self.token
 
         self.game.packets.data_received(response.content, self.game)
 
@@ -177,7 +179,7 @@ class BanchoClient:
 
         if not self.connected:
             return
-        
+
         if not self.queue:
             # Queue is empty, sending ping
             self.ping()
@@ -186,7 +188,7 @@ class BanchoClient:
             self.ping_count = 0
 
         queue = copy(self.queue)
-        data  = b''.join(queue)
+        data = b"".join(queue)
 
         response = self.session.post(self.url, data=data)
 
@@ -196,7 +198,9 @@ class BanchoClient:
         if not response.ok:
             self.connected = False
             self.retry = True
-            self.logger.error(f'[{response.request.url}]: Connection was refused ({response.status_code})')
+            self.logger.error(
+                f"[{response.request.url}]: Connection was refused ({response.status_code})"
+            )
             return
 
         self.fast_read = False
@@ -209,14 +213,11 @@ class BanchoClient:
     def exit(self):
         """Send logout packet to bancho, and disconnect."""
 
-        self.enqueue(
-            ClientPackets.LOGOUT, 
-            int(0).to_bytes(4, 'little')
-        )
+        self.enqueue(ClientPackets.LOGOUT, int(0).to_bytes(4, "little"))
         self.connected = False
-        self.retry     = False
+        self.retry = False
 
-    def enqueue(self, packet: ClientPackets, data: bytes = b'', dequeue=True) -> bytes:
+    def enqueue(self, packet: ClientPackets, data: bytes = b"", dequeue=True) -> bytes:
         """Send a packet to the queue and dequeue"""
 
         stream = StreamOut()
@@ -244,7 +245,7 @@ class BanchoClient:
         self.player.silenced = False
         self.silenced = False
 
-        self.logger.info('You can now talk again.')
+        self.logger.info("You can now talk again.")
 
     def ping(self):
         self.enqueue(ClientPackets.PING)
@@ -263,7 +264,7 @@ class BanchoClient:
 
     def request_status(self):
         self.enqueue(ClientPackets.REQUEST_STATUS_UPDATE)
-    
+
     def update_status(self):
         if not self.player:
             return
@@ -284,8 +285,8 @@ class BanchoClient:
 
         self.enqueue(
             ClientPackets.START_SPECTATING,
-            int(target.id).to_bytes(4, 'little'),
-            dequeue=False
+            int(target.id).to_bytes(4, "little"),
+            dequeue=False,
         )
 
         self.spectating = target
@@ -293,11 +294,11 @@ class BanchoClient:
         target.request_presence()
         target.request_stats()
 
-        self.status.action     = StatusAction.Watching
-        self.status.text       = target.status.text
-        self.status.checksum   = target.status.checksum
-        self.status.mods       = target.status.mods
-        self.status.mode       = target.status.mode
+        self.status.action = StatusAction.Watching
+        self.status.text = target.status.text
+        self.status.checksum = target.status.checksum
+        self.status.mods = target.status.mods
+        self.status.mode = target.status.mode
         self.status.beatmap_id = target.status.beatmap_id
 
         self.update_status()
@@ -306,7 +307,7 @@ class BanchoClient:
         if not self.spectating:
             return
 
-        self.logger.info(f'Stopped spectating {self.spectating.name}.')
+        self.logger.info(f"Stopped spectating {self.spectating.name}.")
 
         self.enqueue(ClientPackets.STOP_SPECTATING, dequeue=False)
 
@@ -317,7 +318,7 @@ class BanchoClient:
         self.enqueue(ClientPackets.CANT_SPECTATE)
 
     def send_frames(self):
-        raise NotImplementedError # TODO
+        raise NotImplementedError  # TODO
 
     def join_lobby(self):
         if self.in_lobby:
@@ -334,4 +335,4 @@ class BanchoClient:
         self.in_lobby = True
 
     def set_away_message(self, message: str):
-        raise NotImplementedError # TODO
+        raise NotImplementedError  # TODO

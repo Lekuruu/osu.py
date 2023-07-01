@@ -1,8 +1,8 @@
-
-from ..bancho.streams   import StreamIn
+from ..bancho.streams import StreamIn
 from ..bancho.constants import Grade
 
 from dataclasses import dataclass
+
 
 @dataclass
 class BeatmapInfo:
@@ -29,5 +29,5 @@ class BeatmapInfo:
             Grade(stream.u8()),
             Grade(stream.u8()),
             Grade(stream.u8()),
-            stream.string()
+            stream.string(),
         )

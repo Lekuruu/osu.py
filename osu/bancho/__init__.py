@@ -1,5 +1,4 @@
-
-from .client  import BanchoClient
+from .client import BanchoClient
 from .packets import Packets
 
 from . import constants

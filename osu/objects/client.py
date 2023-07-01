@@ -1,4 +1,3 @@
-
 from typing import List, Optional
 from dateutil.tz import tzlocal
 from datetime import datetime
@@ -6,6 +5,7 @@ from datetime import datetime
 import platform
 import hashlib
 import psutil
+
 
 class ClientHash:
 
@@ -24,20 +24,27 @@ class ClientHash:
         self.executable_hash = executable_hash
 
     def __repr__(self) -> str:
-        return f'{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:'
+        return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
 
     @property
     def adapters(self) -> List[str]:
-        return [psutil.net_if_addrs()[adapter][0].address for adapter in psutil.net_if_addrs()]
+        return [
+            psutil.net_if_addrs()[adapter][0].address
+            for adapter in psutil.net_if_addrs()
+        ]
 
     @property
     def adapter_string(self) -> str:
-        if platform.system() in ['Linux', 'Darwin']:
-            return 'runningunderwine'
+        if platform.system() in ["Linux", "Darwin"]:
+            return "runningunderwine"
 
-        adapters = [adapter.replace('-', '') for adapter in self.adapters if adapter.count('-') == 5]
-        adapters.insert(3, '')
-        return '.'.join(adapters)
+        adapters = [
+            adapter.replace("-", "")
+            for adapter in self.adapters
+            if adapter.count("-") == 5
+        ]
+        adapters.insert(3, "")
+        return ".".join(adapters)
 
     @property
     def adapter_hash(self) -> str:
@@ -45,11 +52,12 @@ class ClientHash:
 
     @property
     def uninstall_id(self) -> str:
-        return hashlib.md5(b'unknown').hexdigest() # TODO
+        return hashlib.md5(b"unknown").hexdigest()  # TODO
 
     @property
     def disk_signature(self) -> str:
-        return hashlib.md5(b'unknown').hexdigest() # TODO
+        return hashlib.md5(b"unknown").hexdigest()  # TODO
+
 
 class ClientInfo:
 
@@ -89,17 +97,15 @@ class ClientInfo:
         self.display_city = False
 
         self.utc_offset = round(
-            datetime.now(
-                tzlocal()
-            ).utcoffset().total_seconds() / 3600
+            datetime.now(tzlocal()).utcoffset().total_seconds() / 3600
         )
 
     def __repr__(self) -> str:
-        return f'{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}'
-    
+        return f"{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}"
+
     @classmethod
     def get_file_hash(cls, updates: dict) -> Optional[str]:
         for file in updates:
-            if file['filename'] == 'osu!.exe':
-                return file['file_hash']
+            if file["filename"] == "osu!.exe":
+                return file["file_hash"]
         return None

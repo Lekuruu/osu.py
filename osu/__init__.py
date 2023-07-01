@@ -1,4 +1,3 @@
-
 from .bancho.client import BanchoClient
 from .api.client import WebAPI
 from .game import Game

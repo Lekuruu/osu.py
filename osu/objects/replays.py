@@ -1,9 +1,9 @@
-
 from dataclasses import dataclass
 from typing import List
 
 from ..bancho.constants import ButtonState
 from ..bancho.streams import StreamIn
+
 
 @dataclass
 class ReplayFrame:
@@ -25,12 +25,8 @@ class ReplayFrame:
         y = stream.float()
         time = stream.s32()
 
-        return ReplayFrame(
-            button_state,
-            time,
-            x,
-            y
-        )
+        return ReplayFrame(button_state, time, x, y)
+
 
 @dataclass
 class ScoreFrame:
@@ -75,5 +71,5 @@ class ScoreFrame:
             stream.u8(),
             v2 := stream.bool(),
             stream.float() if v2 else 0.0,
-            stream.float() if v2 else 0.0
+            stream.float() if v2 else 0.0,
         )
