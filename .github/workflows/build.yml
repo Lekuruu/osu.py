@@ -14,7 +14,7 @@ env:
   PROJECT_NAME: osu
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -72,10 +72,34 @@ jobs:
           path: dist
         if: matrix.python-version == 3.11
 
+  build:
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name == 'push'
+    steps:
+      - name: Download a distribution artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
+
+      - name: Use Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install setuptools
+
+      - name: Create local build
+        run: |
+          python setup.py build
+
   publish:
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push'
+    needs: [check, build]
+    if: github.event_name == 'release'
     steps:
       - name: Download a distribution artifact
         uses: actions/download-artifact@v2
