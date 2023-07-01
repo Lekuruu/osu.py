@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name="osu.py",
-    version="1.0.0",
+    name="osu",
+    version="1.0.2",
     author="Lekuru",
     author_email="contact@lekuru.xyz",
     description="A python library that emulates the osu! stable client",
