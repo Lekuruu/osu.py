@@ -11,7 +11,7 @@ on:
       - "*"
 
 env:
-  PROJECT_NAME: osu.py
+  PROJECT_NAME: osu
 
 jobs:
   build:
