@@ -72,6 +72,10 @@ jobs:
           path: dist
         if: matrix.python-version == 3.11
 
+      - name: Run test script
+        run: |
+          python .github/workflows/test.py
+
   build:
     runs-on: ubuntu-latest
     needs: check
