@@ -8,6 +8,18 @@ This is still a work in progress, but I decided to release it anyways.
 **IMPORTANT:**
 Use this library at your own risk! I am not responsible for anything that can happen to your account. If you want to test it out on a private server, you can set the `server` attribute when initializing the client.
 
+You can install this package with pip:
+```shell
+pip install osu
+```
+
+Or build it manually:
+```shell
+git clone https://github.com/Lekuruu/osu.py.git
+cd osu.py
+python setup.py install
+```
+
 ## Features
 
 - [x] Receiving player stats
@@ -15,7 +27,7 @@ Use this library at your own risk! I am not responsible for anything that can ha
 - [x] Up to 12 clients (Tournament Client)
 - [x] Spectating other players
 - [ ] Documentation
-- [ ] Multiplayer?
+- [ ] Multiplayer
 
 ## Example
 
