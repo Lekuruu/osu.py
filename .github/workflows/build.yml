@@ -77,12 +77,6 @@ jobs:
     needs: check
     if: github.event_name == 'push'
     steps:
-      - name: Download a distribution artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: build
-          path: build
-
       - name: Use Python 3.9
         uses: actions/setup-python@v1
         with:
@@ -95,6 +89,12 @@ jobs:
       - name: Create local build
         run: |
           python setup.py build
+
+      - name: Download build folder
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: build
 
   publish:
     runs-on: ubuntu-latest
