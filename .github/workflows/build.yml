@@ -94,9 +94,10 @@ jobs:
 
       - name: Download build folder
         uses: actions/download-artifact@v2
+        if: always()
         with:
           name: build
-          path: build
+          path: osu.py/build
 
   publish:
     runs-on: ubuntu-latest
