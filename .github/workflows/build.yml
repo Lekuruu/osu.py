@@ -92,12 +92,13 @@ jobs:
         run: |
           pip install twine
 
-      # - name: Publish distribution 📦 to Test PyPI
-      #   run: |
-      #     twine upload -r testpypi dist/*
-      #   env:
-      #     TWINE_USERNAME: __token__
-      #     TWINE_PASSWORD: ${{ secrets.test_pypi_password }}
+      - name: Publish distribution 📦 to Test PyPI
+        run: |
+          twine upload -r testpypi dist/*
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.test_pypi_password }}
+          PROJECT_NAME: osu.py
 
       - name: Publish distribution 📦 to PyPI
         run: |
