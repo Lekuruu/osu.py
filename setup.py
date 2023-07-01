@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="osu",
-    version="1.0.3",
+    version="1.0.4",
     author="Lekuru",
     author_email="contact@lekuru.xyz",
     description="A python library that emulates the osu! stable client",
