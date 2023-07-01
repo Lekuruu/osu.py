@@ -167,7 +167,7 @@ class Game:
         # Parse url (e.g.: https://osu.ppy.sh/home/changelog/stable40/20230326)
         version = response.url.removesuffix("/").split("/")[-1]
 
-        if not version.replace('.', '').isdigit():
+        if not version.replace(".", "").isdigit():
             self.logger.error(
                 f'Failed to get client version ("{version}" is not an integer).'
             )
