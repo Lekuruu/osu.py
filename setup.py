@@ -10,7 +10,7 @@ setuptools.setup(
     author_email="contact@lekuru.xyz",
     description="A python library that emulates the osu! stable client",
     long_description=long_description,
-    packages=["osu"],
+    packages=["osu", "osu/api", "osu/bancho", "osu/objects"],
     install_requires=["requests", "psutil", "python-dateutil"],
     keywords=["osu", "osugame", "python", "bancho"],
 )
