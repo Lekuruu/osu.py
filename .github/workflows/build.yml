@@ -92,12 +92,11 @@ jobs:
         run: |
           python setup.py build
 
-      - name: Download build folder
-        uses: actions/download-artifact@v2
-        if: always()
+      - name: Upload build folder
+        uses: actions/upload-artifact@master
         with:
           name: build
-          path: osu.py/build
+          path: build
 
   publish:
     runs-on: ubuntu-latest
