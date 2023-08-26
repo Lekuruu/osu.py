@@ -25,6 +25,9 @@ class WebAPI:
         - `get_star_rating`
         - `get_favourites`
         - `get_comments`
+        - `post_comment`
+        - `get_replay`
+        - `get_avatar`
     """
 
     def __init__(self, game: Game) -> None:
