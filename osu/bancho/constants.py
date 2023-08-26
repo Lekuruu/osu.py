@@ -1,4 +1,4 @@
-from enum import IntEnum, Enum
+from enum import IntEnum, Enum, IntFlag
 from typing import List
 
 
@@ -163,57 +163,56 @@ class StatusAction(Enum):
     OsuDirect = 13
 
 
-class Mods(Enum):
-    NoMods = 0
-    NoFail = 1
-    Easy = 2
-    TouchDevice = 4
-    Hidden = 8
-    HardRock = 16
-    SuddenDeath = 32
-    DoubleTime = 64
-    Relax = 128
-    HalfTime = 256
-    Nightcore = 512
-    Flashlight = 1024
-    Autoplay = 2048
-    SpunOut = 4096
-    Relax2 = 8192
-    Perfect = 16384
-    Key4 = 32768
-    Key5 = 65536
-    Key6 = 131072
-    Key7 = 262144
-    Key8 = 524288
-    FadeIn = 1048576
-    Random = 2097152
-    Cinema = 4194304
-    Target = 8388608
-    Key9 = 16777216
-    KeyCoop = 33554432
-    Key1 = 67108864
-    Key3 = 134217728
-    Key2 = 268435456
-    ScoreV2 = 536870912
-    LastMod = 1073741824
-    KeyMod = 521109504
-    FreeModAllowed = 522171579
-    ScoreIncreaseMods = 1049688
+class Mods(IntFlag):
+    NoMod = 0
+    NoFail = 1 << 0
+    Easy = 1 << 1
+    NoVideo = 1 << 2
+    Hidden = 1 << 3
+    HardRock = 1 << 4
+    SuddenDeath = 1 << 5
+    DoubleTime = 1 << 6
+    Relax = 1 << 7
+    HalfTime = 1 << 8
+    Nightcore = 1 << 9
+    Flashlight = 1 << 10
+    Autoplay = 1 << 11
+    SpunOut = 1 << 12
+    Relax2 = 1 << 13
+    Perfect = 1 << 14
+    Key4 = 1 << 15
+    Key5 = 1 << 16
+    Key6 = 1 << 17
+    Key7 = 1 << 18
+    Key8 = 1 << 19
+    FadeIn = 1 << 20
+    Random = 1 << 21
+    Cinema = 1 << 22
+    Target = 1 << 23
+    Key9 = 1 << 24
+    KeyCoop = 1 << 25
+    Key1 = 1 << 26
+    Key3 = 1 << 27
+    Key2 = 1 << 28
+    LastMod = 1 << 29
+    KeyMod = Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop
+    FreeModAllowed = (  # black formatting be like
+        NoFail
+        | Easy
+        | Hidden
+        | HardRock
+        | SuddenDeath
+        | Flashlight
+        | FadeIn
+        | Relax
+        | Relax2
+        | SpunOut
+        | KeyMod
+    )
+    ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
 
-    @classmethod
-    def pack(cls, values: List[Enum]):
-        return sum([mod.value for mod in values])
 
-    @classmethod
-    def check_active(cls, values: int, mod: int):
-        return (values & mod) > 0
-
-    @classmethod
-    def list(cls, values: int):
-        return [mod for mod in Mods if cls.check_active(values, mod.value)]
-
-
-class Privileges(Enum):
+class Privileges(IntFlag):
     Restriced = 0
     Normal = 1
     BAT = 2
@@ -222,38 +221,14 @@ class Privileges(Enum):
     Admin = 16
     Tournament = 32
 
-    @classmethod
-    def pack(cls, values: List[Enum]):
-        return sum([p.value for p in values])
 
-    @classmethod
-    def check_active(cls, values: int, p: int):
-        return (values & p) > 0
-
-    @classmethod
-    def list(cls, values: int):
-        return [p for p in Privileges if cls.check_active(values, p.value)]
-
-
-class ButtonState(Enum):
+class ButtonState(IntFlag):
     NoButtons = 0
     Left1 = 1
     Right1 = 2
     Left2 = 4
     Right2 = 8
     Smoke = 16
-
-    @classmethod
-    def pack(cls, values: List[Enum]):
-        return sum([b.value for b in values])
-
-    @classmethod
-    def check_active(cls, values: int, b: int):
-        return (values & b) > 0
-
-    @classmethod
-    def list(cls, values: int):
-        return [b for b in ButtonState if cls.check_active(values, b.value)]
 
 
 class Mode(Enum):

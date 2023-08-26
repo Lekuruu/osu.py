@@ -132,7 +132,7 @@ def restricted(stream: StreamIn, game: Game):
 
 @Packets.register(ServerPackets.PRIVILEGES)
 def privileges(stream: StreamIn, game: Game):
-    game.bancho.privileges = Privileges.list(stream.s32())
+    game.bancho.privileges = Privileges(stream.s32())
     game.events.call(ServerPackets.PRIVILEGES, game.bancho.privileges)
 
 
@@ -186,7 +186,7 @@ def presence(stream: StreamIn, game: Game):
 
     b = stream.u8()  # Contains privileges and play mode
 
-    player.privileges = Privileges.list(b & -255)
+    player.privileges = Privileges(b & -255)
     player.mode = Mode(max(0, min(3, (b & 224) >> 5)))
 
     player.longitude = stream.float()
@@ -213,7 +213,7 @@ def stats(stream: StreamIn, game: Game):
     player.status.action = StatusAction(stream.u8())
     player.status.text = stream.string()
     player.status.checksum = stream.string()
-    player.status.mods = Mods.list(stream.u32())
+    player.status.mods = Mods(stream.u32())
     player.status.mode = Mode(max(0, min(3, stream.u8())))
     player.status.beatmap_id = stream.s32()
 

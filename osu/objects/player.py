@@ -29,7 +29,7 @@ class Player:
         self.rank = 0
         self.pp = 0
 
-        self.privileges: List[Privileges] = []
+        self.privileges: Privileges = Privileges.Normal
         self.spectators: Set[Player] = set()
 
         self.cant_spectate = False

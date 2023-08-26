@@ -7,19 +7,19 @@ from ..bancho.streams import StreamIn
 
 @dataclass
 class ReplayFrame:
-    button_state: List[ButtonState]
+    button_state: ButtonState
     time: int
     x: float
     y: float
 
     @classmethod
     def decode(cls, stream: StreamIn):
-        button_state = ButtonState.list(stream.u8())
+        button_state = ButtonState(stream.u8())
 
-        # idk what this does tbh
+        # "Taiko-Byte"
         if stream.s8() > 0:
             if ButtonState.Right1 not in button_state:
-                button_state.append(ButtonState.Right1)
+                button_state |= ButtonState.Right1
 
         x = stream.float()
         y = stream.float()

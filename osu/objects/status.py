@@ -9,7 +9,7 @@ class Status:
     action: StatusAction = StatusAction.Idle
     text: str = ""
     checksum: str = ""
-    mods: List[Mods] = field(default_factory=list)  # = []
+    mods: Mods = Mods.NoMod
     mode: Mode = Mode.Osu
     beatmap_id: int = 0
 

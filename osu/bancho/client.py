@@ -30,7 +30,7 @@ class BanchoClient:
 
         `channels`: osu.objects.Channels
 
-        `privileges`: list[osu.bancho.constants.Privileges]
+        `privileges`: osu.bancho.constants.Privileges
 
         `friends`: list[int]
 
@@ -90,7 +90,7 @@ class BanchoClient:
         self.ping_count = 0
         self.protocol = 0
 
-        self.privileges: List[Privileges] = []
+        self.privileges: Privileges = Privileges.Normal
         self.friends: List[int] = []
 
         self.last_action = datetime.now().timestamp()
