@@ -73,7 +73,7 @@ class BanchoClient:
             "osu-version": self.game.version,
             "Accept-Encoding": "gzip, deflate",
             "User-Agent": "osu!",
-            "Host": self.domain
+            "Host": self.domain,
         }
 
         self.user_id = -1
