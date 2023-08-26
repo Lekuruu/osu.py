@@ -178,7 +178,7 @@ class Mods(IntFlag):
     Flashlight = 1 << 10
     Autoplay = 1 << 11
     SpunOut = 1 << 12
-    Relax2 = 1 << 13
+    Autopilot = 1 << 13
     Perfect = 1 << 14
     Key4 = 1 << 15
     Key5 = 1 << 16
@@ -194,9 +194,11 @@ class Mods(IntFlag):
     Key1 = 1 << 26
     Key3 = 1 << 27
     Key2 = 1 << 28
-    LastMod = 1 << 29
+    ScoreV2 = 1 << 29
+    LastMod = 1 << 30
+    ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
     KeyMod = Key1 | Key2 | Key3 | Key4 | Key5 | Key6 | Key7 | Key8 | Key9 | KeyCoop
-    FreeModAllowed = (  # black formatting be like
+    FreeModAllowed = (  # black coding style be like
         NoFail
         | Easy
         | Hidden
@@ -205,11 +207,58 @@ class Mods(IntFlag):
         | Flashlight
         | FadeIn
         | Relax
-        | Relax2
+        | Autopilot
         | SpunOut
         | KeyMod
     )
-    ScoreIncreaseMods = Hidden | HardRock | DoubleTime | Flashlight | FadeIn
+
+    @property
+    def members(self) -> list:
+        return [flag for flag in Mods if self & flag]
+
+    @property
+    def acronyms(self) -> List[str]:
+        return [
+            {
+                Mods.NoFail: "NF",
+                Mods.Easy: "EZ",
+                Mods.Hidden: "HD",
+                Mods.HardRock: "HR",
+                Mods.SuddenDeath: "SD",
+                Mods.DoubleTime: "DT",
+                Mods.Relax: "Relax",
+                Mods.HalfTime: "HT",
+                Mods.Nightcore: "NC",
+                Mods.Flashlight: "FL",
+                Mods.SpunOut: "SO",
+                Mods.Autopilot: "AP",
+                Mods.Perfect: "PF",
+                Mods.Key1: "K1",
+                Mods.Key2: "K2",
+                Mods.Key3: "K3",
+                Mods.Key4: "K4",
+                Mods.Key5: "K5",
+                Mods.Key6: "K6",
+                Mods.Key7: "K7",
+                Mods.Key8: "K8",
+                Mods.KeyCoop: "2P",
+                Mods.FadeIn: "FI",
+                Mods.Random: "RD",
+                Mods.ScoreV2: "ScoreV2",
+                Mods.Cinema: "Cinema",
+                Mods.Autoplay: "Auto",
+                Mods.Target: "TP",
+            }[mod]
+            for mod in self.members
+            if mod
+            not in [
+                Mods.ScoreIncreaseMods,
+                Mods.FreeModAllowed,
+                Mods.LastMod,
+                Mods.KeyMod,
+                Mods.NoMod,
+            ]
+        ]
 
 
 class Privileges(IntFlag):

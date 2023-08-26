@@ -195,3 +195,22 @@ class WebAPI:
             return
 
         return ScoreResponse.from_string(response.text, mode)
+
+    def get_star_rating(
+        self, beatmap_id: int, mode: Mode = Mode.Osu, mods: Mods = Mods.NoMod
+    ) -> float:
+        """Get star rating of a beatmap"""
+
+        response = self.session.post(
+            f"{self.url}/difficulty-rating",
+            json={
+                "beatmap_id": beatmap_id,
+                "ruleset_id": mode.value,
+                "mods": [{"acronym": acronym} for acronym in mods.acronyms],
+            },
+        )
+
+        if not response.ok:
+            return 0.0
+
+        return float(response.text)
