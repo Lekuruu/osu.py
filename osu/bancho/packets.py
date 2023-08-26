@@ -419,7 +419,7 @@ def channel_info(stream: StreamIn, game: Game):
     topic = stream.string()
 
     if not (c := game.bancho.channels.get(name)):
-        game.bancho.channels.add(c := Channel(name, topic, game))
+        game.bancho.channels.add(c := Channel(name, game, topic))
 
     c.user_count = stream.s16()
 
@@ -435,7 +435,7 @@ def channel_autojoin(stream: StreamIn, game: Game):
     topic = stream.string()
 
     if not (c := game.bancho.channels.get(name)):
-        game.bancho.channels.add(c := Channel(name, topic, game))
+        game.bancho.channels.add(c := Channel(name, game, topic))
 
     c.user_count = stream.s16()
     c.join_success()
