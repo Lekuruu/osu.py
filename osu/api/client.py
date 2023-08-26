@@ -1,7 +1,8 @@
 from typing import Callable, Optional, List
 
-from .constants import Mode, Mods, RankingType, SubmissionStatus
-from ..objects.score import Score, ScoreResponse
+from .constants import Mode, Mods, RankingType
+from ..objects.score import ScoreResponse
+from ..objects.comment import Comment
 from ..game import Game
 
 import requests
@@ -23,6 +24,7 @@ class WebAPI:
         - `get_scores`
         - `get_star_rating`
         - `get_favourites`
+        - `get_comments`
     """
 
     def __init__(self, game: Game) -> None:
@@ -231,3 +233,37 @@ class WebAPI:
         return [
             int(beatmap_id) for beatmap_id in response.text.split("\n") if beatmap_id
         ]
+
+    def get_comments(
+        self,
+        beatmap_id: Optional[int] = None,
+        set_id: Optional[int] = None,
+        replay_id: Optional[int] = None,
+        mode: Mode = Mode.Osu,
+    ) -> List:
+        """Get comments for a beatmap, set or replay"""
+
+        if all([beatmap_id is None, set_id is None, replay_id is None]):
+            return []
+
+        response = self.session.post(
+            f"{self.url}/web/osu-comment.php",
+            files={
+                "u": (None, self.game.username),
+                "p": (None, self.game.password_hash),
+                "b": (None, beatmap_id),
+                "s": (None, set_id),
+                "r": (None, replay_id),
+                "m": (None, mode.value),
+                "a": (None, "get"),
+            },
+        )
+
+        if not response.ok:
+            self.logger.error(f"Failed to fetch comments ({response.status_code})")
+            return []
+
+        if not response.text:
+            return []
+
+        return [Comment.from_string(line) for line in response.text.split("\n") if line]

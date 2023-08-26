@@ -1,6 +1,6 @@
 from ..bancho.constants import Mods, Mode
 
-from enum import IntEnum
+from enum import IntEnum, Enum
 
 
 class RankingType(IntEnum):
@@ -18,3 +18,9 @@ class SubmissionStatus(IntEnum):
     Ranked = 4
     Approved = 5
     Qualified = 6
+
+
+class CommentTarget(str, Enum):
+    Map = "map"
+    Song = "song"
+    Replay = "replay"
