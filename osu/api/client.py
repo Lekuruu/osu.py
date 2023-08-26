@@ -286,3 +286,8 @@ class WebAPI:
             return
 
         return response.content
+
+    def get_avatar(self, user_id: int) -> Optional[bytes]:
+        """Get avatar by user id"""
+
+        return self.session.get(f"https://a.{self.game.server}/{user_id}").content
