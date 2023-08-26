@@ -1,4 +1,5 @@
 from ..api.constants import SubmissionStatus, Mods, Mode
+from ..game import Game
 
 from typing import Optional, List
 from dataclasses import dataclass
@@ -49,9 +50,11 @@ class Score:
             lines[15] == "1",
         )
 
-        # TODO: Export Replay
-        # TODO: Get Comments
-        # TODO: Rank
+    def get_comments(self, game: Game):
+        return game.api.get_comments(replay_id=self.id, mode=self.mode)
+
+    # TODO: Export Replay
+    # TODO: Rank
 
 
 @dataclass
