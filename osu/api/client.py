@@ -1,6 +1,6 @@
 from typing import Callable, Optional, List
 
-from .constants import Mode, Mods, RankingType
+from .constants import Mode, Mods, RankingType, CommentTarget
 from ..objects.score import ScoreResponse
 from ..objects.comment import Comment
 from ..game import Game
@@ -267,6 +267,46 @@ class WebAPI:
             return []
 
         return [Comment.from_string(line) for line in response.text.split("\n") if line]
+
+    def post_comment(
+        self,
+        text: str,
+        time: int,
+        target: CommentTarget = CommentTarget.Map,
+        beatmap_id: Optional[int] = None,
+        replay_id: Optional[int] = None,
+        set_id: Optional[int] = None,
+        mode: Mode = Mode.Osu,
+    ) -> None:
+        """Post a comment to a map, song or replay"""
+
+        if all([beatmap_id is None, set_id is None, replay_id is None]):
+            return
+
+        target_id = {
+            CommentTarget.Map: beatmap_id,
+            CommentTarget.Song: set_id,
+            CommentTarget.Replay: replay_id,
+        }[target]
+
+        if target_id is None:
+            return
+
+        self.session.post(
+            f"{self.url}/web/osu-comment.php",
+            files={
+                "u": (None, self.game.username),
+                "p": (None, self.game.password_hash),
+                "b": (None, beatmap_id),
+                "s": (None, set_id),
+                "r": (None, replay_id),
+                "m": (None, mode.value),
+                "a": (None, "post"),
+                "starttime": (None, time),
+                "comment": (None, text),
+                "target": (None, target.value),
+            },
+        )
 
     def get_replay(self, replay_id: int, mode: Mode = Mode.Osu) -> Optional[bytes]:
         """Get raw replay data by id (not osr!)"""
