@@ -73,7 +73,7 @@ class BanchoClient:
             "osu-version": self.game.version,
             "Accept-Encoding": "gzip, deflate",
             "User-Agent": "osu!",
-            "Host": self.domain,
+            "Host": self.domain
         }
 
         self.user_id = -1
@@ -148,7 +148,7 @@ class BanchoClient:
             self.game.run(retry=True)
 
     def connect(self):
-        data = f"{self.game.username}\r\n{self.game.password_hash}\r\n{self.game.client}\r\n"
+        data = f"{self.game.username}\n{self.game.password_hash}\n{self.game.client}\n"
 
         response = self.session.post(self.url, data=data)
 
