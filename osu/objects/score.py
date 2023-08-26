@@ -53,8 +53,8 @@ class Score:
     def get_comments(self, game: Game):
         return game.api.get_comments(replay_id=self.id, mode=self.mode)
 
-    # TODO: Export Replay
-    # TODO: Rank
+    def get_replay(self, game: Game):
+        return game.api.get_replay(replay_id=self.id, mode=self.mode)
 
 
 @dataclass
