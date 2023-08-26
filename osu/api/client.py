@@ -21,6 +21,8 @@ class WebAPI:
         - `get_backgrounds`
         - `get_friends`
         - `get_scores`
+        - `get_star_rating`
+        - `get_favourites`
     """
 
     def __init__(self, game: Game) -> None:
@@ -214,3 +216,18 @@ class WebAPI:
             return 0.0
 
         return float(response.text)
+
+    def get_favourites(self) -> List[int]:
+        """Get your beatmap favourites"""
+
+        response = self.session.get(
+            f"{self.url}/web/osu-getfavourites.php",
+            params={"u": self.game.username, "h": self.game.password_hash},
+        )
+
+        if not response.ok:
+            return []
+
+        return [
+            int(beatmap_id) for beatmap_id in response.text.split("\n") if beatmap_id
+        ]
