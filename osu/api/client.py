@@ -156,8 +156,8 @@ class WebAPI:
         set_id: int,
         mode: Mode = Mode.Osu,
         mods: Optional[Mods] = Mods.NoMod,
-        rank_type = RankingType.Top,
-        skip_scores: bool = False
+        rank_type=RankingType.Top,
+        skip_scores: bool = False,
     ) -> Optional[ScoreResponse]:
         """Get top scores for a beatmap
 
