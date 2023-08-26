@@ -417,11 +417,13 @@ def cant_spectate(stream: StreamIn, game: Game):
 def channel_info(stream: StreamIn, game: Game):
     name = stream.string()
     topic = stream.string()
+    user_count = stream.s16()
 
     if not (c := game.bancho.channels.get(name)):
         game.bancho.channels.add(c := Channel(name, game, topic))
 
-    c.user_count = stream.s16()
+    c.user_count = user_count
+    c.topic = topic
 
     if c.name == "#osu" and not c.joined:
         c.join()
@@ -433,11 +435,13 @@ def channel_info(stream: StreamIn, game: Game):
 def channel_autojoin(stream: StreamIn, game: Game):
     name = stream.string()
     topic = stream.string()
+    user_count = stream.s16()
 
     if not (c := game.bancho.channels.get(name)):
         game.bancho.channels.add(c := Channel(name, game, topic))
 
-    c.user_count = stream.s16()
+    c.user_count = user_count
+    c.topic = topic
     c.join_success()
 
     game.events.call(ServerPackets.CHANNEL_AUTO_JOIN, c)
