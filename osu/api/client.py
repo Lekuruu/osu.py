@@ -267,3 +267,22 @@ class WebAPI:
             return []
 
         return [Comment.from_string(line) for line in response.text.split("\n") if line]
+
+    def get_replay(self, replay_id: int, mode: Mode = Mode.Osu) -> Optional[bytes]:
+        """Get raw replay data by id (not osr!)"""
+
+        response = self.session.get(
+            f"{self.url}/web/osu-getreplay.php",
+            params={
+                "u": self.game.username,
+                "h": self.game.password_hash,
+                "m": mode.value,
+                "c": replay_id,
+            },
+        )
+
+        if not response.ok:
+            self.logger.error(f"Failed to fetch replay ({response.status_code})")
+            return
+
+        return response.content
