@@ -1,5 +1,7 @@
 from typing import Callable, Optional, List
 
+from .constants import Mode, Mods, RankingType, SubmissionStatus
+from ..objects.score import Score, ScoreResponse
 from ..game import Game
 
 import requests
@@ -18,6 +20,7 @@ class WebAPI:
         - `get_session`
         - `get_backgrounds`
         - `get_friends`
+        - `get_scores`
     """
 
     def __init__(self, game: Game) -> None:
@@ -145,3 +148,48 @@ class WebAPI:
             return [int(id) for id in response.text.split("\n") if id.isdigit()]
 
         return []
+
+    def get_scores(
+        self,
+        beatmap_checksum: str,
+        beatmap_file: str,
+        set_id: int,
+        mode: Mode = Mode.Osu,
+        mods: Optional[Mods] = Mods.NoMod,
+        rank_type=RankingType.Top,
+    ) -> Optional[ScoreResponse]:
+        """Get top scores for a beatmap
+
+        - `beatmap_checksum`: MD5 hash of the beatmap file
+        - `beatmap_file`: Filename of the beatmap
+        - `set_id`: BeatmapsetId for the beatmap
+        - `mode`: Specify a mode
+        - `mods`: Filter by mods (`rank_type` must be set to `SelectedMod`)
+        - `rank_type`: osu.api.constants.RankingTy
+            - `Top`: Global Ranking
+            - `SelectedMod`: Global Ranking (Selected Mods) (Supporter)
+            - `Friends`: Friend Ranking (Supporter)
+            - `Country`: Country Ranking (Supporter)
+        """
+
+        response = self.session.get(
+            f"{self.url}/web/osu-osz2-getscores.php",
+            params={
+                "vv": 4,  # ?
+                "v": rank_type.value,
+                "c": beatmap_checksum,
+                "f": beatmap_file,
+                "m": mode.value,
+                "i": set_id,
+                "mods": mods.value,
+                "a": 0,  # ?
+                "us": self.game.username,
+                "ha": self.game.password_hash,
+            },
+        )
+
+        if not response.ok:
+            self.logger.error(f"Failed to fetch scores ({response.status_code})")
+            return
+
+        return ScoreResponse.from_string(response.text, mode)
