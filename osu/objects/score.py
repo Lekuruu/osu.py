@@ -53,6 +53,7 @@ class Score:
         # TODO: Get Comments
         # TODO: Rank
 
+
 @dataclass
 class ScoreResponse:
     status: SubmissionStatus
