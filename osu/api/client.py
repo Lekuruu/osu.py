@@ -156,7 +156,8 @@ class WebAPI:
         set_id: int,
         mode: Mode = Mode.Osu,
         mods: Optional[Mods] = Mods.NoMod,
-        rank_type=RankingType.Top,
+        rank_type = RankingType.Top,
+        skip_scores: bool = False
     ) -> Optional[ScoreResponse]:
         """Get top scores for a beatmap
 
@@ -175,6 +176,7 @@ class WebAPI:
         response = self.session.get(
             f"{self.url}/web/osu-osz2-getscores.php",
             params={
+                "s": int(skip_scores),
                 "vv": 4,  # ?
                 "v": rank_type.value,
                 "c": beatmap_checksum,
