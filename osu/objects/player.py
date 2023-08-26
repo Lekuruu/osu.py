@@ -49,6 +49,15 @@ class Player:
     def __eq__(self, other: object) -> bool:
         return self.id == other.id
 
+    def request_presence(self):
+        self.game.bancho.request_presence([self.id])
+
+    def request_stats(self):
+        self.game.bancho.request_stats([self.id])
+
+    def avatar(self) -> Optional[bytes]:
+        return self.game.api.get_avatar(self.id)
+
     def send_message(self, message: str):
         """Send a PM to this player"""
 
@@ -70,12 +79,6 @@ class Player:
         )
 
         self.game.bancho.enqueue(ClientPackets.SEND_PRIVATE_MESSAGE, stream.get())
-
-    def request_presence(self):
-        self.game.bancho.request_presence([self.id])
-
-    def request_stats(self):
-        self.game.bancho.request_stats([self.id])
 
     def add_friend(self):
         if self.id in self.game.bancho.friends:
