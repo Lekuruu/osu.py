@@ -35,9 +35,6 @@ class ClientHash:
 
     @property
     def adapter_string(self) -> str:
-        if platform.system() in ["Linux", "Darwin"]:
-            return "runningunderwine"
-
         adapters = [
             adapter.replace("-", "")
             for adapter in self.adapters
@@ -48,15 +45,49 @@ class ClientHash:
 
     @property
     def adapter_hash(self) -> str:
+        if platform.system() != "Windows":
+            return "runningunderwine"
+
         return hashlib.md5(self.adapter_string.encode()).hexdigest()
 
     @property
     def uninstall_id(self) -> str:
-        return hashlib.md5(b"unknown").hexdigest()  # TODO
+        if platform.system() != "Windows":
+            return hashlib.md5(b"unknown").hexdigest()
+
+        import winreg
+
+        try:
+            # Try to read the UninstallID from Registry
+            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg:
+                key = winreg.OpenKey(reg, "Software\\osu!")
+
+                for i in range(1024):
+                    name, value, type = winreg.EnumValue(key, i)
+
+                    if name != "UninstallID":
+                        continue
+
+                    return hashlib.md5(value.encode()).hexdigest()
+        except (FileNotFoundError, WindowsError, EnvironmentError):
+            # Key was not found
+            pass
+
+        return hashlib.md5(b"unknown").hexdigest()
 
     @property
     def disk_signature(self) -> str:
-        return hashlib.md5(b"unknown").hexdigest()  # TODO
+        if platform.system() != "Windows":
+            return hashlib.md5(b"unknown").hexdigest()
+
+        from wmi import WMI
+
+        # Get serial number of first item
+        for item in WMI().query("SELECT * FROM Win32_DiskDrive"):
+            return hashlib.md5(item.SerialNumber.encode()).hexdigest()
+
+        # Fallback
+        return hashlib.md5(b"unknown").hexdigest()
 
 
 class ClientInfo:
