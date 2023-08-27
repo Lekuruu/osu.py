@@ -14,7 +14,7 @@ setuptools.setup(
     description="A python library that emulates the osu! stable client",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=["osu", "osu/api", "osu/bancho", "osu/objects"],
+    packages=setuptools.find_packages(),
     install_requires=requirements,
     keywords=["osu", "osugame", "python", "bancho"],
 )
