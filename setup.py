@@ -12,6 +12,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["osu", "osu/api", "osu/bancho", "osu/objects"],
-    install_requires=["requests", "psutil", "python-dateutil"],
+    install_requires=["requests", "psutil", "python-dateutil", "wmi"],
     keywords=["osu", "osugame", "python", "bancho"],
 )
