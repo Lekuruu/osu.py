@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r") as f:
     long_description = f.read()
 
+with open('requirements.txt', 'r') as f:
+    requirements = f.read().splitlines()
+
 setuptools.setup(
     name="osu",
     version="1.1.0",
@@ -12,6 +15,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["osu", "osu/api", "osu/bancho", "osu/objects"],
-    install_requires=["requests", "psutil", "python-dateutil", "wmi"],
+    install_requires=requirements,
     keywords=["osu", "osugame", "python", "bancho"],
 )
