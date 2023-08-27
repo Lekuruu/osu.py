@@ -1,4 +1,4 @@
 python-dateutil
 requests
 psutil
-wmi
+wmi; platform_system == "Windows"
