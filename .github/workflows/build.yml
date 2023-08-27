@@ -41,6 +41,7 @@ jobs:
       - name: Download dependencies
         if: steps.depcache.outputs.cache-hit != 'true'
         run: |
+          pip install setuptools
           pip download --dest=deps -r requirements.txt
 
       - name: Install dependencies
