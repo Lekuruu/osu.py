@@ -273,7 +273,7 @@ class BanchoClient:
         stream.u8(self.player.status.action.value)
         stream.string(self.player.status.text)
         stream.string(self.player.status.checksum)
-        stream.u32(sum([mod.value for mod in self.player.status.mods]))
+        stream.u32(self.player.status.mods.value)
         stream.u8(self.player.mode.value)
         stream.s32(self.player.status.beatmap_id)
 
