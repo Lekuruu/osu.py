@@ -62,7 +62,9 @@ jobs:
         if: matrix.python-version == 3.11
 
       - name: Create distribution package
-        run: python -m build
+        run: |
+          echo "include requirements.txt" > MANIFEST.in
+          python -m build
         if: matrix.python-version == 3.11
 
       - name: Upload distribution package
