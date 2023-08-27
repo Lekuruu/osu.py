@@ -1,9 +1,12 @@
 import setuptools
+import os
 
-with open("README.md", "r") as f:
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(current_directory, "README.md"), "r") as f:
     long_description = f.read()
 
-with open("requirements.txt", "r") as f:
+with open(os.path.join(current_directory, "requirements.txt"), "r") as f:
     requirements = f.read().splitlines()
 
 setuptools.setup(
