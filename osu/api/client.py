@@ -89,10 +89,11 @@ class WebAPI:
         )
 
         if not response.ok:
-            self.logger.error(
-                f"Error on login: {requests.status_codes._codes[response.status_code][0].upper()}"
-            )
-            self.logger.warning("Ignoring...")
+            if self.game.server == "ppy.sh":
+                self.logger.error(
+                    f"Error on login: {requests.status_codes._codes[response.status_code][0].upper()}"
+                )
+                self.logger.warning("Ignoring...")
             return True
 
         if "error" in response.text:
