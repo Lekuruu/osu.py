@@ -1,7 +1,8 @@
+from typing import Optional, Callable, Dict, List
 from datetime import datetime
-from typing import Optional
 from copy import copy
 
+from .bancho.constants import ServerPackets
 from .objects.client import ClientInfo
 
 import traceback
@@ -25,6 +26,7 @@ class Game:
         stream="stable40",
         version: Optional[int] = None,
         tournament=False,
+        events: Optional[Dict[ServerPackets, List[Callable]]] = {},
     ) -> None:
         """Parameters
         -------------
@@ -49,6 +51,9 @@ class Game:
 
         `tournament`: bool
             This allows for multiple clients at the same time (supporter only)
+
+        `events`: dict, optional
+            Allows to pass in events, instead of registering them normally.
         """
 
         self.username = username
@@ -90,6 +95,9 @@ class Game:
         self.bancho = BanchoClient(self)
         self.api = WebAPI(self)
 
+        if events:
+            self.events.handlers = events
+
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
             # TODO: Custom executable hash?
@@ -98,7 +106,7 @@ class Game:
         self.client = ClientInfo(self.version, updates)
 
     def __repr__(self) -> str:
-        f"<osu! {self.version}>"
+        return f"<osu! {self.version}>"
 
     @property
     def password_hash(self) -> str:
@@ -120,6 +128,7 @@ class Game:
                 self.stream,
                 self.version_number,
                 self.tourney,
+                self.events.handlers,
             )
 
         try:
