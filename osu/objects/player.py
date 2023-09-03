@@ -49,6 +49,11 @@ class Player:
     def __eq__(self, other: object) -> bool:
         return self.id == other.id
 
+    @property
+    def loaded(self) -> bool:
+        # TODO: maybe find a better way of doing this?
+        return bool(self.name)
+
     def request_presence(self):
         self.game.bancho.request_presence([self.id])
 
@@ -64,7 +69,7 @@ class Player:
         if not (player := self.game.bancho.player):
             return
 
-        if not self.name:
+        if not self.loaded:
             # Presence missing
             self.request_presence()
 

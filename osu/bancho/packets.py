@@ -282,7 +282,7 @@ def message(stream: StreamIn, game: Game):
         if not (player := game.bancho.players.by_name(sender)):
             return
 
-    if not player.name:
+    if not player.loaded:
         # Presence missing
         player.request_presence()
 
@@ -300,7 +300,7 @@ def message(stream: StreamIn, game: Game):
         if not (player := game.bancho.players.by_name(target)):
             return
 
-        if not player.name:
+        if not player.loaded:
             # Presence missing
             player.request_presence()
 
