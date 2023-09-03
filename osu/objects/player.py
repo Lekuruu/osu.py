@@ -51,7 +51,6 @@ class Player:
 
     @property
     def loaded(self) -> bool:
-        # TODO: maybe find a better way of doing this?
         return bool(self.name)
 
     def request_presence(self):
