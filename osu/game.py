@@ -98,7 +98,7 @@ class Game:
         self.client = ClientInfo(self.version, updates)
 
     def __repr__(self) -> str:
-        f"<osu! {self.version}>"
+        return f"<osu! {self.version}>"
 
     @property
     def password_hash(self) -> str:
