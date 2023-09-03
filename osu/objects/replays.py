@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
 
+from ..bancho.streams import StreamIn, StreamOut
 from ..bancho.constants import ButtonState
-from ..bancho.streams import StreamIn
 
 
 @dataclass
@@ -12,12 +12,21 @@ class ReplayFrame:
     x: float
     y: float
 
+    def encode(self) -> bytes:
+        stream = StreamOut()
+        stream.u8(self.button_state.value)
+        stream.u8(0)  # "Taiko-Byte"
+        stream.float(self.x)
+        stream.float(self.y)
+        stream.s32(self.time)
+        return stream.get()
+
     @classmethod
     def decode(cls, stream: StreamIn):
         button_state = ButtonState(stream.u8())
 
         # "Taiko-Byte"
-        if stream.s8() > 0:
+        if stream.u8() > 0:
             if ButtonState.Right1 not in button_state:
                 button_state |= ButtonState.Right1
 
@@ -51,6 +60,28 @@ class ScoreFrame:
     @property
     def total_hits(self) -> int:
         return self.c50 + self.c100 + self.c300 + self.cMiss
+
+    def encode(self) -> bytes:
+        stream = StreamOut()
+        stream.s32(self.time)
+        stream.u8(self.id)
+        stream.u16(self.c300)
+        stream.u16(self.c100)
+        stream.u16(self.c50)
+        stream.u16(self.cGeki)
+        stream.u16(self.cKatu)
+        stream.u16(self.cMiss)
+        stream.s32(self.total_score)
+        stream.u16(self.max_combo)
+        stream.u16(self.current_combo)
+        stream.bool(self.perfect)
+        stream.u8(self.current_hp)
+        stream.u8(self.tag_byte)
+        stream.bool(self.score_v2)
+        if self.score_v2:
+            stream.float(self.combo_portion)
+            stream.float(self.bonus_portion)
+        return stream.get()
 
     @classmethod
     def decode(cls, stream: StreamIn):

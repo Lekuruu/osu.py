@@ -2,14 +2,15 @@ from typing import Optional, List
 from datetime import datetime
 from copy import copy
 
+from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
+from .streams import StreamOut
+
+from ..objects.replays import ReplayFrame, ScoreFrame
 from ..objects.collections import Players, Channels
 from ..objects.player import Player
 from ..objects.status import Status
 
 from ..game import Game
-
-from .constants import ClientPackets, Privileges, StatusAction
-from .streams import StreamOut
 
 import requests
 import logging
@@ -338,8 +339,39 @@ class BanchoClient:
     def cant_spectate(self):
         self.enqueue(ClientPackets.CANT_SPECTATE)
 
-    def send_frames(self):
-        raise NotImplementedError  # TODO
+    def send_frames(
+        self,
+        action: ReplayAction,
+        frames: List[ReplayFrame],
+        score_frame: Optional[ScoreFrame] = None,
+        seed: int = 0,
+    ):
+        """
+        This will send a `SPECTATE_FRAMES` packet to the server, which gets broadcasted to all of your spectators.
+        Note that this will not work, if nobody is spectating you.
+        """
+        if not self.player.spectators:
+            self.logger.warning(
+                "Failed to send frames, because no spectators were found."
+            )
+            return
+
+        if self.spectating:
+            action = ReplayAction.WatchingOther
+            extra = self.spectating.id
+        else:
+            extra = seed
+
+        stream = StreamOut()
+        stream.s32(extra)
+        stream.u16(len(frames))
+        [stream.write(frame.encode()) for frame in frames]
+        stream.u8(action.value)
+
+        if score_frame:
+            stream.write(score_frame.encode())
+
+        self.enqueue(ClientPackets.SPECTATE_FRAMES, stream.get())
 
     def join_lobby(self):
         if self.in_lobby:
