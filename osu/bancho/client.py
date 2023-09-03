@@ -296,6 +296,11 @@ class BanchoClient:
         self.enqueue(ClientPackets.CHANGE_ACTION, stream.get())
 
     def start_spectating(self, target: Player):
+        """Start spectating a player
+
+        You will receive `ServerPackets.SPECTATE_FRAMES` packets that contain replay data.\n
+        You can use osu-recorder (https://github.com/Lekuruu/osu-recorder) as a reference for that.
+        """
         if self.spectating:
             self.stop_spectating()
 
