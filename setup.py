@@ -11,7 +11,7 @@ with open(os.path.join(current_directory, "requirements.txt"), "r") as f:
 
 setuptools.setup(
     name="osu",
-    version="1.1.2",
+    version="1.1.3",
     author="Lekuru",
     author_email="contact@lekuru.xyz",
     description="A python library that emulates the osu! stable client",
