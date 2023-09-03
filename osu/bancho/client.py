@@ -266,6 +266,22 @@ class BanchoClient:
         self.enqueue(ClientPackets.REQUEST_STATUS_UPDATE)
 
     def update_status(self):
+        """Send current player status to the server
+
+        You can change your status by updating the `game.bancho.player.status` attributes.\n
+        For example:
+            >>> status = game.bancho.player.status
+            >>>
+            >>> status.action = StatusAction.Playing
+            >>> status.text = "UNDEAD CORPORATION - Everything will freeze [Time Freeze]"
+            >>> status.checksum = "a84050da9b68ca1bd8e2d1700b9c6ca5" # .osu file checksum
+            >>> status.mods = Mods.Hidden|Mods.HardRock
+            >>> status.mode = GameMode.Osu
+            >>> status.beatmap_id = 555797
+            >>>
+            >>> game.bancho.update_status()
+        """
+
         if not self.player:
             return
 
