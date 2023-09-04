@@ -152,6 +152,9 @@ class Game:
             self.logger.warning("Exiting...")
             self.bancho.exit()
 
+        if exit_on_interrupt:
+            exit(0)
+
     def fetch_version(self, stream: str = "stable40") -> Optional[str]:
         """
         Fetch the latest version of the client from:
