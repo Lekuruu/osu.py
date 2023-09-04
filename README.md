@@ -62,6 +62,15 @@ def on_message(sender: Player, message: str, target: Player):
 game.run()
 ```
 
+You can also run tasks, independent of server actions:
+
+```python
+# Example of a task, running every minute
+@game.tasks.register(minutes=1, loop=True)
+def example_task():
+  ...
+```
+
 [This project](https://github.com/Lekuruu/osu-recorder) is also a good example
 and it was also the reason why I even started this project.
 
