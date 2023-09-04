@@ -122,6 +122,11 @@ def login_reply(stream: StreamIn, game: Game):
     game.events.call(ServerPackets.USER_ID, response)
 
 
+@Packets.register(ServerPackets.PONG)
+def pong(stream: StreamIn, game: Game):
+    game.events.call(ServerPackets.PONG)
+
+
 @Packets.register(ServerPackets.ACCOUNT_RESTRICTED)
 def restricted(stream: StreamIn, game: Game):
     game.logger.error("You have been banned.")
