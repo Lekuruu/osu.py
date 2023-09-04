@@ -10,8 +10,6 @@ class Task:
     interval: float
     loop: bool
     last_call: datetime
-    args: list
-    kwargs: dict
 
 
 class TaskManager:
@@ -40,8 +38,6 @@ class TaskManager:
                     interval=total,
                     loop=loop,
                     last_call=datetime.now(),
-                    args=args,
-                    kwargs=kwargs,
                 )
             )
             return f
@@ -63,7 +59,7 @@ class TaskManager:
 
                 try:
                     self.logger.debug(f"Trying to run task: {task.function}")
-                    task.function(*task.args, **task.kwargs)
+                    task.function()
                 except Exception as exc:
                     self.logger.error(f"Failed to run task: {exc}", exc_info=exc)
 
