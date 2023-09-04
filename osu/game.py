@@ -118,7 +118,7 @@ class Game:
         """Return current time as ticks"""
         return int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 10000000)
 
-    def run(self, retry=False) -> None:
+    def run(self, retry=False, exit_on_interrupt=False) -> None:
         if retry:
             # Reinitialize game
             self.__init__(
