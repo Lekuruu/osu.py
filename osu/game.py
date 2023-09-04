@@ -88,11 +88,13 @@ class Game:
 
         from .bancho import BanchoClient, Packets
         from .events import EventHandler
+        from .tasks import TaskManager
         from .api import WebAPI
 
         self.packets = copy(Packets)
         self.events = EventHandler()
         self.bancho = BanchoClient(self)
+        self.tasks = TaskManager(self)
         self.api = WebAPI(self)
 
         if events:
