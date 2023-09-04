@@ -107,17 +107,14 @@ class WebAPI:
 
         return True
 
-    def verify(self, hash: str) -> requests.Response:
-        """This will print out a url, where the user can verify this client.\n
-        After that, it will exit.
-        """
-
+    def verify(self, hash: str, exit_after: bool = True) -> None:
+        """This will print out a url, where the user can verify this client."""
         self.logger.info("Verification required.")
         self.logger.info(
             f'{self.url}/p/verify?u={self.game.username.replace(" ", "%20")}&reason=bancho&ch={hash}'
         )
         self.logger.info("You only need to do this once.")
-        exit(0)
+        if exit_after: exit(0)
 
     def get_session(self) -> requests.Response:
         """Perform a request on `/web/osu-session.php`.\n
