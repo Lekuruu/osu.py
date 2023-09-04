@@ -114,7 +114,9 @@ class WebAPI:
             f'{self.url}/p/verify?u={self.game.username.replace(" ", "%20")}&reason=bancho&ch={hash}'
         )
         self.logger.info("You only need to do this once.")
-        if exit_after: exit(0)
+
+        if exit_after:
+            exit(0)
 
     def get_session(self) -> requests.Response:
         """Perform a request on `/web/osu-session.php`.\n
