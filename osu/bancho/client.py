@@ -141,6 +141,7 @@ class BanchoClient:
 
         while self.connected:
             self.dequeue()
+            self.game.tasks.execute()
             time.sleep(self.request_interval)
 
         if self.retry:
