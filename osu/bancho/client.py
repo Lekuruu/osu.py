@@ -59,6 +59,12 @@ class BanchoClient:
         `stop_spectating`: Stop spectating
 
         `cant_spectate`: Is sent when the player does not have the beatmap for spectating
+
+        `send_frames`: Send replay frames to your spectators
+
+        `join_lobby`: Join the lobby
+
+        `leave_lobby`: Leave the lobby
     """
 
     def __init__(self, game: Game) -> None:
