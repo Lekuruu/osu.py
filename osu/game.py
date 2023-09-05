@@ -139,7 +139,7 @@ class Game:
                 self.version_number,
                 self.tourney,
                 self.events.handlers,
-                self.tasks.tasks
+                self.tasks.tasks,
             )
 
         try:
