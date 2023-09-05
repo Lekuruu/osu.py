@@ -4,6 +4,7 @@ from copy import copy
 
 from .bancho.constants import ServerPackets
 from .objects.client import ClientInfo
+from .tasks import Task
 
 import traceback
 import requests
@@ -27,6 +28,7 @@ class Game:
         version: Optional[int] = None,
         tournament=False,
         events: Optional[Dict[ServerPackets, List[Callable]]] = {},
+        tasks: Optional[List[Task]] = [],
     ) -> None:
         """Parameters
         -------------
@@ -53,7 +55,10 @@ class Game:
             This allows for multiple clients at the same time (supporter only)
 
         `events`: dict, optional
-            Allows to pass in events, instead of registering them normally.
+            Allows to pass in events, instead of registering them normally
+
+        `tasks`: list, optional
+            Allows to pass in pre-defined tasks, just like the `events` parameter
         """
 
         self.username = username
@@ -100,6 +105,9 @@ class Game:
         if events:
             self.events.handlers = events
 
+        if tasks:
+            self.tasks.tasks = tasks
+
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
             # TODO: Custom executable hash?
@@ -131,6 +139,7 @@ class Game:
                 self.version_number,
                 self.tourney,
                 self.events.handlers,
+                self.tasks.tasks
             )
 
         try:
