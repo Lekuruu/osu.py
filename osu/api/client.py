@@ -334,3 +334,7 @@ class WebAPI:
         """Get avatar by user id"""
 
         return self.session.get(f"https://a.{self.game.server}/{user_id}").content
+
+    # TODO: Add favourite
+    # TODO: osu! direct
+    # TODO: osz download
