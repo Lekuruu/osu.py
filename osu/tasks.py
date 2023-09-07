@@ -69,6 +69,9 @@ class TaskManager:
             if last_call >= task.interval:
                 task.last_call = datetime.now()
 
+                if not task.loop:
+                    self.tasks.remove(task)
+
                 try:
                     self.logger.debug(f"Trying to run task: '{task.function.__name__}'")
 
@@ -98,9 +101,6 @@ class TaskManager:
                         f"Failed to run '{task.function.__name__}' task: {exc}",
                         exc_info=exc,
                     )
-
-                if not task.loop:
-                    self.tasks.remove(task)
 
         self.logger.debug("Done.")
 
