@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, Future
 from typing import List, Dict, Callable
 
 from .bancho.constants import ServerPackets
@@ -23,9 +24,12 @@ class EventHandler:
 
     def __init__(self) -> None:
         self.handlers: Dict[ServerPackets, List[Callable]] = {}
+        self.executor = ThreadPoolExecutor(max_workers=10)
 
-    def register(self, packet: ServerPackets):
+    def register(self, packet: ServerPackets, threaded: bool = False):
         def wrapper(f: Callable):
+            if threaded:
+                f = self._submit_future(f)
             if packet in self.handlers:
                 self.handlers[packet].append(f)
             else:
@@ -38,3 +42,14 @@ class EventHandler:
         if packet in self.handlers:
             for handler in self.handlers[packet]:
                 handler(*args)
+
+    def _submit_future(self, f: Callable) -> Callable:
+        def execute(*args):
+            future = self.executor.submit(f, *args)
+            future.add_done_callback(self._future_callback)
+            return future
+
+        return execute
+
+    def _future_callback(self, future: Future):
+        ...  # TODO
