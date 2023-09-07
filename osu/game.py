@@ -102,9 +102,6 @@ class Game:
         self.tasks = TaskManager(self)
         self.api = WebAPI(self)
 
-        # Used for running async/threaded tasks
-        self.executor = ThreadPoolExecutor(max_workers=10)
-
         if events:
             self.events.handlers = events
 

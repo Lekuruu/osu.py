@@ -47,7 +47,7 @@ def tasks():
     game.tasks.execute()
 
     # Wait for thread
-    for thread in game.executor._threads:
+    for thread in game.tasks.executor._threads:
         thread.join(timeout=1)
 
     if not async_task_success:

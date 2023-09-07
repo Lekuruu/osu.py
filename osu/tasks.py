@@ -1,5 +1,5 @@
+from concurrent.futures import Future, ThreadPoolExecutor
 from typing import List, Callable, Optional
-from concurrent.futures import Future
 from dataclasses import dataclass
 from datetime import datetime
 import logging
@@ -25,6 +25,7 @@ class TaskManager:
     """
 
     def __init__(self, game) -> None:
+        self.executor = ThreadPoolExecutor(max_workers=10)
         self.logger = logging.getLogger("tasks")
         self.tasks: List[Task] = []
         self.game = game
@@ -89,7 +90,7 @@ class TaskManager:
                     # Thread is still running
                     # TODO
 
-                    future = self.game.executor.submit(task.function)
+                    future = self.executor.submit(task.function)
                     future.add_done_callback(self._thread_callback)
 
                     self.logger.debug(
