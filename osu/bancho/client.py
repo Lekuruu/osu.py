@@ -206,7 +206,11 @@ class BanchoClient:
         response = self.session.post(self.url, data=data)
 
         for item in queue:
-            self.queue.remove(item)
+            try:
+                self.queue.remove(item)
+            except ValueError as exc:
+                self.logger.warning(exc, exc_info=exc)
+                continue
 
         if not response.ok:
             self.connected = False
