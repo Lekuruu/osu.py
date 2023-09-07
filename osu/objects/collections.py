@@ -4,13 +4,16 @@ from collections.abc import Iterator
 from ..bancho.constants import ClientPackets, PresenceFilter
 from ..game import Game
 
+from .lists import LockedSet
+
 from .channel import Channel
 from .player import Player
 
 
-class Players(Set[Player]):
+class Players(LockedSet[Player]):
     def __init__(self, game: Game) -> None:
         self.game = game
+        super().__init__()
 
     def __iter__(self) -> Iterator[Player]:
         return super().__iter__()
@@ -31,13 +34,13 @@ class Players(Set[Player]):
             return super().remove(player)
 
     def by_id(self, id: int) -> Optional[Player]:
-        for p in self:
+        for p in self.copy():
             if p.id == id:
                 return p
         return None
 
     def by_name(self, name: str) -> Optional[Player]:
-        for p in self:
+        for p in self.copy():
             if p.name == name:
                 return p
         return None
@@ -57,7 +60,7 @@ class Players(Set[Player]):
         )
 
 
-class Channels(Set[Channel]):
+class Channels(LockedSet[Channel]):
     def __iter__(self) -> Iterator[Channel]:
         return super().__iter__()
 
@@ -73,7 +76,7 @@ class Channels(Set[Channel]):
             return super().remove(channel)
 
     def get(self, name: str) -> Optional[Channel]:
-        for c in self:
+        for c in self.copy():
             if c.name == name:
                 return c
         return None
