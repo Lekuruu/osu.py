@@ -146,9 +146,14 @@ class BanchoClient:
         self.connect()
 
         while self.connected:
-            self.dequeue()
-            self.game.tasks.execute()
-            time.sleep(self.request_interval)
+            try:
+                self.dequeue()
+                self.game.tasks.execute()
+                time.sleep(self.request_interval)
+            except KeyboardInterrupt:
+                raise
+            except Exception as exc:
+                self.logger.fatal(f"Unhandled Exception: {exc}", exc_info=exc)
 
         if self.retry:
             self.logger.error("Retrying in 15 seconds...")

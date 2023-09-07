@@ -158,9 +158,6 @@ class Game:
         except KeyboardInterrupt:
             pass
 
-        except Exception as exc:
-            self.logger.fatal(f"Unhandled exception: {exc}", exc_info=exc)
-
         finally:
             self.logger.warning("Exiting...")
             self.bancho.exit()
