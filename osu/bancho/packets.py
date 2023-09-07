@@ -209,7 +209,7 @@ def stats(stream: StreamIn, game: Game):
 
     if not (player := game.bancho.players.by_id(user_id)):
         # Add new player, if not found in collection
-        game.bancho.request_presence(user_id)
+        game.bancho.request_presence([user_id])
         game.bancho.players.add(player := Player(user_id, game=game))
 
     player.last_status = copy(player.status)
