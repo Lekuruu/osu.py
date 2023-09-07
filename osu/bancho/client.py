@@ -195,8 +195,8 @@ class BanchoClient:
 
         if not self.queue:
             # Queue is empty, sending ping
-            self.ping()
             self.ping_count += 1
+            return self.ping()
         else:
             self.ping_count = 0
 
@@ -208,8 +208,8 @@ class BanchoClient:
         for item in queue:
             try:
                 self.queue.remove(item)
-            except ValueError as exc:
-                self.logger.warning(exc, exc_info=exc)
+            except ValueError:
+                # Queue was probably modified by another thread
                 continue
 
         if not response.ok:
