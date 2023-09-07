@@ -20,6 +20,7 @@ Or build it manually:
 ```shell
 git clone https://github.com/Lekuruu/osu.py.git
 cd osu.py
+pip install setuptools
 python setup.py install
 ```
 
