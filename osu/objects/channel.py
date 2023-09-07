@@ -50,10 +50,11 @@ class Channel:
         self.game.bancho.enqueue(ClientPackets.CHANNEL_PART, stream.get())
 
     def join_success(self):
+        if not self.joined:
+            self.logger.info(f"Joined {self.name}!")
+
         self.joining = False
         self.joined = True
-
-        self.logger.info(f"Joined {self.name}!")
 
         if self.name == "#osu":
             # Load players
