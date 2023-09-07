@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Callable, Dict, List
 from datetime import datetime
 from copy import copy
@@ -102,6 +103,9 @@ class Game:
         self.tasks = TaskManager(self)
         self.api = WebAPI(self)
 
+        # Used for running async/threaded tasks
+        self.executor = ThreadPoolExecutor(max_workers=10)
+
         if events:
             self.events.handlers = events
 
@@ -162,6 +166,8 @@ class Game:
         finally:
             self.logger.warning("Exiting...")
             self.bancho.exit()
+            self.logger.info("Stopping tasks...")
+            self.executor.shutdown(cancel_futures=True)
 
         if exit_on_interrupt:
             exit(0)

@@ -1,6 +1,7 @@
-from typing import List, Callable
+from typing import List, Callable, Optional
+from concurrent.futures import Future
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 import logging
 
 
@@ -10,12 +11,13 @@ class Task:
     interval: float
     loop: bool
     last_call: datetime
+    threaded: bool
 
 
 class TaskManager:
     """### TaskManager
 
-    Used to run any task syncronously, because threading can mess up the game sometimes.\n
+    Used to run any task syncronously or asyncronously inside a thread.\n
     Example of registering a task that runs every minute:
     >>> @game.tasks.register(minutes=1, loop=True)
     >>> def example_task():
@@ -27,8 +29,17 @@ class TaskManager:
         self.tasks: List[Task] = []
         self.game = game
 
-    def register(self, *, seconds=0, minutes=0, hours=0, loop=True, args=[], kwargs={}):
-        """Register a task"""
+    def register(self, *, seconds=0, minutes=0, hours=0, loop=False, threaded=False):
+        """Register a task
+
+        `seconds`, `minutes`, `hours`: Specify when this task should run
+
+        `loop`: If set to `True`, the task will loop itself in the specified time interval
+
+        `threaded`: This will run the task inside a thread.
+            Note that this is **not recommended**, since interactions with the game client were not designed to be done asyncronous.
+            I will try to fix this issue in the future.
+        """
 
         def wrapper(f: Callable):
             total = (seconds) + (minutes * 60) + (hours * 60 * 60)
@@ -38,6 +49,7 @@ class TaskManager:
                     interval=total,
                     loop=loop,
                     last_call=datetime.now(),
+                    threaded=threaded,
                 )
             )
             return f
@@ -58,9 +70,39 @@ class TaskManager:
                 task.last_call = datetime.now()
 
                 try:
-                    self.logger.debug(f"Trying to run task: {task.function}")
-                    task.function()
+                    self.logger.debug(f"Trying to run task: '{task.function.__name__}'")
+
+                    if not task.threaded:
+                        task.function()
+                        self.logger.debug(
+                            f"Task '{task.function.__name__}' was successfully executed."
+                        )
+                        continue
+
+                    # if (
+                    #     task.current_thread is not None
+                    #     and not task.current_thread.done()
+                    # ):
+                    # Thread is still running
+                    # TODO
+
+                    future = self.game.executor.submit(task.function)
+                    future.add_done_callback(self._thread_callback)
+
+                    self.logger.debug(
+                        f"Task '{task.function.__name__}' was submitted to executor."
+                    )
+
                 except Exception as exc:
-                    self.logger.error(f"Failed to run task: {exc}", exc_info=exc)
+                    self.logger.error(
+                        f"Failed to run '{task.function.__name__}' task: {exc}",
+                        exc_info=exc,
+                    )
+
+                if not task.loop:
+                    self.tasks.remove(task)
 
         self.logger.debug("Done.")
+
+    def _thread_callback(self, future: Future) -> None:
+        ... # TODO
