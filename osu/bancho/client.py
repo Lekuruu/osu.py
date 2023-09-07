@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from copy import copy
+from queue import Queue
 
 from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
 from .streams import StreamOut
@@ -93,6 +93,7 @@ class BanchoClient:
 
         self.channels = Channels()
         self.players = Players(game)
+        self.queue = Queue()
 
         self.ping_count = 0
         self.protocol = 0
@@ -108,8 +109,6 @@ class BanchoClient:
 
         self.min_idletime = 1
         self.max_idletime = 4
-
-        self.queue = []
 
     @property
     def status(self) -> Status:
@@ -193,24 +192,19 @@ class BanchoClient:
         if not self.connected:
             return
 
-        if not self.queue:
+        if self.queue.empty():
             # Queue is empty, sending ping
             self.ping_count += 1
             return self.ping()
         else:
             self.ping_count = 0
 
-        queue = copy(self.queue)
-        data = b"".join(queue)
+        data = b""
+
+        while not self.queue.empty():
+            data += self.queue.get()
 
         response = self.session.post(self.url, data=data)
-
-        for item in queue:
-            try:
-                self.queue.remove(item)
-            except ValueError:
-                # Queue was probably modified by another thread
-                continue
 
         if not response.ok:
             self.connected = False
@@ -248,7 +242,7 @@ class BanchoClient:
         self.logger.debug(f'Sending {packet.name} -> "{data}"')
 
         # Append to queue
-        self.queue.append(stream.get())
+        self.queue.put(stream.get())
 
         if dequeue:
             self.dequeue()
