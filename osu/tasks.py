@@ -105,4 +105,4 @@ class TaskManager:
         self.logger.debug("Done.")
 
     def _thread_callback(self, future: Future) -> None:
-        ... # TODO
+        ...  # TODO
