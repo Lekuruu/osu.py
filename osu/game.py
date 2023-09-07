@@ -7,7 +7,6 @@ from .bancho.constants import ServerPackets
 from .objects.client import ClientInfo
 from .tasks import Task
 
-import traceback
 import requests
 import hashlib
 import logging
@@ -159,9 +158,8 @@ class Game:
         except KeyboardInterrupt:
             pass
 
-        except Exception as e:
-            traceback.print_exc()
-            self.logger.fatal(f"Unhandled exception: {e}")
+        except Exception as exc:
+            self.logger.fatal(f"Unhandled exception: {exc}", exc_info=exc)
 
         finally:
             self.logger.warning("Exiting...")

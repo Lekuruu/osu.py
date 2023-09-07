@@ -18,7 +18,6 @@ from .constants import (
     Mods,
 )
 
-import traceback
 import threading
 import time
 
@@ -59,8 +58,9 @@ class PacketHandler:
                 try:
                     handler(data, game)
                 except Exception as exc:
-                    traceback.print_exc()
-                    game.logger.error(f"Error while executing {handler}: {exc}")
+                    game.logger.error(
+                        f"Error while executing {handler}: {exc}", exc_info=exc
+                    )
         else:
             game.logger.warning(f'No handler found for "{packet.name}"')
 
