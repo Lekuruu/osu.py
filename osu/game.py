@@ -161,7 +161,7 @@ class Game:
         finally:
             self.logger.warning("Exiting...")
             self.bancho.exit()
-            self.logger.info("Stopping tasks...")
+            self.logger.warning("Stopping tasks...")
             self.executor.shutdown(cancel_futures=True)
 
         if exit_on_interrupt:
