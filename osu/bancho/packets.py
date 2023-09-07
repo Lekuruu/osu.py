@@ -56,6 +56,7 @@ class PacketHandler:
         if packet in self.handlers:
             for handler in self.handlers[packet]:
                 try:
+                    # TODO: Add threading
                     handler(data, game)
                 except Exception as exc:
                     game.logger.error(
