@@ -46,10 +46,10 @@ class EventHandler:
     def _submit_future(self, f: Callable) -> Callable:
         def execute(*args):
             future = self.executor.submit(f, *args)
-            future.add_done_callback(self._future_callback)
+            future.add_done_callback(self._thread_callback)
             return future
 
         return execute
 
-    def _future_callback(self, future: Future):
+    def _thread_callback(self, future: Future):
         ...  # TODO
