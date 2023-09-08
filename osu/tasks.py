@@ -90,6 +90,9 @@ class TaskManager:
                     # Thread is still running
                     # TODO
 
+                    if self.executor._shutdown:
+                        return
+
                     future = self.executor.submit(task.function)
                     future.add_done_callback(self._thread_callback)
 

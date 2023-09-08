@@ -45,6 +45,8 @@ class EventHandler:
 
     def _submit_future(self, f: Callable) -> Callable:
         def execute(*args):
+            if self.executor._shutdown:
+                return
             future = self.executor.submit(f, *args)
             future.add_done_callback(self._thread_callback)
             return future
