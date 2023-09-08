@@ -511,7 +511,9 @@ def user_silenced(stream: StreamIn, game: Game):
 
     if not (player := game.bancho.players.by_id(user_id)):
         game.bancho.request_presence([user_id])
-        return
+
+    if not player.loaded:
+        game.bancho.request_presence([user_id])
 
     player.silenced = True
 
@@ -525,7 +527,9 @@ def target_silenced(stream: StreamIn, game: Game):
 
     if not (player := game.bancho.players.by_id(user_id)):
         game.bancho.request_presence([user_id])
-        return
+
+    if not player.loaded:
+        game.bancho.request_presence([user_id])
 
     player.silenced = True
 
