@@ -11,7 +11,7 @@ logger.info("Performing tests...")
 game = Game(
     username="testuser",
     password="testpass",
-    version="b1337",
+    version=1337,
     server="ppy.sh",
     stream="stable40",
 )

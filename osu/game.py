@@ -47,7 +47,7 @@ class Game:
             Release stream
             (`stable40`)
 
-        `version`: int, optional
+        `version`: int/float, optional
             Set a custom version
             (Will fetch the latest version automatically)
 
