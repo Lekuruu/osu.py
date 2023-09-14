@@ -193,7 +193,7 @@ def presence(stream: StreamIn, game: Game):
     b = stream.u8()  # Contains privileges and play mode
 
     player.privileges = Privileges(b & -255)
-    player.mode = Mode(max(0, min(3, (b & 224) >> 5)))
+    player.status.mode = Mode(max(0, min(3, (b & 224) >> 5)))
 
     player.longitude = stream.float()
     player.latitude = stream.float()
