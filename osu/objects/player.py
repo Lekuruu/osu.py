@@ -52,7 +52,7 @@ class Player:
     def mode(self) -> Mode:
         return self.status.mode
 
-    @name.setter
+    @mode.setter
     def mode(self, value: Mode):
         self.status.mode = value
 
