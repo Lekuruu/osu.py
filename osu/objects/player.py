@@ -17,7 +17,6 @@ class Player:
 
         self.timezone = 0
         self.country_code = 0
-        self.mode = Mode.Osu
         self.longitude = 0.0
         self.latitude = 0.0
 
@@ -48,6 +47,10 @@ class Player:
 
     def __eq__(self, other: object) -> bool:
         return self.id == other.id
+
+    @property
+    def mode(self) -> Mode:
+        return self.status.mode
 
     @property
     def loaded(self) -> bool:
