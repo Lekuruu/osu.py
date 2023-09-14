@@ -52,8 +52,8 @@ class Player:
     def mode(self) -> Mode:
         return self.status.mode
 
-    @property.setter
-    def mode(self, value: Mode) -> None:
+    @name.setter
+    def mode(self, value: Mode):
         self.status.mode = value
 
     @property
