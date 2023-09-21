@@ -43,7 +43,7 @@ python setup.py install
 Here is a small example of how to use this package:
 
 ```python
-from osu.constants import ServerPackets
+from osu.bancho.constants import ServerPackets
 from osu.objects import Player
 from osu import Game
 
