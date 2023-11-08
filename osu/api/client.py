@@ -13,6 +13,17 @@ class WebAPI:
 
     """WebAPI
     -----------
+    This class provides access to the client api endpoints, which includes:
+        - Leaderboards
+        - Comments
+        - Friends
+        - Replays
+        - Avatars
+        - Beatmap Star Ratings
+        - Seasonal Backgrounds
+
+    with the exception being score submission for obvious reasons.
+    osu!direct will be implemented soon.
 
     Functions:
         - `check_updates`

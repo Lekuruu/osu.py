@@ -16,7 +16,8 @@ class Game:
 
     """osu! game client
     --------------------
-    This class will try to emulate the online functionality of the osu! stable client.
+    This class will emulate the online functionality of the osu! stable client.
+    It will provide interaction with bancho, as well as the client api.
     """
 
     def __init__(

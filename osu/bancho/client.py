@@ -21,8 +21,25 @@ class BanchoClient:
 
     """BanchoClient
     ---------------
+    To interact with bancho, you can set event listeners on server packets.
 
-    Parameters:
+    Here is an example for the message packet:
+    ```
+    @game.events.register(ServerPackets.SEND_MESSAGE)
+    def on_message(sender: Player, message: str, target: Channel|Player):
+        print(f"Received message from {sender.name} on {target.name}: {message}")
+    ```
+    Please refer to `osu.bancho.packets.py`, to find the arguments that are being passed into the event.
+
+    You can also create tasks, that run in specific intervals:
+    ```
+    @game.tasks.register(minutes=1, loop=True)
+    def example_task():
+        # This code runs every minute
+        ...
+    ```
+
+    Attributes:
         `player`: osu.objects.Player
 
         `spectating`: osu.objects.Player
