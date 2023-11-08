@@ -15,7 +15,7 @@ class ReplayFrame:
     def encode(self) -> bytes:
         stream = StreamOut()
         stream.u8(self.button_state.value)
-        stream.u8(0)  # "Taiko-Byte"
+        stream.u8(0)  # unused
         stream.float(self.x)
         stream.float(self.y)
         stream.s32(self.time)
@@ -25,7 +25,8 @@ class ReplayFrame:
     def decode(cls, stream: StreamIn):
         button_state = ButtonState(stream.u8())
 
-        # "Taiko-Byte"
+        # This byte is now unused and was replaced by the ButtonState flag
+        # It's only kept here, because of legacy replay support
         if stream.u8() > 0:
             if ButtonState.Right1 not in button_state:
                 button_state |= ButtonState.Right1
