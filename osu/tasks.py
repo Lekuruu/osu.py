@@ -38,8 +38,6 @@ class TaskManager:
         `loop`: If set to `True`, the task will loop itself in the specified time interval
 
         `threaded`: This will run the task inside a thread.
-            Note that this is **not recommended**, since interactions with the game client were not designed to be done asyncronous.
-            I will try to fix this issue in the future.
         """
 
         def wrapper(f: Callable):
