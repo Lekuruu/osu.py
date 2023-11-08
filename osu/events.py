@@ -18,7 +18,7 @@ class EventHandler:
     >>> game = Game(...)
     >>>
     >>> @game.events.register(ServerPackets.SEND_MESSAGE)
-    >>> def message_handler(sender, message, target):
+    >>> def message_handler(sender: Player, message: str, target: Player|Channel):
     >>>     print(message)
     """
 
@@ -28,6 +28,7 @@ class EventHandler:
 
     def register(self, packet: ServerPackets, threaded: bool = False):
         """Register an event, that will be executed once the given server packet has been received."""
+
         def wrapper(f: Callable):
             if threaded:
                 f = self._submit_future(f)
@@ -50,10 +51,6 @@ class EventHandler:
             if self.executor._shutdown:
                 return
             future = self.executor.submit(f, *args)
-            future.add_done_callback(self._thread_callback)
             return future
 
         return execute
-
-    def _thread_callback(self, future: Future):
-        ...  # TODO

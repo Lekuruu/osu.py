@@ -1,5 +1,5 @@
-from concurrent.futures import Future, ThreadPoolExecutor
-from typing import List, Callable, Optional
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Callable
 from dataclasses import dataclass
 from datetime import datetime
 import logging
@@ -91,9 +91,7 @@ class TaskManager:
                     if self.executor._shutdown:
                         return
 
-                    future = self.executor.submit(task.function)
-                    future.add_done_callback(self._thread_callback)
-
+                    self.executor.submit(task.function)
                     self.logger.debug(
                         f"Task '{task.function.__name__}' was submitted to executor."
                     )
@@ -105,6 +103,3 @@ class TaskManager:
                     )
 
         self.logger.debug("Done.")
-
-    def _thread_callback(self, future: Future) -> None:
-        ...  # TODO
