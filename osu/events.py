@@ -14,7 +14,7 @@ class EventHandler:
     After a packet has been received from the server,
     it will call every event associated with that packet.
 
-    Example of how a event can be registered and used:
+    Example of how an event can be registered and used:
     >>> game = Game(...)
     >>>
     >>> @game.events.register(ServerPackets.SEND_MESSAGE)
@@ -27,6 +27,7 @@ class EventHandler:
         self.executor = ThreadPoolExecutor(max_workers=10)
 
     def register(self, packet: ServerPackets, threaded: bool = False):
+        """Register an event, that will be executed once the given server packet has been received."""
         def wrapper(f: Callable):
             if threaded:
                 f = self._submit_future(f)
@@ -39,6 +40,7 @@ class EventHandler:
         return wrapper
 
     def call(self, packet: ServerPackets, *args):
+        """Call all events for the given packet"""
         if packet in self.handlers:
             for handler in self.handlers[packet]:
                 handler(*args)
