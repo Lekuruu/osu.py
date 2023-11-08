@@ -19,6 +19,7 @@ from .constants import (
 )
 
 import threading
+import zlib
 import time
 
 
@@ -43,6 +44,10 @@ class PacketHandler:
             packet = ServerPackets(stream.u16())
             compression = stream.bool()  # unused
             data = stream.read(stream.u32())
+
+            if compression:
+                # Compression was used in very early versions of bancho
+                data = zlib.decompress(data)
 
             game.logger.debug(f'Received packet {packet.name} -> "{data}"')
 
