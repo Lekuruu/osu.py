@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 
 from ..bancho.streams import StreamIn, StreamOut
 from ..bancho.constants import ButtonState

@@ -1,4 +1,3 @@
-from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, Callable, Dict, List
 from datetime import datetime
 from copy import copy
