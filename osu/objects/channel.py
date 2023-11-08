@@ -18,6 +18,7 @@ class Channel:
         self.joining = False
 
         self.logger = logging.getLogger(self.name)
+        self.logger.disabled = game.logger.disabled
 
     def __hash__(self) -> int:
         return int(self.name.encode().hex(), 16)

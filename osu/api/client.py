@@ -48,6 +48,7 @@ class WebAPI:
         self.session.headers = {"User-Agent": "osu!", "osu-version": self.game.version}
 
         self.logger = logging.getLogger(f"osu!api-{game.version}")
+        self.logger.disabled = game.logger.disabled
 
         self.url = f"https://osu.{self.game.server}"
 

@@ -38,6 +38,7 @@ class Player:
         self.last_status = Status()
 
         self.logger = logging.getLogger(self.name)
+        self.logger.disabled = game.logger.disabled
 
     def __repr__(self) -> str:
         return f'<Player "{self.name}" ({self.id})>'

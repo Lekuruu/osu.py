@@ -26,9 +26,11 @@ class TaskManager:
 
     def __init__(self, game) -> None:
         self.executor = ThreadPoolExecutor(max_workers=10)
-        self.logger = logging.getLogger("tasks")
         self.tasks: List[Task] = []
         self.game = game
+
+        self.logger = logging.getLogger("tasks")
+        self.logger.disabled = game.logger.disabled
 
     def register(self, *, seconds=0, minutes=0, hours=0, loop=False, threaded=False):
         """Register a task

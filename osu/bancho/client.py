@@ -88,6 +88,7 @@ class BanchoClient:
         self.game = game
 
         self.logger = logging.getLogger(f"bancho-{game.version}")
+        self.logger.disabled = game.logger.disabled
 
         self.domain = f"c.{game.server}"
         self.url = f"https://{self.domain}"

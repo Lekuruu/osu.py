@@ -27,9 +27,10 @@ class Game:
         server="ppy.sh",
         stream="stable40",
         version: Optional[int] = None,
-        tournament=False,
+        tournament: bool = False,
         events: Optional[Dict[ServerPackets, List[Callable]]] = {},
         tasks: Optional[List[Task]] = [],
+        disable_logging: bool = False,
     ) -> None:
         """Parameters
         -------------
@@ -60,6 +61,9 @@ class Game:
 
         `tasks`: list, optional
             Allows to pass in pre-defined tasks, just like the `events` parameter
+
+        `disable_logging`: bool
+            Disable the logging, duh
         """
 
         self.username = username
@@ -72,6 +76,7 @@ class Game:
         self.version_number = version
 
         self.logger = logging.getLogger("osu!")
+        self.logger.disabled = disable_logging
 
         if not version:
             # Fetch latest client version
@@ -141,6 +146,7 @@ class Game:
                 self.tourney,
                 self.events.handlers,
                 self.tasks.tasks,
+                self.logger.disabled,
             )
 
         try:
