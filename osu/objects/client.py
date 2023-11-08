@@ -9,7 +9,15 @@ import psutil
 
 class ClientHash:
 
-    """The client hash is used to identify a device on the server side."""
+    """### Client Hash
+    The client hash is used to identify a device on the server side.
+    These are usually known as "Hardware IDs" or "Unique IDs".
+
+    You can set custom hardware ids, by assigning custom values to these attributes:
+        - `adapters`: List[str]
+        - `uninstall_id`: str
+        - `disk_signature`: str
+    """
 
     def __init__(self, executable_hash: str) -> None:
         """
@@ -23,15 +31,27 @@ class ClientHash:
 
         self.executable_hash = executable_hash
 
+        # Custom properties
+        self._uninstall_id: Optional[str] = None
+        self._disk_signature: Optional[str] = None
+        self._adapters: Optional[List[str]] = None
+
     def __repr__(self) -> str:
         return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
 
     @property
     def adapters(self) -> List[str]:
+        if self._adapters:
+            return self._adapters
+
         return [
             psutil.net_if_addrs()[adapter][0].address
             for adapter in psutil.net_if_addrs()
         ]
+
+    @adapters.setter
+    def adapters(self, value: List[str]):
+        self._adapters = value
 
     @property
     def adapter_string(self) -> str:
@@ -52,6 +72,10 @@ class ClientHash:
 
     @property
     def uninstall_id(self) -> str:
+        if self._uninstall_id != None:
+            assert len(self._uninstall_id) == 32, "Invalid md5 hash"
+            return self._uninstall_id
+
         if platform.system() != "Windows":
             return hashlib.md5(b"unknown").hexdigest()
 
@@ -75,8 +99,16 @@ class ClientHash:
 
         return hashlib.md5(b"unknown").hexdigest()
 
+    @uninstall_id.setter
+    def uninstall_id(self, value: str):
+        self._uninstall_id = value
+
     @property
     def disk_signature(self) -> str:
+        if self._disk_signature != None:
+            assert len(self._disk_signature) == 32, "Invalid md5 hash"
+            return self._disk_signature
+
         if platform.system() != "Windows":
             return hashlib.md5(b"unknown").hexdigest()
 
@@ -88,6 +120,10 @@ class ClientHash:
 
         # Fallback
         return hashlib.md5(b"unknown").hexdigest()
+
+    @disk_signature.setter
+    def disk_signature(self, value: str):
+        self._disk_signature = value
 
 
 class ClientInfo:
