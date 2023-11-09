@@ -24,3 +24,22 @@ class CommentTarget(str, Enum):
     Map = "map"
     Song = "song"
     Replay = "replay"
+
+
+class DisplayMode(IntEnum):
+    Ranked = 0
+    # TODO: 1
+    Pending = 2
+    Qualified = 3
+    All = 4
+    Graveyard = 5
+    # TODO: 6
+    RankedPlayed = 7
+
+
+class ModeSelect(IntEnum):
+    All = -1
+    Osu = 0
+    Taiko = 1
+    CatchTheBeat = 2
+    OsuMania = 3

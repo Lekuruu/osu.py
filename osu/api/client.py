@@ -1,6 +1,7 @@
 from typing import Callable, Optional, Iterator, List
 
-from .constants import Mode, Mods, RankingType, CommentTarget
+from .constants import Mode, Mods, RankingType, CommentTarget, DisplayMode, ModeSelect
+from ..objects.beatmap import OnlineBeatmap
 from ..objects.score import ScoreResponse
 from ..objects.comment import Comment
 from ..game import Game
@@ -406,4 +407,28 @@ class WebAPI:
 
         return response.iter_content(1024)
 
-    # TODO: osu! direct
+    def search_beatmapsets(
+        self, query: str, display_mode=DisplayMode.Ranked, mode=ModeSelect.All, page=0
+    ) -> Optional[List[OnlineBeatmap]]:
+        """Get a list of beatmapsets"""
+
+        response = self.session.get(
+            f"https://osu.ppy.sh/web/osu-search.php",
+            params={
+                "u": self.game.username,
+                "h": self.game.password_hash,
+                "q": query,
+                "r": display_mode.value,
+                "m": mode.value,
+                "p": page,
+            },
+        )
+
+        lines = response.text.splitlines()
+        status = int(lines[0])
+
+        if status < 0:
+            self.logger.error(f'Failed to get beatmapsets: "{lines[1]}"')
+            return
+
+        return [OnlineBeatmap.parse(line) for line in lines[1:]]
