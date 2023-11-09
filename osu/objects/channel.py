@@ -68,9 +68,10 @@ class Channel:
         if not (player := self.game.bancho.player):
             return
 
-        self.logger.info(
-            f'<{player.name}{f" ({player.id})" if player.id else ""}> [{self.name}]: "{message}"'
-        )
+        if not self.game.disable_chat:
+            self.logger.info(
+                f'<{player.name}{f" ({player.id})" if player.id else ""}> [{self.name}]: "{message}"'
+            )
 
         stream = StreamOut()
         stream.string(player.name)

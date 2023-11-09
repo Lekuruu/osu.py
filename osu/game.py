@@ -29,6 +29,7 @@ class Game:
         tournament: bool = False,
         events: Optional[Dict[ServerPackets, List[Callable]]] = {},
         tasks: Optional[List[Task]] = [],
+        disable_chat_logging: bool = False,
         disable_logging: bool = False,
     ) -> None:
         """Parameters
@@ -71,6 +72,7 @@ class Game:
         self.stream = stream
         self.version = version
         self.tourney = tournament
+        self.disable_chat = disable_chat_logging
 
         self.version_number = version
 

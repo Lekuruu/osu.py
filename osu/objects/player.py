@@ -86,9 +86,10 @@ class Player:
         stream.string(self.name)
         stream.s32(player.id)
 
-        self.logger.info(
-            f'<{player.name}{f" ({player.id})" if player.id else ""}> [{self.name}]: "{message}"'
-        )
+        if not self.game.disable_chat:
+            self.logger.info(
+                f'<{player.name}{f" ({player.id})" if player.id else ""}> [{self.name}]: "{message}"'
+            )
 
         self.game.bancho.enqueue(ClientPackets.SEND_PRIVATE_MESSAGE, stream.get())
 
