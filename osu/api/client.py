@@ -43,7 +43,8 @@ class WebAPI:
         - `get_avatar`
         - `get_beatmap_thumbnail`
         - `get_beatmap_preview`
-        - `download_osz`
+        - `search_beatmapsets`
+        - `download_osz`,
     """
 
     def __init__(self, game: Game) -> None:
