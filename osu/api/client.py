@@ -1,4 +1,4 @@
-from typing import Callable, Optional, List
+from typing import Callable, Optional, Iterator, List
 
 from .constants import Mode, Mods, RankingType, CommentTarget
 from ..objects.score import ScoreResponse
@@ -42,6 +42,7 @@ class WebAPI:
         - `get_avatar`
         - `get_beatmap_thumbnail`
         - `get_beatmap_preview`
+        - `download_osz`
     """
 
     def __init__(self, game: Game) -> None:
@@ -384,5 +385,25 @@ class WebAPI:
 
         return response.content if response.ok else None
 
+    def download_osz(
+        self, beatmapset_id: int, no_video: bool = False
+    ) -> Optional[Iterator[bytes]]:
+        """Download an osz file. This will return an iterator of bytes."""
+
+        response = self.session.get(
+            f"https://osu.ppy.sh/d/{beatmapset_id}{'n' if no_video else ''}",
+            allow_redirects=True,
+            stream=True,
+            params={
+                "u": self.game.username,
+                "h": self.game.password_hash,
+                "vv": 2,  # what is this lol
+            },
+        )
+
+        if not response.ok:
+            return
+
+        return response.iter_content(1024)
+
     # TODO: osu! direct
-    # TODO: osz download
