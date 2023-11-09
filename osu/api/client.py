@@ -35,6 +35,7 @@ class WebAPI:
         - `get_scores`
         - `get_star_rating`
         - `get_favourites`
+        - `add_favourite`
         - `get_comments`
         - `post_comment`
         - `get_replay`
@@ -249,6 +250,20 @@ class WebAPI:
             int(beatmap_id) for beatmap_id in response.text.split("\n") if beatmap_id
         ]
 
+    def add_favourite(self, beatmapset_id) -> str:
+        """Add a beatmap to your favourites list"""
+
+        response = self.session.get(
+            f"{self.url}/web/osu-addfavourite.php",
+            params={
+                "u": self.game.username,
+                "h": self.game.password_hash,
+                "a": beatmapset_id,
+            },
+        )
+
+        return response.text
+
     def get_comments(
         self,
         beatmap_id: Optional[int] = None,
@@ -347,6 +362,5 @@ class WebAPI:
 
         return self.session.get(f"https://a.{self.game.server}/{user_id}").content
 
-    # TODO: Add favourite
     # TODO: osu! direct
     # TODO: osz download
