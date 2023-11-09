@@ -33,7 +33,7 @@ python setup.py install
 - [x] Comments
 - [x] Replays
 - [x] Scores/Leaderboards
-- [ ] osu!direct
+- [x] osu!direct
 - [ ] Documentation
 - [ ] (Multiplayer)
 
