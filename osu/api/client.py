@@ -40,6 +40,8 @@ class WebAPI:
         - `post_comment`
         - `get_replay`
         - `get_avatar`
+        - `get_beatmap_thumbnail`
+        - `get_beatmap_preview`
     """
 
     def __init__(self, game: Game) -> None:
@@ -361,6 +363,26 @@ class WebAPI:
         """Get avatar by user id"""
 
         return self.session.get(f"https://a.{self.game.server}/{user_id}").content
+
+    def get_beatmap_thumbnail(
+        self, beatmapset_id: int, large: bool = False
+    ) -> Optional[bytes]:
+        """Get the background thumbnail of a beatmap"""
+
+        response = self.session.get(
+            f"https://b.{self.game.server}/thumb/{beatmapset_id}{'l' if large else ''}.jpg"
+        )
+
+        return response.content if response.ok else None
+
+    def get_beatmap_preview(self, beatmapset_id: int) -> Optional[bytes]:
+        """Get the preview to a song of a beatmap"""
+
+        response = self.session.get(
+            f"https://b.{self.game.server}/preview/{beatmapset_id}.mp3"
+        )
+
+        return response.content if response.ok else None
 
     # TODO: osu! direct
     # TODO: osz download
