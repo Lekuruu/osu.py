@@ -62,12 +62,15 @@ class Player:
         return bool(self.name)
 
     def request_presence(self):
+        """Request a presence update for this player"""
         self.game.bancho.request_presence([self.id])
 
     def request_stats(self):
+        """Request a stats update for this player"""
         self.game.bancho.request_stats([self.id])
 
     def avatar(self) -> Optional[bytes]:
+        """Get the avatar for this player"""
         return self.game.api.get_avatar(self.id)
 
     def send_message(self, message: str):

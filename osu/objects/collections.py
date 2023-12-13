@@ -27,19 +27,23 @@ class Players(LockedSet[Player]):
         return [p for p in self if not p.name]
 
     def add(self, player: Player) -> None:
+        """Add a player to the collection"""
         return super().add(player)
 
     def remove(self, player: Player) -> None:
+        """Remove a player from the collection"""
         if player in self:
             return super().remove(player)
 
     def by_id(self, id: int) -> Optional[Player]:
+        """Get a player by id"""
         for p in self.copy():
             if p.id == id:
                 return p
         return None
 
     def by_name(self, name: str) -> Optional[Player]:
+        """Get a player by name"""
         for p in self.copy():
             if p.name == name:
                 return p
@@ -55,6 +59,7 @@ class Players(LockedSet[Player]):
             self.game.bancho.request_presence([p.id for p in chunk])
 
     def request_updates(self, filter=PresenceFilter.All):
+        """Change your presence filter and request updates from all players"""
         self.game.bancho.enqueue(
             ClientPackets.RECEIVE_UPDATES, int(filter.value).to_bytes(4, "little")
         )
@@ -69,13 +74,16 @@ class Channels(LockedSet[Channel]):
         return [c for c in self if c.joined]
 
     def add(self, channel: Channel) -> None:
+        """Add a channel to the collection"""
         return super().add(channel)
 
     def remove(self, channel: Channel) -> None:
+        """Remove a channel to the collection"""
         if channel in self:
             return super().remove(channel)
 
     def get(self, name: str) -> Optional[Channel]:
+        """Get a channel by name"""
         for c in self.copy():
             if c.name == name:
                 return c

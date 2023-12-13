@@ -27,6 +27,7 @@ class Channel:
         return self.name == other.name
 
     def join(self):
+        """Join this channel"""
         if self.joined:
             return
 
@@ -39,6 +40,7 @@ class Channel:
         self.game.bancho.enqueue(ClientPackets.CHANNEL_JOIN, stream.get())
 
     def leave(self):
+        """Leave this channel"""
         if not self.joined:
             return
 
@@ -51,6 +53,7 @@ class Channel:
         self.game.bancho.enqueue(ClientPackets.CHANNEL_PART, stream.get())
 
     def join_success(self):
+        """Will be called by the server, when you successfully joined a channel"""
         if not self.joined:
             self.logger.info(f"Joined {self.name}!")
 
@@ -62,6 +65,12 @@ class Channel:
             self.game.bancho.players.load()
 
     def send_message(self, message: str, force=False):
+        """Send a message inside this channel
+
+        Args:
+            message (str): Your message
+            force (bool, optional): Sends the message, even if you haven't joined this channel yet
+        """
         if not self.joined and not force:
             return
 
