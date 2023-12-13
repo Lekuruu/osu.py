@@ -4,6 +4,13 @@ from enum import IntEnum, Enum
 
 
 class RankingType(IntEnum):
+    """
+    - `Top`: Global Ranking
+    - `SelectedMod`: Global Ranking (Selected Mods) (Supporter)
+    - `Friends`: Friend Ranking (Supporter)
+    - `Country`: Country Ranking (Supporter)
+    """
+
     Top = 1
     SelectedMod = 2
     Friends = 3
