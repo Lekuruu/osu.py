@@ -27,15 +27,15 @@ python setup.py install
 
 - [x] Receiving player stats
 - [x] Sending/Receiving chat messages
-- [x] Up to 12 clients (Tournament Client)
 - [x] Spectating
 - [x] Avatars
 - [x] Comments
 - [x] Replays
 - [x] Scores/Leaderboards
 - [x] osu!direct
+- [x] Tournament client behaviour
 - [ ] Documentation
-- [ ] (Multiplayer)
+- [ ] Multiplayer
 
 ## Example
 
@@ -45,6 +45,13 @@ Here is a small example of how to use this package:
 from osu.bancho.constants import ServerPackets
 from osu.objects import Player
 from osu import Game
+import logging
+
+# Enable extended logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] - <%(name)s> %(levelname)s: %(message)s'
+)
 
 # Initialize the game class
 game = Game(
