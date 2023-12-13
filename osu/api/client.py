@@ -24,7 +24,6 @@ class WebAPI:
         - Seasonal Backgrounds
 
     with the exception being score submission for obvious reasons.
-    osu!direct will be implemented soon.
 
     Functions:
         - `check_updates`
@@ -44,7 +43,7 @@ class WebAPI:
         - `get_beatmap_thumbnail`
         - `get_beatmap_preview`
         - `search_beatmapsets`
-        - `download_osz`,
+        - `download_osz`
     """
 
     def __init__(self, game: Game) -> None:
@@ -59,6 +58,8 @@ class WebAPI:
         self.url = f"https://osu.{self.game.server}"
 
     def connected_to_bancho(self, *args, **kwargs) -> Callable:
+        """Can be used as a class wrapper to ensure that the client is connected"""
+
         def wrapper(f: Callable):
             if not self.game.bancho.connected:
                 return
@@ -67,7 +68,13 @@ class WebAPI:
 
         return wrapper
 
-    def check_updates(self) -> Optional[dict]:
+    def check_updates(self) -> Optional[List[dict]]:
+        """This will a request on `/web/check-updates.php`
+
+        Returns:
+            Optional[list]: When the request was successful, it will return a list of dicts with the following attributes:
+                            file_version, filename, file_hash, filesize, timestamp, patch_id, url_full
+        """
         self.logger.info("Checking for updates...")
 
         response = self.session.get(
@@ -90,7 +97,11 @@ class WebAPI:
         return response.json()
 
     def connect(self, retry=False) -> bool:
-        """This will perform a request on `/web/bancho_connect.php`."""
+        """This will perform a request on `/web/bancho_connect.php`.
+
+        Returns:
+            bool: If the request was successful
+        """
 
         self.logger.info("Connecting to bancho...")
 
@@ -138,7 +149,7 @@ class WebAPI:
 
     def get_session(self) -> requests.Response:
         """Perform a request on `/web/osu-session.php`.\n
-        I don't know what this actually does.\n
+        I don't know what this actually does.
         My guess is that it checks, if somebody is already online with this account.
         """  # TODO
 
@@ -153,8 +164,12 @@ class WebAPI:
 
         return response
 
-    def get_backgrounds(self) -> Optional[dict]:
-        """This will perform a request on `/web/osu-getseasonal.php`."""
+    def get_backgrounds(self) -> Optional[list]:
+        """This will perform a request on `/web/osu-getseasonal.php`.
+
+        Returns:
+            Optional[list]: List of urls for the seasonal background images
+        """
 
         response = self.session.get(f"{self.url}/web/osu-getseasonal.php")
 
@@ -162,7 +177,11 @@ class WebAPI:
             return response.json()
 
     def get_friends(self) -> List[int]:
-        """This will perform a request on `/web/osu-getfriends.php`."""
+        """This will perform a request on `/web/osu-getfriends.php`.
+
+        Returns:
+            List[int]: The user ids of your friends
+        """
 
         response = self.session.get(
             f"{self.url}/web/osu-getfriends.php",
@@ -186,16 +205,16 @@ class WebAPI:
     ) -> Optional[ScoreResponse]:
         """Get top scores for a beatmap
 
-        - `beatmap_checksum`: MD5 hash of the beatmap file
-        - `beatmap_file`: Filename of the beatmap
-        - `set_id`: BeatmapsetId for the beatmap
-        - `mode`: Specify a mode
-        - `mods`: Filter by mods (`rank_type` must be set to `SelectedMod`)
-        - `rank_type`: osu.api.constants.RankingTy
-            - `Top`: Global Ranking
-            - `SelectedMod`: Global Ranking (Selected Mods) (Supporter)
-            - `Friends`: Friend Ranking (Supporter)
-            - `Country`: Country Ranking (Supporter)
+        Args:
+            beatmap_checksum (str): MD5 hash of the beatmap file
+            beatmap_file (str): Filename of the beatmap
+            set_id (int): BeatmapsetId for the beatmap
+            mode (Mode, optional): Specify a mode
+            mods (Mods, optional): Filter by mods (`rank_type` must be set to `SelectedMod`)
+            rank_type (RankingType, optional): Select the leaderboard type
+
+        Returns:
+            Optional[ScoreResponse]
         """
 
         response = self.session.get(
@@ -224,7 +243,15 @@ class WebAPI:
     def get_star_rating(
         self, beatmap_id: int, mode: Mode = Mode.Osu, mods: Mods = Mods.NoMod
     ) -> float:
-        """Get star rating of a beatmap"""
+        """Get star rating of a beatmap
+
+        Args:
+            beatmap_id (int): Beatmap ID
+            mode (Mode, optional): Mode
+            mods (Mods, optional): Mods
+
+        Returns: float
+        """
 
         response = self.session.post(
             f"{self.url}/difficulty-rating",
@@ -241,7 +268,11 @@ class WebAPI:
         return float(response.text)
 
     def get_favourites(self) -> List[int]:
-        """Get your beatmap favourites"""
+        """Get your beatmap favourites
+
+        Returns:
+            List[int]: List of beatmapset ids
+        """
 
         response = self.session.get(
             f"{self.url}/web/osu-getfavourites.php",
@@ -255,8 +286,15 @@ class WebAPI:
             int(beatmap_id) for beatmap_id in response.text.split("\n") if beatmap_id
         ]
 
-    def add_favourite(self, beatmapset_id) -> str:
-        """Add a beatmap to your favourites list"""
+    def add_favourite(self, beatmapset_id: int) -> str:
+        """Add a beatmap to your favourites list
+
+        Args:
+            beatmapset_id (int)
+
+        Returns:
+            str: A human-readable response string. e.g. "Added to favourites! You have a total of 2 favourites."
+        """
 
         response = self.session.get(
             f"{self.url}/web/osu-addfavourite.php",
@@ -275,8 +313,18 @@ class WebAPI:
         set_id: Optional[int] = None,
         replay_id: Optional[int] = None,
         mode: Mode = Mode.Osu,
-    ) -> List:
-        """Get comments for a beatmap, set or replay"""
+    ) -> List[Comment]:
+        """Get comments for a beatmap, set or replay
+
+        Args:
+            beatmap_id (int, optional): Get comments from this map
+            set_id (int, optional): Get comments from this set
+            replay_id (int, optional): Get comments from this replay
+            mode (Mode, optional): Specify the mode
+
+        Returns:
+            List[Comment]
+        """
 
         if all([beatmap_id is None, set_id is None, replay_id is None]):
             return []
@@ -313,7 +361,17 @@ class WebAPI:
         set_id: Optional[int] = None,
         mode: Mode = Mode.Osu,
     ) -> None:
-        """Post a comment to a map, song or replay"""
+        """Post a comment to a map, song or replay
+
+        Args:
+            text (str): The content of your comment
+            time (int): The time you want this comment to appear inside the map
+            target (CommentTarget): Specify where this comment should appear.
+            mode (Mode, optional): Specify the mode
+            beatmap_id (Optional[int], optional): Set the beatmap id, if you set the target to "Map"
+            replay_id (Optional[int], optional): Set the replay id, if you set the target to "Replay"
+            set_id (Optional[int], optional): Set the set it, if you set the target to "Song"
+        """
 
         if all([beatmap_id is None, set_id is None, replay_id is None]):
             return
@@ -344,7 +402,17 @@ class WebAPI:
         )
 
     def get_replay(self, replay_id: int, mode: Mode = Mode.Osu) -> Optional[bytes]:
-        """Get raw replay data by id (not osr!)"""
+        """Get raw replay data by id (not osr!)
+
+        Args:
+            replay_id (int): The score/replay id
+            mode (Mode, optional): The mode of this score
+
+        Returns:
+            Optional[bytes]: The raw replay data, compressed with lzma
+
+        Please view this page for more information: https://osu.ppy.sh/wiki/de/Client/File_formats/osr_%28file_format%29
+        """
 
         response = self.session.get(
             f"{self.url}/web/osu-getreplay.php",
@@ -390,7 +458,15 @@ class WebAPI:
     def download_osz(
         self, beatmapset_id: int, no_video: bool = False
     ) -> Optional[Iterator[bytes]]:
-        """Download an osz file. This will return an iterator of bytes."""
+        """Download an osz file
+
+        Args:
+            beatmapset_id (int): The beatmapset id
+            no_video (bool, optional): Specify if the osz should contain a video
+
+        Returns:
+            Optional[Iterator[bytes]]: An iterator of bytes, which contains the osz
+        """
 
         response = self.session.get(
             f"https://osu.ppy.sh/d/{beatmapset_id}{'n' if no_video else ''}",
@@ -411,7 +487,17 @@ class WebAPI:
     def search_beatmapsets(
         self, query: str, display_mode=DisplayMode.Ranked, mode=ModeSelect.All, page=0
     ) -> Optional[List[OnlineBeatmap]]:
-        """Get a list of beatmapsets"""
+        """Get a list of beatmapsets, aka. osu! direct search
+
+        Args:
+            query (str): Search for beatmaps
+            display_mode (DisplayMode): Filter maps by their status
+            mode (ModeSelect): Filter maps by their mode
+            page (int): Specify an offset/page
+
+        Returns:
+            Optional[List[OnlineBeatmap]]
+        """
 
         response = self.session.get(
             f"https://osu.ppy.sh/web/osu-search.php",
