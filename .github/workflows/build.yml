@@ -83,7 +83,7 @@ jobs:
     needs: check
     if: github.event_name == 'push' || github.event_name == 'release'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Use Python 3.9
         uses: actions/setup-python@v1
