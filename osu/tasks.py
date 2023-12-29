@@ -62,8 +62,6 @@ class TaskManager:
         if not self.game.bancho.connected:
             return
 
-        self.logger.debug("Running tasks...")
-
         for task in self.tasks:
             last_call = (datetime.now() - task.last_call).total_seconds()
 
@@ -83,13 +81,6 @@ class TaskManager:
                         )
                         continue
 
-                    # if (
-                    #     task.current_thread is not None
-                    #     and not task.current_thread.done()
-                    # ):
-                    # Thread is still running
-                    # TODO
-
                     if self.executor._shutdown:
                         return
 
@@ -103,5 +94,3 @@ class TaskManager:
                         f"Failed to run '{task.function.__name__}' task: {exc}",
                         exc_info=exc,
                     )
-
-        self.logger.debug("Done.")
