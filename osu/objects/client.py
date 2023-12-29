@@ -55,6 +55,9 @@ class ClientHash:
 
     @property
     def adapter_string(self) -> str:
+        if platform.system() != "Windows":
+            return "runningunderwine"
+
         adapters = [
             adapter.replace("-", "")
             for adapter in self.adapters
