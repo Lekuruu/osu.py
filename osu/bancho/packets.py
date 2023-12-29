@@ -10,6 +10,7 @@ from ..game import Game
 from .streams import StreamIn
 from .constants import (
     ServerPackets,
+    ClientPackets,
     ReplayAction,
     StatusAction,
     LoginError,
@@ -72,6 +73,11 @@ class PacketHandler:
 
 
 Packets = PacketHandler()
+
+
+@Packets.register(ServerPackets.PONG)
+def tcp_ping(stream: StreamIn, game: Game):
+    game.bancho.enqueue(ClientPackets.PING)
 
 
 @Packets.register(ServerPackets.PROTOCOL_VERSION)
