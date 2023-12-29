@@ -63,7 +63,7 @@ class Game:
             Allows to pass in pre-defined tasks, just like the `events` parameter
 
         `disable_logging`: bool
-            Disable the logging, duh
+            Disable the logging
         """
 
         self.username = username
@@ -120,7 +120,7 @@ class Game:
             # TODO: Custom executable hash?
             exit(1)
 
-        self.client = ClientInfo(self.version, updates)
+        self.client = ClientInfo.from_updates(self.version, updates)
 
     def __repr__(self) -> str:
         return f"<osu! {self.version}>"

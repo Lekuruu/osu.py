@@ -150,18 +150,18 @@ class ClientInfo:
             aka. "Block non-friend dms"
     """
 
-    def __init__(self, version: str, updates: dict) -> None:
+    def __init__(self, version: str, hash: str) -> None:
         """
         Args:
             `version`: str
                 Client version (e.g. b20220829)
 
-            `updates`: dict
-                Update response from `/web/check-updates.php`
+            `hash`: dict
+                The executable hash of your `osu!.exe`.
         """
 
-        self.hash = ClientHash(self.get_file_hash(updates))
         self.version = version
+        self.hash = ClientHash(hash)
 
         self.friendonly_dms = False
         self.display_city = False
@@ -179,3 +179,10 @@ class ClientInfo:
             if file["filename"] == "osu!.exe":
                 return file["file_hash"]
         return None
+
+    @classmethod
+    def from_updates(cls, version: str, updates: dict) -> "ClientInfo":
+        return cls(
+            version,
+            cls.get_file_hash(updates),
+        )
