@@ -94,7 +94,7 @@ class TcpBanchoClient(HTTPBanchoClient):
 
         return ServerPackets(packet_id), StreamIn(packet_data)
 
-    def enqueue(self, packet: ClientPackets, data: bytes = b"", _=None) -> bytes:
+    def enqueue(self, packet: ClientPackets, data: bytes = b"", dequeue=None) -> bytes:
         """Send a packet to the queue and dequeue"""
         stream = StreamOut()
 
