@@ -109,16 +109,20 @@ jobs:
     needs: [check, build]
     if: github.event_name == 'release'
     steps:
-      - name: Download distribution folder
-        uses: actions/download-artifact@v3
-        with:
-          name: dist
-          path: dist
+      - uses: actions/checkout@v4
 
       - name: Use Python 3.9
         uses: actions/setup-python@v1
         with:
           python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install setuptools
+
+      - name: Create local build
+        run: |
+          python setup.py build
 
       - name: Install dependencies
         run: |
