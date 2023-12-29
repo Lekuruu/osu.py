@@ -207,7 +207,7 @@ class BanchoClient:
 
         self.game.packets.data_received(response.content, self.game)
 
-    def dequeue(self) -> Optional[requests.Response]:
+    def dequeue(self) -> None:
         """Send a request to bancho, empty the queue and handle incoming packets"""
 
         if not self.connected:
@@ -240,11 +240,8 @@ class BanchoClient:
 
         self.last_action = datetime.now().timestamp()
 
-        return response
-
     def exit(self):
         """Send logout packet to bancho, and disconnect."""
-
         self.enqueue(ClientPackets.LOGOUT, int(0).to_bytes(4, "little"))
         self.connected = False
         self.retry = False
