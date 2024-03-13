@@ -75,7 +75,6 @@ class Player:
 
     def send_message(self, message: str):
         """Send a PM to this player"""
-
         if not (player := self.game.bancho.player):
             return
 
@@ -97,6 +96,7 @@ class Player:
         self.game.bancho.enqueue(ClientPackets.SEND_PRIVATE_MESSAGE, stream.get())
 
     def add_friend(self):
+        """Add this player to the friends list"""
         if self.id in self.game.bancho.friends:
             self.game.logger.warning(
                 f"Tried to add friend, but you are already friends with {self.name}."
@@ -111,6 +111,7 @@ class Player:
         )
 
     def remove_friend(self):
+        """Remove this player from the friends list"""
         if self.id not in self.game.bancho.friends:
             self.game.logger.warning(
                 f"Tried to remove friend, but you are not friends with {self.name}."
