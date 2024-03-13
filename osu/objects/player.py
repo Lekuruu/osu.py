@@ -97,13 +97,29 @@ class Player:
         self.game.bancho.enqueue(ClientPackets.SEND_PRIVATE_MESSAGE, stream.get())
 
     def add_friend(self):
+        if self.id in self.game.bancho.friends:
+            self.game.logger.warning(
+                f"Tried to add friend, but you are already friends with {self.name}."
+            )
+            return
+
         self.game.logger.info(f"You are now friends with {self.name}.")
+
+        self.game.bancho.friends.add(self.id)
         self.game.bancho.enqueue(
             ClientPackets.FRIEND_ADD, int(self.id).to_bytes(4, "little")
         )
 
     def remove_friend(self):
+        if self.id not in self.game.bancho.friends:
+            self.game.logger.warning(
+                f"Tried to remove friend, but you are not friends with {self.name}."
+            )
+            return
+
         self.game.logger.info(f"You are no longer friends with {self.name}.")
+
+        self.game.bancho.friends.remove(self.id)
         self.game.bancho.enqueue(
             ClientPackets.FRIEND_REMOVE, int(self.id).to_bytes(4, "little")
         )
