@@ -18,7 +18,6 @@ import time
 
 
 class BanchoClient:
-
     """BanchoClient
     ---------------
     To interact with bancho, you can set event listeners on server packets.

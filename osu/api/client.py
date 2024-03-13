@@ -11,7 +11,6 @@ import logging
 
 
 class WebAPI:
-
     """WebAPI
     -----------
     This class provides access to the client api endpoints, which includes:

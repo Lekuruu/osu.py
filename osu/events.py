@@ -5,7 +5,6 @@ from .bancho.constants import ServerPackets
 
 
 class EventHandler:
-
     """EventHandler
     ---------------
 

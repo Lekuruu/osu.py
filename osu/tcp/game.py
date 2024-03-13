@@ -12,7 +12,6 @@ import logging
 
 
 class TcpGame:
-
     """osu! game client (tcp)
     --------------------
     This class is a modified version of the "Game" class, that uses the TCP protocol instead of the HTTP protocol.

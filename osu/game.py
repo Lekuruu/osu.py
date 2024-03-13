@@ -12,7 +12,6 @@ import logging
 
 
 class Game:
-
     """osu! game client
     --------------------
     This class will emulate the online functionality of the osu! stable client.

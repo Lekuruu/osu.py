@@ -8,7 +8,6 @@ import psutil
 
 
 class ClientHash:
-
     """### Client Hash
     The client hash is used to identify a device on the server side.
     These are usually known as "Hardware IDs" or "Unique IDs".
@@ -130,7 +129,6 @@ class ClientHash:
 
 
 class ClientInfo:
-
     """Sent when logging in to bancho.
 
     Parameters:
