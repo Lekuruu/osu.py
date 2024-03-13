@@ -21,7 +21,7 @@ class Channel:
         self.logger.disabled = game.logger.disabled
 
     def __hash__(self) -> int:
-        return int(self.name.encode().hex(), 16)
+        return hash(self.name)
 
     def __eq__(self, other: object) -> bool:
         return self.name == other.name
