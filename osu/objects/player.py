@@ -3,8 +3,8 @@ from typing import Set, List, Optional
 from .status import Status
 from ..game import Game
 
+from ..bancho.constants import LEVEL_GRAPH, ClientPackets, Privileges, Mode
 from ..bancho.streams import StreamOut
-from ..bancho.constants import ClientPackets, Privileges, Mode
 
 import logging
 
@@ -60,6 +60,20 @@ class Player:
     @property
     def loaded(self) -> bool:
         return bool(self.name)
+
+    @property
+    def level(self) -> int:
+        if self.tscore <= 0:
+            return 1
+
+        if self.tscore >= LEVEL_GRAPH[-1]:
+            return 100 + int((self.tscore - LEVEL_GRAPH[99]) / 100000000000)
+
+        for idx, v in enumerate(LEVEL_GRAPH, start=0):
+            if v > self.tscore:
+                return idx
+
+        return 1
 
     def request_presence(self):
         """Request a presence update for this player"""
