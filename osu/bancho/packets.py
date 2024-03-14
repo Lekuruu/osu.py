@@ -252,12 +252,9 @@ def presence_bundle(stream: StreamIn, game: Game):
     user_ids = stream.intlist()
 
     for id in user_ids:
-        if not (game.bancho.players.by_id(id)):
-            # Add player if not found
-            game.bancho.players.add(Player(id, game=game))
+        game.bancho.players.add(Player(id, game=game))
 
     game.bancho.fast_read = True
-
     game.events.call(ServerPackets.USER_PRESENCE_BUNDLE, user_ids)
 
 
