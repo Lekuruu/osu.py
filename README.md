@@ -96,7 +96,7 @@ game = Game(
 asyncio.run(game.run_async())
 ```
 
-You can view an example project [here](https://github.com/Lekuruu/osu-recorder).
+For a more in-depth example, please view [this project](https://github.com/lekuruu/osu-recorder).
 
 ---
 
