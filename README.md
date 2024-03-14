@@ -32,8 +32,8 @@ python setup.py install
 - [x] Comments
 - [x] Replays
 - [x] Scores/Leaderboards
-- [x] osu!direct
 - [x] Tournament client behaviour
+- [x] osu!direct
 - [ ] Documentation
 - [ ] Multiplayer
 
@@ -78,8 +78,25 @@ def example_task():
   ...
 ```
 
-[This project](https://github.com/Lekuruu/osu-recorder) is also a good example
-and it was also the reason why I even started this project.
+You can also run this project with asyncio:
+
+```shell
+pip install asyncio
+```
+
+```python
+import asyncio
+
+game = Game(
+  USERNAME,
+  PASSWORD
+)
+
+# Run the game
+asyncio.run(game.run_async())
+```
+
+You can view an example project [here](https://github.com/Lekuruu/osu-recorder).
 
 ---
 
