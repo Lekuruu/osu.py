@@ -56,6 +56,15 @@ class WebAPI:
 
         self.url = f"https://osu.{self.game.server}"
 
+    @property
+    def verification_url(self) -> str:
+        return (
+            f"{self.url}/p/verify"
+            f'?u={self.game.username.replace(" ", "%20")}'
+            f"&reason=bancho"
+            f"&ch={self.game.client.hash}"
+        )
+
     def connected_to_bancho(self, *args, **kwargs) -> Callable:
         """Can be used as a class wrapper to ensure that the client is connected"""
 
@@ -130,17 +139,15 @@ class WebAPI:
             )
 
             if "verify" in response.text:
-                self.verify(str(self.game.client.hash))
+                self.verify()
                 return False
 
         return True
 
-    def verify(self, hash: str, exit_after: bool = True) -> None:
+    def verify(self, exit_after: bool = True) -> None:
         """This will print out a url, where the user can verify this client."""
         self.logger.info("Verification required.")
-        self.logger.info(
-            f'{self.url}/p/verify?u={self.game.username.replace(" ", "%20")}&reason=bancho&ch={hash}'
-        )
+        self.logger.info(self.verification_url)
         self.logger.info("You only need to do this once.")
 
         if exit_after:
