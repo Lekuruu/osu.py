@@ -172,6 +172,13 @@ class Game:
         if exit_on_interrupt:
             exit(0)
 
+    async def run_async(self) -> None:
+        """Run the game in an async context"""
+        import asyncio
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self.run, False, False)
+
     def fetch_version(self, stream: str = "stable40") -> Optional[str]:
         """
         Fetch the latest version of the client from:
