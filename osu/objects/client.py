@@ -67,9 +67,6 @@ class ClientHash:
 
     @property
     def adapter_hash(self) -> str:
-        if platform.system() != "Windows":
-            return "runningunderwine"
-
         return hashlib.md5(self.adapter_string.encode()).hexdigest()
 
     @property
