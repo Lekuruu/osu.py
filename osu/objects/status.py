@@ -19,6 +19,6 @@ class Status:
         self.action = StatusAction.Idle
         self.text = ""
         self.checksum = ""
-        self.mods = []
+        self.mods = Mods.NoMod
         self.mode = Mode.Osu
         self.beatmap_id = 0
