@@ -365,6 +365,7 @@ class BanchoClient:
         self.logger.info(f"Stopped spectating {self.spectating.name}.")
 
         self.enqueue(ClientPackets.STOP_SPECTATING, dequeue=False)
+        self.spectating = None
 
         self.status.reset()
         self.update_status()
