@@ -3,14 +3,8 @@ from typing import Set, List, Optional
 from .status import Status
 from ..game import Game
 
+from ..bancho.constants import ClientPackets, CountryCodes, LevelGraph, Privileges, Mode
 from ..bancho.streams import StreamOut
-from ..bancho.constants import (
-    ClientPackets,
-    CountryCodes,
-    LevelGraph,
-    Privileges,
-    Mode
-)
 
 import logging
 
