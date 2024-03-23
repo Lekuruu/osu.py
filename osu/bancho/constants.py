@@ -146,7 +146,7 @@ class LoginError(Enum):
         }[self]
 
 
-LEVEL_GRAPH = [
+LevelGraph = [
     0,
     30000,
     130000,

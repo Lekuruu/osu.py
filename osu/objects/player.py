@@ -3,8 +3,13 @@ from typing import Set, List, Optional
 from .status import Status
 from ..game import Game
 
-from ..bancho.constants import LEVEL_GRAPH, ClientPackets, Privileges, Mode
 from ..bancho.streams import StreamOut
+from ..bancho.constants import (
+    ClientPackets,
+    LevelGraph,
+    Privileges,
+    Mode
+)
 
 import logging
 
@@ -66,10 +71,10 @@ class Player:
         if self.tscore <= 0:
             return 1
 
-        if self.tscore >= LEVEL_GRAPH[-1]:
-            return 100 + int((self.tscore - LEVEL_GRAPH[99]) / 100000000000)
+        if self.tscore >= LevelGraph[-1]:
+            return 100 + int((self.tscore - LevelGraph[99]) / 100000000000)
 
-        for idx, v in enumerate(LEVEL_GRAPH, start=0):
+        for idx, v in enumerate(LevelGraph, start=0):
             if v > self.tscore:
                 return idx
 
