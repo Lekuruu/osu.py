@@ -6,6 +6,7 @@ from ..game import Game
 from ..bancho.streams import StreamOut
 from ..bancho.constants import (
     ClientPackets,
+    CountryCodes,
     LevelGraph,
     Privileges,
     Mode
@@ -79,6 +80,10 @@ class Player:
                 return idx
 
         return 1
+
+    @property
+    def country(self) -> str:
+        return list(CountryCodes.keys())[self.country_code]
 
     def request_presence(self):
         """Request a presence update for this player"""
