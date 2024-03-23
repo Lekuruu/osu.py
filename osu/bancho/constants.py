@@ -421,6 +421,7 @@ class Grade(Enum):
     F = 8
     N = 9
 
+
 CountryCodes = {
     "XX": "Unknown",
     "OC": "Oceania",
@@ -674,5 +675,5 @@ CountryCodes = {
     "IM": "Isle of Man",
     "JE": "Jersey",
     "BL": "Saint Barthélemy",
-    "MF": "Saint Martin (French part)"
+    "MF": "Saint Martin (French part)",
 }
