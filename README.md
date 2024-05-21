@@ -6,7 +6,7 @@
 osu.py is a python library that emulates part of the online functionality of the osu! stable client.
 
 **IMPORTANT:**
-Use this library at your own risk! I am not responsible for anything that can happen to your account. If you want to test it out on a private server, you can set the `server` attribute when initializing the client.
+Use this library at your own risk! I am not responsible for any unexpected behavior of the client or anything that can happen to your account. If you want to test it out on a custom server, you can set the `server` attribute when initializing the client.
 
 You can install this package with pip:
 
