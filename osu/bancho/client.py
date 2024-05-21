@@ -57,6 +57,10 @@ class BanchoClient:
 
         `retry`: bool
 
+        `min_idletime`: int (Minimum time between requests)
+
+        `max_idletime`: int (Maximum time between requests)
+
     Functions:
         `enqueue`: Send a bancho packet to the server
 
@@ -125,7 +129,7 @@ class BanchoClient:
         self.in_lobby = False
 
         self.min_idletime = 1
-        self.max_idletime = 4
+        self.max_idletime = 2.5
 
     @property
     def status(self) -> Status:
@@ -148,12 +152,9 @@ class BanchoClient:
 
         interval = 1
 
-        if self.game.tourney:
-            return interval
-
         if not self.spectating:
             interval *= 1 + self.idle_time / 10
-            interval *= 1 + self.ping_count
+            interval *= self.ping_count
 
         interval = min(self.max_idletime, max(self.min_idletime, interval))
 
@@ -165,9 +166,9 @@ class BanchoClient:
 
         while self.connected:
             try:
+                time.sleep(self.request_interval)
                 self.dequeue()
                 self.game.tasks.execute()
-                time.sleep(self.request_interval)
             except KeyboardInterrupt:
                 raise
             except Exception as exc:
@@ -216,7 +217,8 @@ class BanchoClient:
             # Queue is empty, sending ping
             self.ping_count += 1
             return self.ping()
-        else:
+
+        if self.queue.qsize() > 1:
             self.ping_count = 0
 
         data = b""
