@@ -12,7 +12,7 @@ from ..bancho.packets import Packets
 from ..objects.collections import Players, Channels, Matches
 from ..objects.player import Player
 from ..objects.match import Match
-    
+
 if TYPE_CHECKING:
     from .game import TcpGame
 
