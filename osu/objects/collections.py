@@ -11,9 +11,6 @@ from .match import Match
 if TYPE_CHECKING:
     from ..game import Game
 
-if TYPE_CHECKING:
-    from ..game import Game
-
 
 class Players(LockedSet[Player]):
     def __init__(self, game: "Game") -> None:
