@@ -438,5 +438,6 @@ class BanchoClient:
 
     def create_match(self, name: str, password: str = ""):
         """Create a new multiplayer match"""
+        self.logger.info(f"Creating match {name} with password {password}...")
         self.join_lobby()
-        Match.create(self.game, self.player, password, self.max_slots)
+        self.match = Match.create(self.game, self.player, password, self.max_slots)
