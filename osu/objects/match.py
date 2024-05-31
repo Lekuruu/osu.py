@@ -60,3 +60,34 @@ class Match:
 
         self.slots: List[Slot] = [Slot() for _ in range(amount_slots)]
         self.seed: int = 0
+
+    def serialize(self) -> bytes:
+        stream = StreamOut()
+        stream.u16(self.id)
+
+        stream.bool(self.in_progress)
+        stream.u8(self.type.value)
+        stream.u32(self.mods.value)
+
+        stream.string(self.name)
+        stream.string(self.password)
+        stream.string(self.beatmap_text)
+        stream.s32(self.beatmap_id)
+        stream.string(self.beatmap_checksum)
+
+        [stream.u8(slot.status.value) for slot in self.slots]
+        [stream.u8(slot.team.value) for slot in self.slots]
+        [stream.s32(slot.player_id) for slot in self.slots if slot.has_player]
+
+        stream.s32(self.host.id)
+        stream.u8(self.mode.value)
+        stream.u8(self.scoring_type.value)
+        stream.u8(self.team_type.value)
+
+        stream.bool(self.freemod)
+
+        if self.freemod:
+            [stream.s32(slot.mods.value) for slot in self.slots]
+
+        stream.s32(self.seed)
+        return stream.get()
