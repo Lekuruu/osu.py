@@ -9,7 +9,7 @@ from ..bancho.constants import Privileges, ServerPackets
 from ..bancho.streams import StreamIn, StreamOut
 from ..bancho.packets import Packets
 
-from ..objects.collections import Players, Channels
+from ..objects.collections import Players, Channels, Matches
 from ..objects.player import Player
 from ..objects.match import Match
 from .game import TcpGame
@@ -40,6 +40,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.match: Optional[Match] = None
 
         self.channels = Channels()
+        self.matches = Matches()
         self.players = Players(game)
         self.queue = Queue()
 

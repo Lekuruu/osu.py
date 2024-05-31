@@ -5,8 +5,8 @@ from queue import Queue
 from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
 from .streams import StreamOut
 
+from ..objects.collections import Players, Channels, Matches
 from ..objects.replays import ReplayFrame, ScoreFrame
-from ..objects.collections import Players, Channels
 from ..objects.match import Match, Slot
 from ..objects.player import Player
 from ..objects.status import Status
@@ -44,7 +44,11 @@ class BanchoClient:
 
         `spectating`: osu.objects.Player
 
+        `match`: osu.objects.Match
+
         `players`: osu.objects.Players
+
+        `matches`: osu.objects.Matches
 
         `channels`: osu.objects.Channels
 
@@ -86,6 +90,8 @@ class BanchoClient:
         `join_lobby`: Join the lobby
 
         `leave_lobby`: Leave the lobby
+
+        `create_match`: Create a multiplayer match
     """
 
     def __init__(self, game: Game) -> None:
@@ -115,6 +121,7 @@ class BanchoClient:
         self.match: Optional[Match] = None
 
         self.channels = Channels()
+        self.matches = Matches()
         self.players = Players(game)
         self.queue = Queue()
 
