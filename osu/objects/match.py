@@ -35,7 +35,9 @@ class Slot:
 
 
 class Match:
-    def __init__(self, game: Game, host: Player, password: str = "") -> None:
+    def __init__(
+        self, game: Game, host: Player, password: str = "", amount_slots: int = 16
+    ) -> None:
         self.id: int = -1
         self.name: str = f"{host.name}'s Game"
         self.password: str = password
@@ -54,5 +56,5 @@ class Match:
         self.beatmap_id: int = -1
         self.beatmap_checksum: str = ""
 
-        self.slots: List[Slot] = []
+        self.slots: List[Slot] = [Slot() for _ in range(amount_slots)]
         self.seed: int = 0
