@@ -3,7 +3,7 @@ from typing import List
 
 from .player import Player
 from ..game import Game
-from ..bancho.streams import StreamOut
+from ..bancho.streams import StreamOut, StreamIn
 from ..bancho.constants import (
     MatchScoringTypes,
     MatchTeamTypes,
@@ -66,10 +66,53 @@ class Match:
         cls, game: Game, host: Player, password: str = "", amount_slots: int = 16
     ) -> "Match":
         match = cls(game, host, password, amount_slots)
-        game.bancho.enqueue(ClientPackets.CREATE_MATCH, match.serialize())
+        game.bancho.enqueue(ClientPackets.CREATE_MATCH, match.encode())
         return match
 
-    def serialize(self) -> bytes:
+    @classmethod
+    def decode(cls, stream: StreamIn, game: Game, amount_slots: int = 16) -> "Match":
+        match = cls(game, game.bancho.player)
+        match.id = stream.u16()
+
+        match.in_progress = stream.bool()
+        match.type = MatchType(stream.u8())
+        match.mods = Mods(stream.u32())
+
+        match.name = stream.string()
+        match.password = stream.string()
+
+        match.beatmap_text = stream.string()
+        match.beatmap_id = stream.s32()
+        match.beatmap_checksum = stream.string()
+
+        slot_status = [SlotStatus(stream.u8()) for _ in range(amount_slots)]
+        slot_team = [SlotTeam(stream.u8()) for _ in range(amount_slots)]
+        slot_id = [
+            stream.s32() if (slot_status[i] & SlotStatus.HasPlayer) > 0 else -1
+            for i in range(len(slot_status))
+        ]
+
+        match.host = game.bancho.players.by_id(stream.s32())
+        match.mode = Mode(stream.u8())
+
+        match.scoring_type = MatchScoringTypes(stream.u8())
+        match.team_type = MatchTeamTypes(stream.u8())
+
+        match.freemod = stream.bool()
+        slot_mods = [Mods.NoMod for _ in range(amount_slots)]
+
+        if match.freemod:
+            slot_mods = [Mods(stream.u32()) for _ in range(amount_slots)]
+
+        match.slots = [
+            Slot(slot_id[i], slot_status[i], slot_team[i], slot_mods[i])
+            for i in range(amount_slots)
+        ]
+
+        match.seed = stream.s32()
+        return match
+
+    def encode(self) -> bytes:
         stream = StreamOut()
         stream.u16(self.id)
 
@@ -99,3 +142,22 @@ class Match:
 
         stream.s32(self.seed)
         return stream.get()
+
+    def update_from_match(self, match: "Match") -> "Match":
+        self.id = match.id
+        self.in_progress = match.in_progress
+        self.type = match.type
+        self.mods = match.mods
+        self.name = match.name
+        self.password = match.password
+        self.beatmap_text = match.beatmap_text
+        self.beatmap_id = match.beatmap_id
+        self.beatmap_checksum = match.beatmap_checksum
+        self.host = match.host
+        self.mode = match.mode
+        self.scoring_type = match.scoring_type
+        self.team_type = match.team_type
+        self.freemod = match.freemod
+        self.slots = match.slots
+        self.seed = match.seed
+        return self
