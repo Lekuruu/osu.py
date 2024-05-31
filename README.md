@@ -33,9 +33,10 @@ python setup.py install
 - [x] Replays
 - [x] Scores/Leaderboards
 - [x] Tournament client behaviour
-- [x] osu!direct
-- [ ] Documentation
+- [x] Direct Search
+- [x] Direct Download
 - [ ] Multiplayer
+- [ ] Documentation
 
 ## Example
 
