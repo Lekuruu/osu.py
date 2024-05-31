@@ -125,6 +125,7 @@ class BanchoClient:
         self.players = Players(game)
         self.queue = Queue()
 
+        self.max_slots = 16
         self.ping_count = 0
         self.protocol = 0
 
@@ -437,6 +438,6 @@ class BanchoClient:
         self.in_lobby = True
         # TODO: Update status
 
-    def create_match(self, name: str, password: str = "", amount_slots: int = 16):
+    def create_match(self, name: str, password: str = ""):
         """Create a new multiplayer match"""
-        Match.create(self.game, self.player, password, amount_slots)
+        Match.create(self.game, self.player, password, self.max_slots)

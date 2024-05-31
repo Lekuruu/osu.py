@@ -44,6 +44,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.players = Players(game)
         self.queue = Queue()
 
+        self.max_slots = 8
         self.ping_count = 0
         self.protocol = 0
 
