@@ -428,3 +428,8 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.PART_LOBBY)
         self.in_lobby = True
+        # TODO: Update status
+
+    def create_match(self, name: str, password: str = "", amount_slots: int = 16):
+        """Create a new multiplayer match"""
+        Match.create(self.game, self.player, password, amount_slots)
