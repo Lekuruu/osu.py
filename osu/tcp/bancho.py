@@ -80,24 +80,31 @@ class TcpBanchoClient(HTTPBanchoClient):
         except ConnectionRefusedError:
             self.logger.error("Connection refused by the server.")
 
-    def get_packet(self) -> Tuple[int, StreamIn]:
-        """Get a packet from the server"""
-        packet_header = StreamIn(self.socket.recv(7))
+    def process_packets(self) -> None:
+        """Process incoming packets from the server"""
+        while True:
+            packet_header = StreamIn(self.socket.recv(7))
 
-        packet_id = packet_header.u16()
-        compression = packet_header.bool()
-        packet_size = packet_header.u32()
-        packet_data = self.socket.recv(packet_size)
+            if packet_header.eof():
+                return
 
-        if compression:
-            packet_data = gzip.decompress(packet_data)
+            packet_id = packet_header.u16()
+            compression = packet_header.bool()
+            packet_size = packet_header.u32()
+            packet_data = self.socket.recv(packet_size)
 
-        return ServerPackets(packet_id), StreamIn(packet_data)
+            if compression:
+                packet_data = gzip.decompress(packet_data)
+
+            packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
+
+            self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
+            self.game.packets.packet_received(packet, stream, self.game)
 
     def enqueue(
-        self, packet: ClientPackets, data: bytes = b"", dequeue: bool = True
+        self, packet: ClientPackets, data: bytes = b"", dequeue: bool = False
     ) -> bytes:
-        """Send a packet to the queue and dequeue"""
+        """Send a packet to the server and dequeue"""
         stream = StreamOut()
 
         # Construct header
@@ -107,9 +114,8 @@ class TcpBanchoClient(HTTPBanchoClient):
         stream.write(data)
 
         self.logger.debug(f'Sending {packet.name} -> "{data}"')
-
-        # Append to queue
-        self.queue.put(stream.get())
+        self.socket.send(stream.get())
+        self.last_action = datetime.now().timestamp()
 
         if dequeue:
             self.dequeue()
@@ -117,33 +123,16 @@ class TcpBanchoClient(HTTPBanchoClient):
         return stream.get()
 
     def dequeue(self) -> None:
-        """Send a request to bancho, empty the queue and handle incoming packets"""
-        if not self.connected and self.queue.empty():
-            return
-
-        data = b""
-
-        while not self.queue.empty():
-            data += self.queue.get()
-
-        if data:
-            self.socket.send(data)
-            self.last_action = datetime.now().timestamp()
-
+        """Process all incoming packets from the server"""
         if not self.connected:
             return
 
         try:
-            packet, stream = self.get_packet()
+            self.process_packets()
         except OverflowError as e:
-            self.logger.error(f'Failed to receive packet: "{e}"')
+            self.logger.error(f'Failed to process packets: "{e}"')
             self.connected = False
             self.retry = True
-            return
-
-        self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
-
-        self.game.packets.packet_received(packet, stream, self.game)
 
     def exit(self):
         """Send logout packet to bancho, and disconnect."""
