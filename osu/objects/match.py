@@ -16,7 +16,7 @@ from ..bancho.constants import (
 )
 
 
-@dataclass(slots=True)
+@dataclass
 class Slot:
     player_id: int = -1
     status: SlotStatus = SlotStatus.Locked
