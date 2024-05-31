@@ -11,6 +11,7 @@ from ..bancho.packets import Packets
 
 from ..objects.collections import Players, Channels
 from ..objects.player import Player
+from ..objects.match import Match
 from .game import TcpGame
 
 import logging
@@ -36,6 +37,7 @@ class TcpBanchoClient(HTTPBanchoClient):
 
         self.spectating: Optional[Player] = None
         self.player: Optional[Player] = None
+        self.match: Optional[Match] = None
 
         self.channels = Channels()
         self.players = Players(game)
