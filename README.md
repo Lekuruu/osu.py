@@ -63,7 +63,7 @@ game = Game(
 # Simple message handler
 @game.events.register(ServerPackets.SEND_MESSAGE)
 def on_message(sender: Player, message: str, target: Player):
-  if message.startswith('!ping'):
+  if message.startswith('?ping'):
     sender.send_message('pong!')
 
 # Run the game
