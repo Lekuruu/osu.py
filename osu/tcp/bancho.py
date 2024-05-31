@@ -86,24 +86,23 @@ class TcpBanchoClient(HTTPBanchoClient):
 
     def process_packets(self) -> None:
         """Process incoming packets from the server"""
-        while True:
-            packet_header = StreamIn(self.socket.recv(7))
+        packet_header = StreamIn(self.socket.recv(7))
 
-            if packet_header.eof():
-                return
+        if packet_header.eof():
+            return
 
-            packet_id = packet_header.u16()
-            compression = packet_header.bool()
-            packet_size = packet_header.u32()
-            packet_data = self.socket.recv(packet_size)
+        packet_id = packet_header.u16()
+        compression = packet_header.bool()
+        packet_size = packet_header.u32()
+        packet_data = self.socket.recv(packet_size)
 
-            if compression:
-                packet_data = gzip.decompress(packet_data)
+        if compression:
+            packet_data = gzip.decompress(packet_data)
 
-            packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
+        packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
 
-            self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
-            self.game.packets.packet_received(packet, stream, self.game)
+        self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
+        self.game.packets.packet_received(packet, stream, self.game)
 
     def enqueue(
         self, packet: ClientPackets, data: bytes = b"", dequeue: bool = False
