@@ -7,6 +7,7 @@ from .streams import StreamOut
 
 from ..objects.replays import ReplayFrame, ScoreFrame
 from ..objects.collections import Players, Channels
+from ..objects.match import Match, Slot
 from ..objects.player import Player
 from ..objects.status import Status
 
@@ -111,6 +112,7 @@ class BanchoClient:
 
         self.spectating: Optional[Player] = None
         self.player: Optional[Player] = None
+        self.match: Optional[Match] = None
 
         self.channels = Channels()
         self.players = Players(game)
@@ -417,6 +419,7 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.JOIN_LOBBY)
         self.in_lobby = True
+        # TODO: Update status
 
     def leave_lobby(self):
         """Leave the multiplayer lobby"""
