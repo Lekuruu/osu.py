@@ -427,7 +427,6 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.JOIN_LOBBY)
         self.in_lobby = True
-        # TODO: Update status
 
     def leave_lobby(self):
         """Leave the multiplayer lobby"""
@@ -436,7 +435,6 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.PART_LOBBY)
         self.in_lobby = True
-        # TODO: Update status
 
     def create_match(self, name: str, password: str = ""):
         """Create a new multiplayer match"""
