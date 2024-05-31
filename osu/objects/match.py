@@ -3,14 +3,16 @@ from typing import List
 
 from .player import Player
 from ..game import Game
+from ..bancho.streams import StreamOut
 from ..bancho.constants import (
-    SlotStatus,
-    SlotTeam,
-    Mods,
-    MatchType,
-    Mode,
     MatchScoringTypes,
     MatchTeamTypes,
+    ClientPackets,
+    SlotStatus,
+    MatchType,
+    SlotTeam,
+    Mods,
+    Mode,
 )
 
 
@@ -38,7 +40,7 @@ class Match:
     def __init__(
         self, game: Game, host: Player, password: str = "", amount_slots: int = 16
     ) -> None:
-        self.id: int = -1
+        self.id: int = 0
         self.name: str = f"{host.name}'s Game"
         self.password: str = password
         self.host = host
