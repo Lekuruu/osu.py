@@ -61,6 +61,14 @@ class Match:
         self.slots: List[Slot] = [Slot() for _ in range(amount_slots)]
         self.seed: int = 0
 
+    @classmethod
+    def create(
+        cls, game: Game, host: Player, password: str = "", amount_slots: int = 16
+    ) -> "Match":
+        match = cls(game, host, password, amount_slots)
+        game.bancho.enqueue(ClientPackets.CREATE_MATCH, match.serialize())
+        return match
+
     def serialize(self) -> bytes:
         stream = StreamOut()
         stream.u16(self.id)
