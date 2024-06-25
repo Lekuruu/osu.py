@@ -5,6 +5,7 @@ from ..objects.replays import ScoreFrame, ReplayFrame
 from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
 from ..objects.player import Player
+from ..objects.match import Match
 from ..game import Game
 
 from .streams import StreamIn
@@ -560,3 +561,22 @@ def dms_blocked(stream: StreamIn, game: Game):
 
     game.logger.info(f"{player} blocked their dms.")
     game.events.call(ServerPackets.USER_DM_BLOCKED, player)
+
+
+@Packets.register(ServerPackets.NEW_MATCH)
+def new_match(stream: StreamIn, game: Game):
+    match = Match.decode(stream, game, game.bancho.max_slots)
+    game.bancho.matches.add(match)
+    game.events.call(ServerPackets.NEW_MATCH, match)
+
+
+@Packets.register(ServerPackets.UPDATE_MATCH)
+def update_match(stream: StreamIn, game: Game):
+    match_update = Match.decode(stream, game, game.bancho.max_slots)
+
+    if not (match := game.bancho.matches.by_id(match_update.id)):
+        new_match(stream, game)
+        return
+
+    match.update_from_match(match_update)
+    game.events.call(ServerPackets.UPDATE_MATCH, match)

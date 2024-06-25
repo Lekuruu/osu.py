@@ -8,6 +8,7 @@ from .lists import LockedSet
 
 from .channel import Channel
 from .player import Player
+from .match import Match
 
 
 class Players(LockedSet[Player]):
@@ -87,4 +88,25 @@ class Channels(LockedSet[Channel]):
         for c in self.copy():
             if c.name == name:
                 return c
+        return None
+
+
+class Matches(LockedSet[Match]):
+    def __iter__(self) -> Iterator[Match]:
+        return super().__iter__()
+
+    def add(self, match: Match) -> None:
+        """Add a match to the collection"""
+        return super().add(match)
+
+    def remove(self, match: Match) -> None:
+        """Remove a match from the collection"""
+        if match in self:
+            return super().remove(match)
+
+    def by_id(self, id: int) -> Optional[Match]:
+        """Get a match by id"""
+        for m in self.copy():
+            if m.id == id:
+                return m
         return None
