@@ -111,11 +111,14 @@ class ClientHash:
         if platform.system() != "Windows":
             return hashlib.md5(b"unknown").hexdigest()
 
-        from wmi import WMI
+        try:
+            from wmi import WMI
 
-        # Get serial number of first item
-        for item in WMI().query("SELECT * FROM Win32_DiskDrive"):
-            return hashlib.md5(item.SerialNumber.encode()).hexdigest()
+            # Get serial number of first item
+            for item in WMI().query("SELECT * FROM Win32_DiskDrive"):
+                return hashlib.md5(item.SerialNumber.encode()).hexdigest()
+        except Exception:
+            pass
 
         # Fallback
         return hashlib.md5(b"unknown").hexdigest()
