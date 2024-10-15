@@ -65,32 +65,34 @@ class TaskManager:
         for task in self.tasks:
             last_call = (datetime.now() - task.last_call).total_seconds()
 
-            if last_call >= task.interval:
-                task.last_call = datetime.now()
+            if last_call < task.interval:
+                continue
 
-                if not task.loop:
-                    self.tasks.remove(task)
+            task.last_call = datetime.now()
 
-                try:
-                    self.logger.debug(f"Trying to run task: '{task.function.__name__}'")
+            if not task.loop:
+                self.tasks.remove(task)
 
-                    if not task.threaded:
-                        task.function()
-                        self.logger.debug(
-                            f"Task '{task.function.__name__}' was successfully executed."
-                        )
-                        continue
+            try:
+                self.logger.debug(f"Trying to run task: '{task.function.__name__}'")
 
-                    if self.executor._shutdown:
-                        return
-
-                    self.executor.submit(task.function)
+                if not task.threaded:
+                    task.function()
                     self.logger.debug(
-                        f"Task '{task.function.__name__}' was submitted to executor."
+                        f"Task '{task.function.__name__}' was successfully executed."
                     )
+                    continue
 
-                except Exception as exc:
-                    self.logger.error(
-                        f"Failed to run '{task.function.__name__}' task: {exc}",
-                        exc_info=exc,
-                    )
+                if self.executor._shutdown:
+                    return
+
+                self.executor.submit(task.function)
+                self.logger.debug(
+                    f"Task '{task.function.__name__}' was submitted to executor."
+                )
+
+            except Exception as exc:
+                self.logger.error(
+                    f"Failed to run '{task.function.__name__}' task: {exc}",
+                    exc_info=exc,
+                )
