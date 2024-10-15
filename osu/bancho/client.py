@@ -5,8 +5,9 @@ from queue import Queue
 from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
 from .streams import StreamOut
 
+from ..objects.collections import Players, Channels, Matches
 from ..objects.replays import ReplayFrame, ScoreFrame
-from ..objects.collections import Players, Channels
+from ..objects.match import Match, Slot
 from ..objects.player import Player
 from ..objects.status import Status
 
@@ -44,7 +45,11 @@ class BanchoClient:
 
         `spectating`: osu.objects.Player
 
+        `match`: osu.objects.Match
+
         `players`: osu.objects.Players
+
+        `matches`: osu.objects.Matches
 
         `channels`: osu.objects.Channels
 
@@ -86,6 +91,8 @@ class BanchoClient:
         `join_lobby`: Join the lobby
 
         `leave_lobby`: Leave the lobby
+
+        `create_match`: Create a multiplayer match
     """
 
     def __init__(self, game: "Game") -> None:
@@ -112,11 +119,14 @@ class BanchoClient:
 
         self.spectating: Optional[Player] = None
         self.player: Optional[Player] = None
+        self.match: Optional[Match] = None
 
         self.channels = Channels()
+        self.matches = Matches()
         self.players = Players(game)
         self.queue = Queue()
 
+        self.max_slots = 16
         self.ping_count = 0
         self.protocol = 0
 
@@ -426,3 +436,9 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.PART_LOBBY)
         self.in_lobby = True
+
+    def create_match(self, name: str, password: str = ""):
+        """Create a new multiplayer match"""
+        self.logger.info(f"Creating match {name} with password {password}...")
+        self.join_lobby()
+        self.match = Match.create(self.game, self.player, password, self.max_slots)
