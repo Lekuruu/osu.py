@@ -566,14 +566,14 @@ def dms_blocked(stream: StreamIn, game: "Game"):
 
 
 @Packets.register(ServerPackets.NEW_MATCH)
-def new_match(stream: StreamIn, game: Game):
+def new_match(stream: StreamIn, game: "Game"):
     match = Match.decode(stream, game, game.bancho.max_slots)
     game.bancho.matches.add(match)
     game.events.call(ServerPackets.NEW_MATCH, match)
 
 
 @Packets.register(ServerPackets.UPDATE_MATCH)
-def update_match(stream: StreamIn, game: Game):
+def update_match(stream: StreamIn, game: "Game"):
     match_update = Match.decode(stream, game, game.bancho.max_slots)
 
     if not (match := game.bancho.matches.by_id(match_update.id)):

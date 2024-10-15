@@ -1,8 +1,7 @@
+from typing import List, TYPE_CHECKING
 from dataclasses import dataclass
-from typing import List
 
 from .player import Player
-from ..game import Game
 from ..bancho.streams import StreamOut, StreamIn
 from ..bancho.constants import (
     MatchScoringTypes,
@@ -14,6 +13,9 @@ from ..bancho.constants import (
     Mods,
     Mode,
 )
+
+if TYPE_CHECKING:
+    from ..game import Game
 
 
 @dataclass
@@ -38,7 +40,7 @@ class Slot:
 
 class Match:
     def __init__(
-        self, game: Game, host: Player, password: str = "", amount_slots: int = 16
+        self, game: "Game", host: Player, password: str = "", amount_slots: int = 16
     ) -> None:
         self.id: int = 0
         self.name: str = f"{host.name}'s Game"
@@ -63,14 +65,14 @@ class Match:
 
     @classmethod
     def create(
-        cls, game: Game, host: Player, password: str = "", amount_slots: int = 16
+        cls, game: "Game", host: Player, password: str = "", amount_slots: int = 16
     ) -> "Match":
         match = cls(game, host, password, amount_slots)
         game.bancho.enqueue(ClientPackets.CREATE_MATCH, match.encode())
         return match
 
     @classmethod
-    def decode(cls, stream: StreamIn, game: Game, amount_slots: int = 16) -> "Match":
+    def decode(cls, stream: StreamIn, game: "Game", amount_slots: int = 16) -> "Match":
         match = cls(game, game.bancho.player)
         match.id = stream.u16()
 
