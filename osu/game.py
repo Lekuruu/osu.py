@@ -72,26 +72,12 @@ class Game:
         self.version = version
         self.tourney = tournament
         self.disable_chat = disable_chat_logging
-
         self.version_number = version
 
         self.logger = logging.getLogger("osu!")
         self.logger.disabled = disable_logging
 
-        if not version:
-            # Fetch latest client version
-            self.version = self.fetch_version(stream)
-
-            if not self.version:
-                # Failed to get version
-                exit(1)
-        else:
-            # Custom client version was set
-            self.version = f"b{self.version}"
-
-            if self.tourney:
-                self.version = f"{self.version}tourney"
-
+        self.resolve_version()
         self.session = requests.Session()
         self.session.headers = {"User-Agent": "osu!", "osu-version": self.version}
 
@@ -113,6 +99,10 @@ class Game:
 
         if tasks:
             self.tasks.tasks = tasks
+
+        if not self.version or not self.version_number:
+            # Failed to get version
+            exit(1)
 
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
@@ -178,6 +168,22 @@ class Game:
 
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.run, False, False)
+
+    def resolve_version(self) -> None:
+        """Ensure the client version is set"""
+        if not self.version:
+            # Fetch latest client version
+            self.version = self.fetch_version(self.stream)
+            return
+
+        if type(self.version) not in (float, int):
+            raise ValueError("Invalid version number")
+
+        # Custom client version was set
+        self.version = f"b{self.version}"
+
+        if self.tourney:
+            self.version = f"{self.version}tourney"
 
     def fetch_version(self, stream: str = "stable40") -> Optional[str]:
         """

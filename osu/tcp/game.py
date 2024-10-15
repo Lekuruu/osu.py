@@ -77,17 +77,12 @@ class TcpGame:
         self.version = version
         self.tourney = tournament
         self.disable_chat = disable_chat_logging
-
         self.version_number = version
 
         self.logger = logging.getLogger("osu!")
         self.logger.disabled = disable_logging
 
-        self.version = f"b{self.version}"
-
-        if self.tourney:
-            self.version = f"{self.version}tourney"
-
+        self.resolve_version()
         self.session = requests.Session()
         self.session.headers = {"User-Agent": "osu!", "osu-version": self.version}
 
@@ -162,3 +157,13 @@ class TcpGame:
 
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.run, False, False)
+
+    def resolve_version(self) -> None:
+        """Ensure a correct client version was set"""
+        if type(self.version) not in (float, int):
+            raise ValueError("Invalid version number")
+
+        self.version = f"b{self.version}"
+
+        if self.tourney:
+            self.version = f"{self.version}tourney"
