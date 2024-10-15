@@ -6,7 +6,7 @@ from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
 from ..objects.player import Player
 from ..objects.match import Match
-    
+
 if TYPE_CHECKING:
     from ..game import Game
 
@@ -568,6 +568,7 @@ def dms_blocked(stream: StreamIn, game: "Game"):
 @Packets.register(ServerPackets.NEW_MATCH)
 def new_match(stream: StreamIn, game: "Game"):
     match = Match.decode(stream, game, game.bancho.max_slots)
+
     game.bancho.matches.add(match)
     game.events.call(ServerPackets.NEW_MATCH, match)
 
