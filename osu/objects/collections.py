@@ -1,18 +1,19 @@
-from typing import List, Set, Iterator, Optional
+from typing import List, Set, Iterator, Optional, TYPE_CHECKING
 from collections.abc import Iterator
 
 from ..bancho.constants import ClientPackets, PresenceFilter
-from ..game import Game
 
 from .lists import LockedSet
-
 from .channel import Channel
 from .player import Player
 from .match import Match
 
+if TYPE_CHECKING:
+    from ..game import Game
+
 
 class Players(LockedSet[Player]):
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: "Game") -> None:
         self.game = game
         super().__init__()
 

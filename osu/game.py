@@ -6,6 +6,11 @@ from .bancho.constants import ServerPackets
 from .objects.client import ClientInfo
 from .tasks import Task
 
+from .bancho import BanchoClient, Packets
+from .events import EventHandler
+from .tasks import TaskManager
+from .api import WebAPI
+
 import requests
 import hashlib
 import logging
@@ -82,11 +87,6 @@ class Game:
         self.session.headers = {"User-Agent": "osu!", "osu-version": self.version}
 
         self.logger.name = f"osu!-{self.version}"
-
-        from .bancho import BanchoClient, Packets
-        from .events import EventHandler
-        from .tasks import TaskManager
-        from .api import WebAPI
 
         self.packets = copy(Packets)
         self.events = EventHandler()

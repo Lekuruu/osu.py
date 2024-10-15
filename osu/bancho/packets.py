@@ -1,4 +1,4 @@
-from typing import List, Dict, Callable
+from typing import List, Dict, Callable, TYPE_CHECKING
 from copy import copy
 
 from ..objects.replays import ScoreFrame, ReplayFrame
@@ -6,7 +6,9 @@ from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
 from ..objects.player import Player
 from ..objects.match import Match
-from ..game import Game
+
+if TYPE_CHECKING:
+    from ..game import Game
 
 from .streams import StreamIn
 from .constants import (
@@ -39,7 +41,7 @@ class PacketHandler:
 
         return wrapper
 
-    def data_received(self, data: bytes, game: Game):
+    def data_received(self, data: bytes, game: "Game"):
         stream = StreamIn(data)
 
         while not stream.eof():
@@ -59,7 +61,7 @@ class PacketHandler:
             # Reset stream
             stream = StreamIn(stream.readall())
 
-    def packet_received(self, packet: ServerPackets, data: StreamIn, game: Game):
+    def packet_received(self, packet: ServerPackets, data: StreamIn, game: "Game"):
         if packet in self.handlers:
             for handler in self.handlers[packet]:
                 try:
@@ -77,18 +79,18 @@ Packets = PacketHandler()
 
 
 @Packets.register(ServerPackets.PONG)
-def tcp_ping(stream: StreamIn, game: Game):
+def tcp_ping(stream: StreamIn, game: "Game"):
     game.bancho.enqueue(ClientPackets.PING)
 
 
 @Packets.register(ServerPackets.PROTOCOL_VERSION)
-def protocol_version(stream: StreamIn, game: Game):
+def protocol_version(stream: StreamIn, game: "Game"):
     game.bancho.protocol = stream.s32()
     game.events.call(ServerPackets.PROTOCOL_VERSION, game.bancho.protocol)
 
 
 @Packets.register(ServerPackets.RESTART)
-def server_restart(stream: StreamIn, game: Game):
+def server_restart(stream: StreamIn, game: "Game"):
     timeout = stream.s32() / 1000
 
     game.logger.warning(f"Bancho is restarting. Retrying in {timeout} seconds...")
@@ -101,7 +103,7 @@ def server_restart(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_ID)
-def login_reply(stream: StreamIn, game: Game):
+def login_reply(stream: StreamIn, game: "Game"):
     response = stream.s32()
 
     if response < 0:
@@ -136,12 +138,12 @@ def login_reply(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.PONG)
-def pong(stream: StreamIn, game: Game):
+def pong(stream: StreamIn, game: "Game"):
     game.events.call(ServerPackets.PONG)
 
 
 @Packets.register(ServerPackets.ACCOUNT_RESTRICTED)
-def restricted(stream: StreamIn, game: Game):
+def restricted(stream: StreamIn, game: "Game"):
     game.logger.error("You have been banned.")
     game.events.call(ServerPackets.ACCOUNT_RESTRICTED)
     game.bancho.connected = False
@@ -149,49 +151,49 @@ def restricted(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.PRIVILEGES)
-def privileges(stream: StreamIn, game: Game):
+def privileges(stream: StreamIn, game: "Game"):
     game.bancho.privileges = Privileges(stream.s32())
     game.events.call(ServerPackets.PRIVILEGES, game.bancho.privileges)
 
 
 @Packets.register(ServerPackets.FRIENDS_LIST)
-def friends(stream: StreamIn, game: Game):
+def friends(stream: StreamIn, game: "Game"):
     game.bancho.friends = stream.intlist()
     game.events.call(ServerPackets.FRIENDS_LIST, game.bancho.friends)
 
 
 @Packets.register(ServerPackets.MAIN_MENU_ICON)
-def menu_icon(stream: StreamIn, game: Game):
+def menu_icon(stream: StreamIn, game: "Game"):
     image, link = stream.string().split("|")
     game.events.call(ServerPackets.MAIN_MENU_ICON, image, link)
 
 
 @Packets.register(ServerPackets.VERSION_UPDATE)
-def version_update(stream: StreamIn, game: Game):
+def version_update(stream: StreamIn, game: "Game"):
     game.logger.info("Bancho requested a version update.")
     game.events.call(ServerPackets.VERSION_UPDATE)
 
 
 @Packets.register(ServerPackets.VERSION_UPDATE_FORCED)
-def version_update_forced(stream: StreamIn, game: Game):
+def version_update_forced(stream: StreamIn, game: "Game"):
     game.logger.warning("Bancho forced a version update.")
     game.events.call(ServerPackets.VERSION_UPDATE_FORCED)
 
 
 @Packets.register(ServerPackets.GET_ATTENTION)
-def attension(stream: StreamIn, game: Game):
+def attension(stream: StreamIn, game: "Game"):
     game.events.call(ServerPackets.GET_ATTENTION)
 
 
 @Packets.register(ServerPackets.NOTIFICATION)
-def notification(stream: StreamIn, game: Game):
+def notification(stream: StreamIn, game: "Game"):
     message = stream.string()
     game.logger.info(f'Notification from bancho: "{message}"')
     game.events.call(ServerPackets.NOTIFICATION, message)
 
 
 @Packets.register(ServerPackets.USER_PRESENCE)
-def presence(stream: StreamIn, game: Game):
+def presence(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -217,7 +219,7 @@ def presence(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_STATS)
-def stats(stream: StreamIn, game: Game):
+def stats(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -249,7 +251,7 @@ def stats(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_PRESENCE_BUNDLE)
-def presence_bundle(stream: StreamIn, game: Game):
+def presence_bundle(stream: StreamIn, game: "Game"):
     user_ids = stream.intlist()
 
     for id in user_ids:
@@ -260,7 +262,7 @@ def presence_bundle(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_PRESENCE_SINGLE)
-def presence_single(stream: StreamIn, game: Game):
+def presence_single(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (game.bancho.players.by_id(user_id)):
@@ -271,7 +273,7 @@ def presence_single(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_LOGOUT)
-def logout(stream: StreamIn, game: Game):
+def logout(stream: StreamIn, game: "Game"):
     if not (player := game.bancho.players.by_id(stream.s32())):
         return
 
@@ -285,7 +287,7 @@ def logout(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.SEND_MESSAGE)
-def message(stream: StreamIn, game: Game):
+def message(stream: StreamIn, game: "Game"):
     sender = stream.string()
     message = stream.string()
     target = stream.string()
@@ -331,7 +333,7 @@ def message(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.SPECTATOR_JOINED)
-def spectator_joined(stream: StreamIn, game: Game):
+def spectator_joined(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -346,7 +348,7 @@ def spectator_joined(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.SPECTATOR_LEFT)
-def spectator_left(stream: StreamIn, game: Game):
+def spectator_left(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -362,7 +364,7 @@ def spectator_left(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.FELLOW_SPECTATOR_JOINED)
-def fellow_spectator_joined(stream: StreamIn, game: Game):
+def fellow_spectator_joined(stream: StreamIn, game: "Game"):
     if not game.bancho.spectating:
         return
 
@@ -378,7 +380,7 @@ def fellow_spectator_joined(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.FELLOW_SPECTATOR_LEFT)
-def fellow_spectator_left(stream: StreamIn, game: Game):
+def fellow_spectator_left(stream: StreamIn, game: "Game"):
     if not game.bancho.spectating:
         return
 
@@ -397,7 +399,7 @@ def fellow_spectator_left(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.SPECTATE_FRAMES)
-def frames(stream: StreamIn, game: Game):
+def frames(stream: StreamIn, game: "Game"):
     if not game.bancho.spectating:
         return
 
@@ -414,7 +416,7 @@ def frames(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.SPECTATOR_CANT_SPECTATE)
-def cant_spectate(stream: StreamIn, game: Game):
+def cant_spectate(stream: StreamIn, game: "Game"):
     if not game.bancho.spectating:
         return
 
@@ -430,7 +432,7 @@ def cant_spectate(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.CHANNEL_INFO)
-def channel_info(stream: StreamIn, game: Game):
+def channel_info(stream: StreamIn, game: "Game"):
     name = stream.string()
     topic = stream.string()
     user_count = stream.s16()
@@ -448,7 +450,7 @@ def channel_info(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.CHANNEL_AUTO_JOIN)
-def channel_autojoin(stream: StreamIn, game: Game):
+def channel_autojoin(stream: StreamIn, game: "Game"):
     name = stream.string()
     topic = stream.string()
     user_count = stream.s16()
@@ -464,12 +466,12 @@ def channel_autojoin(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.CHANNEL_INFO_END)
-def channel_info_end(stream: StreamIn, game: Game):
+def channel_info_end(stream: StreamIn, game: "Game"):
     game.events.call(ServerPackets.CHANNEL_INFO_END)
 
 
 @Packets.register(ServerPackets.CHANNEL_JOIN_SUCCESS)
-def channel_join_success(stream: StreamIn, game: Game):
+def channel_join_success(stream: StreamIn, game: "Game"):
     name = stream.string()
 
     if not (c := game.bancho.channels.get(name)):
@@ -481,7 +483,7 @@ def channel_join_success(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.CHANNEL_KICK)
-def channel_revoked(stream: StreamIn, game: Game):
+def channel_revoked(stream: StreamIn, game: "Game"):
     name = stream.string()
 
     if not (c := game.bancho.channels.get(name)):
@@ -494,14 +496,14 @@ def channel_revoked(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.BEATMAP_INFO_REPLY)
-def beatmapinfo_reply(stream: StreamIn, game: Game):
+def beatmapinfo_reply(stream: StreamIn, game: "Game"):
     beatmaps = [BeatmapInfo.decode(stream) for beatmap in range(stream.s32())]
 
     game.events.call(ServerPackets.BEATMAP_INFO_REPLY, beatmaps)
 
 
 @Packets.register(ServerPackets.SILENCE_END)
-def silence_info(stream: StreamIn, game: Game):
+def silence_info(stream: StreamIn, game: "Game"):
     if (remaining_silence := stream.s32()) > 0:
         game.bancho.player.silenced = True
         game.bancho.silenced = True
@@ -516,7 +518,7 @@ def silence_info(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_SILENCED)
-def user_silenced(stream: StreamIn, game: Game):
+def user_silenced(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -532,7 +534,7 @@ def user_silenced(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.TARGET_IS_SILENCED)
-def target_silenced(stream: StreamIn, game: Game):
+def target_silenced(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
@@ -550,7 +552,7 @@ def target_silenced(stream: StreamIn, game: Game):
 
 
 @Packets.register(ServerPackets.USER_DM_BLOCKED)
-def dms_blocked(stream: StreamIn, game: Game):
+def dms_blocked(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):

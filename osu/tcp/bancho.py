@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, List
+from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
@@ -12,7 +12,9 @@ from ..bancho.packets import Packets
 from ..objects.collections import Players, Channels, Matches
 from ..objects.player import Player
 from ..objects.match import Match
-from .game import TcpGame
+
+if TYPE_CHECKING:
+    from .game import TcpGame
 
 import logging
 import socket
@@ -21,7 +23,7 @@ import time
 
 
 class TcpBanchoClient(HTTPBanchoClient):
-    def __init__(self, game: TcpGame, ip: str, port: int) -> None:
+    def __init__(self, game: "TcpGame", ip: str, port: int) -> None:
         self.game = game
 
         self.logger = logging.getLogger(f"tcp-bancho-{game.version}")

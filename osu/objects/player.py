@@ -1,16 +1,18 @@
-from typing import Set, Optional
-
-from .status import Status
-from ..game import Game
+from typing import Set, Optional, TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets, CountryCodes, LevelGraph, Privileges, Mode
 from ..bancho.streams import StreamOut
+
+from .status import Status
+
+if TYPE_CHECKING:
+    from ..game import Game
 
 import logging
 
 
 class Player:
-    def __init__(self, id: int, name: str = "", game: Optional[Game] = None) -> None:
+    def __init__(self, id: int, name: str = "", game: Optional["Game"] = None) -> None:
         self.id = id
         self.name = name
         self.game = game

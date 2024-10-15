@@ -1,14 +1,16 @@
+from typing import Optional, TYPE_CHECKING
+
 from ..bancho.constants import ClientPackets
 from ..bancho.streams import StreamOut
-from ..game import Game
 
-from typing import Optional
+if TYPE_CHECKING:
+    from ..game import Game
 
 import logging
 
 
 class Channel:
-    def __init__(self, name: str, game: Game, topic: Optional[str] = None) -> None:
+    def __init__(self, name: str, game: "Game", topic: Optional[str] = None) -> None:
         self.name = name
         self.topic = topic
         self.game = game

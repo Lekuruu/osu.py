@@ -1,9 +1,11 @@
-from ..api.constants import SubmissionStatus, Mods, Mode
-from ..game import Game
-
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime
+
+from ..api.constants import SubmissionStatus, Mods, Mode
+
+if TYPE_CHECKING:
+    from ..game import Game
 
 
 @dataclass
@@ -50,10 +52,10 @@ class Score:
             lines[15] == "1",
         )
 
-    def get_comments(self, game: Game):
+    def get_comments(self, game: "Game"):
         return game.api.get_comments(replay_id=self.id, mode=self.mode)
 
-    def get_replay(self, game: Game):
+    def get_replay(self, game: "Game"):
         return game.api.get_replay(replay_id=self.id, mode=self.mode)
 
 
