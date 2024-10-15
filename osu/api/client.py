@@ -1,10 +1,12 @@
-from typing import Callable, Optional, Iterator, List
+from typing import Callable, Optional, Iterator, List, TYPE_CHECKING
 
 from .constants import Mode, Mods, RankingType, CommentTarget, DisplayMode, ModeSelect
 from ..objects.beatmap import OnlineBeatmap
 from ..objects.score import ScoreResponse
 from ..objects.comment import Comment
-from ..game import Game
+
+if TYPE_CHECKING:
+    from ..game import Game
 
 import requests
 import logging
@@ -45,7 +47,7 @@ class WebAPI:
         - `download_osz`
     """
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: "Game") -> None:
         self.game = game
 
         self.session = requests.Session()

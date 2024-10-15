@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
@@ -10,7 +10,8 @@ from ..objects.collections import Players, Channels
 from ..objects.player import Player
 from ..objects.status import Status
 
-from ..game import Game
+if TYPE_CHECKING:
+    from ..game import Game
 
 import requests
 import logging
@@ -87,7 +88,7 @@ class BanchoClient:
         `leave_lobby`: Leave the lobby
     """
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: "Game") -> None:
         self.game = game
 
         self.logger = logging.getLogger(f"bancho-{game.version}")
