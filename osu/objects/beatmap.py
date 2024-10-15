@@ -20,7 +20,7 @@ class BeatmapInfo:
     checksum: str
 
     @classmethod
-    def decode(cls, stream: StreamIn):
+    def decode(cls, stream: StreamIn) -> "BeatmapInfo":
         return BeatmapInfo(
             stream.s16(),
             stream.s32(),
@@ -53,7 +53,7 @@ class OnlineBeatmap:
     difficulties: List[Tuple[str, Mode]]
 
     @classmethod
-    def parse(cls, string: str):
+    def parse(cls, string: str) -> "OnlineBeatmap":
         args = string.split("|")
         return OnlineBeatmap(
             args[0],

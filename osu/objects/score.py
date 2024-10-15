@@ -27,7 +27,7 @@ class Score:
     has_replay: bool
 
     @classmethod
-    def from_string(cls, string: str, mode: Mode):
+    def from_string(cls, string: str, mode: Mode) -> "Score":
         lines = string.split("|")
 
         return Score(
@@ -70,7 +70,7 @@ class ScoreResponse:
     scores: List[Score]
 
     @classmethod
-    def from_string(cls, string: str, mode: Mode):
+    def from_string(cls, string: str, mode: Mode) -> "ScoreResponse":
         result = string.split("\n")
 
         if len(result) <= 0:

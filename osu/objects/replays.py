@@ -21,7 +21,7 @@ class ReplayFrame:
         return stream.get()
 
     @classmethod
-    def decode(cls, stream: StreamIn):
+    def decode(cls, stream: StreamIn) -> "ReplayFrame":
         button_state = ButtonState(stream.u8())
 
         # This byte is now unused and was replaced by the ButtonState flag
@@ -84,7 +84,7 @@ class ScoreFrame:
         return stream.get()
 
     @classmethod
-    def decode(cls, stream: StreamIn):
+    def decode(cls, stream: StreamIn) -> "ScoreFrame":
         return ScoreFrame(
             stream.s32(),
             stream.u8(),
