@@ -49,7 +49,7 @@ class Players(LockedSet[Player]):
                 return p
         return None
 
-    def load(self):
+    def load(self) -> None:
         # Split players into chunks of 255
         player_chunks = [
             self.pending[i : i + 255] for i in range(0, len(self.pending), 255)

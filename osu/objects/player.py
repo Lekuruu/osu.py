@@ -1,4 +1,4 @@
-from typing import Set, List, Optional
+from typing import Set, Optional
 
 from .status import Status
 from ..game import Game
@@ -62,6 +62,10 @@ class Player:
         return bool(self.name)
 
     @property
+    def country(self) -> str:
+        return list(CountryCodes.keys())[self.country_code]
+
+    @property
     def level(self) -> int:
         if self.tscore <= 0:
             return 1
@@ -75,15 +79,11 @@ class Player:
 
         return 1
 
-    @property
-    def country(self) -> str:
-        return list(CountryCodes.keys())[self.country_code]
-
-    def request_presence(self):
+    def request_presence(self) -> None:
         """Request a presence update for this player"""
         self.game.bancho.request_presence([self.id])
 
-    def request_stats(self):
+    def request_stats(self) -> None:
         """Request a stats update for this player"""
         self.game.bancho.request_stats([self.id])
 
@@ -91,7 +91,7 @@ class Player:
         """Get the avatar for this player"""
         return self.game.api.get_avatar(self.id)
 
-    def send_message(self, message: str):
+    def send_message(self, message: str) -> None:
         """Send a PM to this player"""
         if not (player := self.game.bancho.player):
             return
@@ -113,7 +113,7 @@ class Player:
 
         self.game.bancho.enqueue(ClientPackets.SEND_PRIVATE_MESSAGE, stream.get())
 
-    def add_friend(self):
+    def add_friend(self) -> None:
         """Add this player to the friends list"""
         if self.id in self.game.bancho.friends:
             self.game.logger.warning(
@@ -128,7 +128,7 @@ class Player:
             ClientPackets.FRIEND_ADD, int(self.id).to_bytes(4, "little")
         )
 
-    def remove_friend(self):
+    def remove_friend(self) -> None:
         """Remove this player from the friends list"""
         if self.id not in self.game.bancho.friends:
             self.game.logger.warning(
