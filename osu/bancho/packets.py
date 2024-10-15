@@ -6,7 +6,7 @@ from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
 from ..objects.player import Player
 from ..objects.match import Match
-
+    
 if TYPE_CHECKING:
     from ..game import Game
 
