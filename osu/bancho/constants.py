@@ -76,6 +76,7 @@ class ServerPackets(IntEnum):
     NEW_MATCH = 27
     DISPOSE_MATCH = 28
     TOGGLE_BLOCK_NON_FRIEND_DMS = 34
+    LOBBY_PART = 35  # unused
     MATCH_JOIN_SUCCESS = 36
     MATCH_JOIN_FAIL = 37
     FELLOW_SPECTATOR_JOINED = 42
@@ -420,6 +421,44 @@ class Grade(Enum):
     D = 7
     F = 8
     N = 9
+
+
+class MatchType(IntEnum):
+    Standard = 0
+    Powerplay = 1
+
+
+class MatchScoringTypes(IntEnum):
+    Score = 0
+    Accuracy = 1
+    Combo = 2
+    ScoreV2 = 3
+
+
+class MatchTeamTypes(IntEnum):
+    HeadToHead = 0
+    TagCoop = 1
+    TeamVs = 2
+    TagTeamVs = 3
+
+
+class SlotStatus(IntFlag):
+    Open = 1
+    Locked = 2
+    NotReady = 4
+    Ready = 8
+    NoMap = 16
+    Playing = 32
+    Complete = 64
+    Quit = 128
+
+    HasPlayer = NotReady | Ready | NoMap | Playing | Complete
+
+
+class SlotTeam(IntEnum):
+    Neutral = 0
+    Blue = 1
+    Red = 2
 
 
 CountryCodes = {
