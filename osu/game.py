@@ -30,6 +30,7 @@ class Game:
         server="ppy.sh",
         stream="stable40",
         version: Optional[int] = None,
+        executable_hash: Optional[str] = None,
         tournament: bool = False,
         events: Optional[Dict[ServerPackets, List[Callable]]] = {},
         tasks: Optional[List[Task]] = [],
@@ -104,9 +105,12 @@ class Game:
             # Failed to get version
             exit(1)
 
+        if executable_hash:
+            self.client = ClientInfo(self.version, executable_hash)
+            return
+
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
-            # TODO: Custom executable hash?
             exit(1)
 
         self.client = ClientInfo.from_updates(self.version, updates)
@@ -133,6 +137,7 @@ class Game:
                 self.server,
                 self.stream,
                 self.version_number,
+                self.client.hash.executable_hash,
                 self.tourney,
                 self.events.handlers,
                 self.tasks.tasks,
