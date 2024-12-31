@@ -57,6 +57,7 @@ class WebAPI:
         self.logger.disabled = game.logger.disabled
 
         self.url = f"https://osu.{self.game.server}"
+        self.asset_url = f"https://assets.{self.game.server}"
 
     @property
     def verification_url(self) -> str:
@@ -180,6 +181,18 @@ class WebAPI:
         """
 
         response = self.session.get(f"{self.url}/web/osu-getseasonal.php")
+
+        if response.ok:
+            return response.json()
+
+    def get_menu_content(self) -> Optional[dict]:
+        """This will perform a request on `/web/osu-getcurrent.php`.
+
+        Returns:
+            Optional[dict]: The menu content
+        """
+
+        response = self.session.get(f"{self.asset_url}/menu-content.json")
 
         if response.ok:
             return response.json()

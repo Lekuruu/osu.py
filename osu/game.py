@@ -146,8 +146,8 @@ class Game:
 
         try:
             if not retry:
-                self.api.get_session()
                 self.api.get_backgrounds()
+                self.api.get_menu_content()
 
             if not self.api.connect(retry):
                 exit(1)
