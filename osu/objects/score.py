@@ -89,6 +89,7 @@ class ScoreResponse:
             "2": SubmissionStatus.Ranked,
             "3": SubmissionStatus.Approved,
             "4": SubmissionStatus.Qualified,
+            "5": SubmissionStatus.Loved,
         }[status_results[0]]
 
         beatmap_id = None

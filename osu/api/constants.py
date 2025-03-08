@@ -25,6 +25,7 @@ class SubmissionStatus(IntEnum):
     Ranked = 4
     Approved = 5
     Qualified = 6
+    Loved = 7
 
 
 class CommentTarget(str, Enum):
