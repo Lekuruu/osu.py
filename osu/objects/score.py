@@ -70,6 +70,9 @@ class ScoreResponse:
     rating: float
     personal_best: Optional[Score]
     scores: List[Score]
+    has_osz2: bool = False
+    featured_artist_track_id: Optional[int] = None
+    featured_artist_license_text: Optional[str] = None
 
     @classmethod
     def from_string(cls, string: str, mode: Mode) -> "ScoreResponse":
@@ -79,7 +82,6 @@ class ScoreResponse:
             return
 
         status_results = result[0].split("|")
-
         beatmap_status = {
             "-1": SubmissionStatus.NotSubmitted,
             "0": SubmissionStatus.Pending,
@@ -89,23 +91,30 @@ class ScoreResponse:
             "4": SubmissionStatus.Qualified,
         }[status_results[0]]
 
+        beatmap_id = None
+        beatmapset_id = None
+        total_scores = 0
+        featured_artist_track_id = None
+        featured_artist_license_text = None
+        has_osz2 = status_results[1] == 'true'
+
         if len(status_results) > 2:
             beatmap_id = int(status_results[2])
             beatmapset_id = int(status_results[3])
-            total_scores = int(status_results[4])
-        else:
-            beatmap_id = None
-            beatmapset_id = None
-            total_scores = 0
+            total_scores = int(status_results[4] or '0')
+
+        if len(status_results) > 5:
+            featured_artist_track_id = int(status_results[5] or '0') or None
+            featured_artist_license_text = status_results[6] or None
+
+        offset = 0
+        beatmap_format = None
+        rating = 0.0
 
         if len(result) > 1:
             offset = int(result[1])
             beatmap_format = result[2]
             rating = float(result[3])
-        else:
-            offset = 0
-            beatmap_format = None
-            rating = 0.0
 
         personal_best = None
         scores = []
@@ -130,4 +139,7 @@ class ScoreResponse:
             rating,
             personal_best,
             scores,
+            has_osz2,
+            featured_artist_track_id,
+            featured_artist_license_text
         )
