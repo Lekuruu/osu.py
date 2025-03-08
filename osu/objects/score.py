@@ -122,7 +122,7 @@ class ScoreResponse:
 
         if len(result) > 4:
             if len(result[4]) > 0:
-                personal_best = Score.from_string(result[4])
+                personal_best = Score.from_string(result[4], mode)
 
             for score in result[5:]:
                 if not score:
