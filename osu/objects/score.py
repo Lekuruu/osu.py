@@ -97,15 +97,15 @@ class ScoreResponse:
         total_scores = 0
         featured_artist_track_id = None
         featured_artist_license_text = None
-        has_osz2 = status_results[1] == 'true'
+        has_osz2 = status_results[1] == "true"
 
         if len(status_results) > 2:
             beatmap_id = int(status_results[2])
             beatmapset_id = int(status_results[3])
-            total_scores = int(status_results[4] or '0')
+            total_scores = int(status_results[4] or "0")
 
         if len(status_results) > 5:
-            featured_artist_track_id = int(status_results[5] or '0') or None
+            featured_artist_track_id = int(status_results[5] or "0") or None
             featured_artist_license_text = status_results[6] or None
 
         offset = 0
@@ -142,5 +142,5 @@ class ScoreResponse:
             scores,
             has_osz2,
             featured_artist_track_id,
-            featured_artist_license_text
+            featured_artist_license_text,
         )
