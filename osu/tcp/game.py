@@ -9,6 +9,7 @@ from ..api import WebAPI
 
 from ..bancho.constants import ServerPackets
 from ..objects.client import ClientInfo
+from ..utils import deprecated
 from ..tasks import Task
 
 import requests
@@ -150,6 +151,7 @@ class TcpGame:
         if exit_on_interrupt:
             exit(0)
 
+    @deprecated
     async def run_async(self) -> None:
         """Run the game in an async context"""
         import asyncio

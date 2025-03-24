@@ -2,11 +2,10 @@ from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
-from osu.bancho.constants import ClientPackets
-
 from ..bancho.client import BanchoClient as HTTPBanchoClient
 from ..bancho.constants import Privileges, ServerPackets
 from ..bancho.streams import StreamIn, StreamOut
+from ..bancho.constants import ClientPackets
 from ..bancho.packets import Packets
 
 from ..objects.collections import Players, Channels

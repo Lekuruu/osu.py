@@ -9,6 +9,7 @@ from .tasks import Task
 from .bancho import BanchoClient, Packets
 from .events import EventHandler
 from .tasks import TaskManager
+from .utils import deprecated
 from .api import WebAPI
 
 import requests
@@ -167,6 +168,7 @@ class Game:
         if exit_on_interrupt:
             exit(0)
 
+    @deprecated
     async def run_async(self) -> None:
         """Run the game in an async context"""
         import asyncio

@@ -79,24 +79,6 @@ def example_task():
   ...
 ```
 
-You can also run this project with asyncio:
-
-```shell
-pip install asyncio
-```
-
-```python
-import asyncio
-
-game = Game(
-  USERNAME,
-  PASSWORD
-)
-
-# Run the game
-asyncio.run(game.run_async())
-```
-
 For a more in-depth example, please view [this project](https://github.com/lekuruu/osu-recorder).
 
 ---
