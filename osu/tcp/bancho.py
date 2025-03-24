@@ -8,8 +8,9 @@ from ..bancho.streams import StreamIn, StreamOut
 from ..bancho.constants import ClientPackets
 from ..bancho.packets import Packets
 
-from ..objects.collections import Players, Channels
+from ..objects.collections import Players, Channels, Matches
 from ..objects.player import Player
+from ..objects.match import Match
 
 if TYPE_CHECKING:
     from .game import TcpGame
@@ -37,11 +38,14 @@ class TcpBanchoClient(HTTPBanchoClient):
 
         self.spectating: Optional[Player] = None
         self.player: Optional[Player] = None
+        self.match: Optional[Match] = None
 
         self.channels = Channels()
+        self.matches = Matches()
         self.players = Players(game)
         self.queue = Queue()
 
+        self.max_slots = 8
         self.ping_count = 0
         self.protocol = 0
 
