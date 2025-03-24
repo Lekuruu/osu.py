@@ -57,6 +57,9 @@ class ClientHash:
         if platform.system() != "Windows":
             return "runningunderwine"
 
+        if isinstance(self.adapters, str):
+            return self.adapters
+
         adapters = [
             adapter.replace("-", "")
             for adapter in self.adapters

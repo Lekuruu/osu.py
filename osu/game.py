@@ -35,8 +35,9 @@ class Game:
         tournament: bool = False,
         events: Optional[Dict[ServerPackets, List[Callable]]] = {},
         tasks: Optional[List[Task]] = [],
+        force_linux_emulation: bool = True,
         disable_chat_logging: bool = False,
-        disable_logging: bool = False,
+        disable_logging: bool = False
     ) -> None:
         """Parameters
         -------------
@@ -68,8 +69,14 @@ class Game:
         `tasks`: list, optional
             Allows to pass in pre-defined tasks, just like the `events` parameter
 
+        `force_linux_emulation`: bool
+            This flag will force osu.py to use a linux client hash, regardless of the operating system.
+
+        `disable_chat_logging`: bool
+            Disables the logging of chat messages
+
         `disable_logging`: bool
-            Disable the logging
+            Disables all logging entirely
         """
 
         self.username = username
@@ -78,8 +85,9 @@ class Game:
         self.stream = stream
         self.version = version
         self.tourney = tournament
-        self.disable_chat = disable_chat_logging
         self.version_number = version
+        self.disable_chat = disable_chat_logging
+        self.force_linux_emulation = force_linux_emulation
 
         self.logger = logging.getLogger("osu!")
         self.logger.disabled = disable_logging
@@ -142,10 +150,15 @@ class Game:
                 self.tourney,
                 self.events.handlers,
                 self.tasks.tasks,
+                self.force_linux_emulation,
+                self.disable_chat,
                 self.logger.disabled,
             )
 
         try:
+            if self.force_linux_emulation:
+                self.client.hash.adapters = "runningunderwine"
+
             if not retry:
                 self.api.get_backgrounds()
                 self.api.get_menu_content()
