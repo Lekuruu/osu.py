@@ -37,7 +37,7 @@ class Game:
         tasks: Optional[List[Task]] = [],
         force_linux_emulation: bool = True,
         disable_chat_logging: bool = False,
-        disable_logging: bool = False
+        disable_logging: bool = False,
     ) -> None:
         """Parameters
         -------------
