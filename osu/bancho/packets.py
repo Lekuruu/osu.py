@@ -61,17 +61,17 @@ class PacketHandler:
             stream = StreamIn(stream.readall())
 
     def packet_received(self, packet: ServerPackets, data: StreamIn, game: "Game"):
-        if packet in self.handlers:
-            for handler in self.handlers[packet]:
-                try:
-                    # TODO: Add threading
-                    handler(data, game)
-                except Exception as exc:
-                    game.logger.error(
-                        f"Error while executing {handler}: {exc}", exc_info=exc
-                    )
-        else:
+        if packet not in self.handlers:
             game.logger.warning(f'No handler found for "{packet.name}"')
+            return
+
+        for handler in self.handlers[packet]:
+            try:
+                handler(data, game)
+            except Exception as exc:
+                game.logger.error(
+                    f"Error while executing {handler}: {exc}", exc_info=exc
+                )
 
 
 Packets = PacketHandler()
@@ -97,7 +97,6 @@ def server_restart(stream: StreamIn, game: "Game"):
     game.bancho.retry = True
 
     game.events.call(ServerPackets.RESTART, game.bancho.protocol)
-
     time.sleep(timeout)
 
 
@@ -105,8 +104,8 @@ def server_restart(stream: StreamIn, game: "Game"):
 def login_reply(stream: StreamIn, game: "Game"):
     response = stream.s32()
 
+    # Check for login errors
     if response < 0:
-        # Got a login error
         try:
             error = LoginError(response)
         except ValueError:
@@ -132,7 +131,6 @@ def login_reply(stream: StreamIn, game: "Game"):
     game.bancho.players.add(game.bancho.player)
 
     game.bancho.fast_read = True
-
     game.events.call(ServerPackets.USER_ID, response)
 
 
@@ -213,7 +211,6 @@ def presence(stream: StreamIn, game: "Game"):
     player.rank = stream.s32()
 
     game.bancho.fast_read = True
-
     game.events.call(ServerPackets.USER_PRESENCE, player)
 
 
@@ -245,7 +242,6 @@ def stats(stream: StreamIn, game: "Game"):
     player.pp = stream.s16()
 
     game.bancho.fast_read = True
-
     game.events.call(ServerPackets.USER_STATS, player)
 
 
@@ -281,7 +277,6 @@ def logout(stream: StreamIn, game: "Game"):
         game.bancho.spectating = None
 
     game.bancho.players.remove(player)
-
     game.events.call(ServerPackets.USER_LOGOUT, player)
 
 
@@ -342,7 +337,6 @@ def spectator_joined(stream: StreamIn, game: "Game"):
     player.cant_spectate = False
 
     game.bancho.player.spectators.add(player)
-
     game.events.call(ServerPackets.SPECTATOR_JOINED, player)
 
 
@@ -358,7 +352,6 @@ def spectator_left(stream: StreamIn, game: "Game"):
         return
 
     game.bancho.player.spectators.remove(player)
-
     game.events.call(ServerPackets.SPECTATOR_LEFT, player)
 
 
@@ -374,7 +367,6 @@ def fellow_spectator_joined(stream: StreamIn, game: "Game"):
         return
 
     game.bancho.spectating.spectators.add(player)
-
     game.events.call(ServerPackets.FELLOW_SPECTATOR_JOINED, player)
 
 
@@ -393,7 +385,6 @@ def fellow_spectator_left(stream: StreamIn, game: "Game"):
         return
 
     game.bancho.spectating.spectators.remove(player)
-
     game.events.call(ServerPackets.SPECTATOR_LEFT, player)
 
 
@@ -490,14 +481,12 @@ def channel_revoked(stream: StreamIn, game: "Game"):
 
     game.bancho.channels.remove(c)
     game.logger.info(f"Kicked out of channel: {name}")
-
     game.events.call(ServerPackets.CHANNEL_KICK, c)
 
 
 @Packets.register(ServerPackets.BEATMAP_INFO_REPLY)
 def beatmapinfo_reply(stream: StreamIn, game: "Game"):
     beatmaps = [BeatmapInfo.decode(stream) for beatmap in range(stream.s32())]
-
     game.events.call(ServerPackets.BEATMAP_INFO_REPLY, beatmaps)
 
 
@@ -506,7 +495,6 @@ def silence_info(stream: StreamIn, game: "Game"):
     if (remaining_silence := stream.s32()) > 0:
         game.bancho.player.silenced = True
         game.bancho.silenced = True
-
         game.logger.warning(f"You have been silenced for {remaining_silence} seconds.")
 
         threading.Timer(remaining_silence, game.bancho.unsilence)

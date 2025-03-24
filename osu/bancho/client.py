@@ -125,7 +125,6 @@ class BanchoClient:
 
         self.last_action = datetime.now().timestamp()
         self.fast_read = False
-
         self.silenced = False
         self.in_lobby = False
 
@@ -147,7 +146,6 @@ class BanchoClient:
     @property
     def request_interval(self) -> int:
         """Time between requests"""
-
         if self.fast_read:
             return 0
 
@@ -157,11 +155,9 @@ class BanchoClient:
             interval *= 1 + self.idle_time / 10
             interval *= self.ping_count
 
-        interval = min(self.max_idletime, max(self.min_idletime, interval))
+        return min(self.max_idletime, max(self.min_idletime, interval))
 
-        return interval
-
-    def run(self):
+    def run(self) -> None:
         """Run the client loop"""
         self.connect()
 
@@ -180,7 +176,7 @@ class BanchoClient:
             time.sleep(15)
             self.game.run(retry=True)
 
-    def connect(self):
+    def connect(self) -> None:
         """Perform the initial connection to the bancho server, to get a connection token"""
         data = f"{self.game.username}\n{self.game.password_hash}\n{self.game.client}\n"
 
@@ -205,7 +201,6 @@ class BanchoClient:
         self.token = token
 
         self.session.headers["osu-token"] = self.token
-
         self.game.packets.data_received(response.content, self.game)
 
     def dequeue(self) -> None:
@@ -239,10 +234,9 @@ class BanchoClient:
 
         self.fast_read = False
         self.game.packets.data_received(response.content, self.game)
-
         self.last_action = datetime.now().timestamp()
 
-    def exit(self):
+    def exit(self) -> None:
         """Send logout packet to bancho, and disconnect."""
         self.enqueue(ClientPackets.LOGOUT, int(0).to_bytes(4, "little"))
         self.connected = False
@@ -269,39 +263,38 @@ class BanchoClient:
 
         return stream.get()
 
-    def unsilence(self):
+    def unsilence(self) -> None:
         """Will be called when the connected player gets unsilenced by the server"""
         if not self.silenced:
             return
 
         self.player.silenced = False
         self.silenced = False
-
         self.logger.info("You can now talk again.")
 
-    def ping(self):
+    def ping(self) -> None:
         """Send a ping to the server"""
         self.enqueue(ClientPackets.PING)
 
-    def request_presence(self, ids: List[int]):
+    def request_presence(self, ids: List[int]) -> None:
         """Request the presence of a list of players"""
         stream = StreamOut()
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_PRESENCE_REQUEST, stream.get())
 
-    def request_stats(self, ids: List[int]):
+    def request_stats(self, ids: List[int]) -> None:
         """Request the stats of a list of players"""
         stream = StreamOut()
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_STATS_REQUEST, stream.get())
 
-    def request_status(self):
+    def request_status(self) -> None:
         """Request a status update for the connected player"""
         self.enqueue(ClientPackets.REQUEST_STATUS_UPDATE)
 
-    def update_status(self):
+    def update_status(self) -> None:
         """Send current player status to the server
 
         You can change your status by updating the `game.bancho.player.status` attributes.\n
@@ -331,7 +324,7 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.CHANGE_ACTION, stream.get())
 
-    def start_spectating(self, target: Player):
+    def start_spectating(self, target: Player) -> None:
         """Start spectating a player
 
         You will receive `ServerPackets.SPECTATE_FRAMES` packets that contain replay data.\n
@@ -360,7 +353,7 @@ class BanchoClient:
 
         self.update_status()
 
-    def stop_spectating(self):
+    def stop_spectating(self) -> None:
         """Stop spectating a player"""
         if not self.spectating:
             return
@@ -373,7 +366,7 @@ class BanchoClient:
         self.status.reset()
         self.update_status()
 
-    def cant_spectate(self):
+    def cant_spectate(self) -> None:
         """Sends a packet to let other spectators know that you have a missing beatmap"""
         self.enqueue(ClientPackets.CANT_SPECTATE)
 
@@ -383,7 +376,7 @@ class BanchoClient:
         frames: List[ReplayFrame],
         score_frame: Optional[ScoreFrame] = None,
         seed: int = 0,
-    ):
+    ) -> None:
         """
         This will send a `SPECTATE_FRAMES` packet to the server, which gets broadcasted to all of your spectators.
         Note that this will not work, if nobody is spectating you.
@@ -411,7 +404,7 @@ class BanchoClient:
 
         self.enqueue(ClientPackets.SPECTATE_FRAMES, stream.get())
 
-    def join_lobby(self):
+    def join_lobby(self) -> None:
         """Join the multiplayer lobby"""
         if self.in_lobby:
             return
@@ -419,7 +412,7 @@ class BanchoClient:
         self.enqueue(ClientPackets.JOIN_LOBBY)
         self.in_lobby = True
 
-    def leave_lobby(self):
+    def leave_lobby(self) -> None:
         """Leave the multiplayer lobby"""
         if not self.in_lobby:
             return
