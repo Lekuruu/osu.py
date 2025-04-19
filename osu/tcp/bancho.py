@@ -83,7 +83,7 @@ class TcpBanchoClient(HTTPBanchoClient):
 
     def process_packets(self) -> None:
         """Process incoming packets from the server"""
-        packet_header = StreamIn(self.socket.recv(7))
+        packet_header = StreamIn(self.socket.recv(7, socket.MSG_WAITALL))
 
         if packet_header.eof():
             return
@@ -91,7 +91,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         packet_id = packet_header.u16()
         compression = packet_header.bool()
         packet_size = packet_header.u32()
-        packet_data = self.socket.recv(packet_size)
+        packet_data = self.socket.recv(packet_size, socket.MSG_WAITALL)
 
         if compression:
             packet_data = gzip.decompress(packet_data)
