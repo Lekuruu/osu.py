@@ -509,7 +509,7 @@ def user_silenced(stream: StreamIn, game: "Game"):
     user_id = stream.s32()
 
     if not (player := game.bancho.players.by_id(user_id)):
-        game.bancho.request_presence([user_id])
+        return
 
     if not player.loaded:
         game.bancho.request_presence([user_id])
