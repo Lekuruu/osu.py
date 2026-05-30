@@ -22,17 +22,17 @@ jobs:
                 python-version: ["3.10", "3.11", "3.12", "3.13"]
 
         steps:
-            - uses: actions/checkout@v1
+            - uses: actions/checkout@v6
               with:
                   fetch-depth: 9
                   submodules: false
 
             - name: Use Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v6
               with:
                   python-version: ${{ matrix.python-version }}
 
-            - uses: actions/cache@v4
+            - uses: actions/cache@v5
               id: depcache
               with:
                   path: deps
@@ -68,7 +68,7 @@ jobs:
               if: matrix.python-version == 3.11
 
             - name: Upload distribution package
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: dist
                   path: dist
@@ -83,10 +83,10 @@ jobs:
         needs: check
         if: github.event_name == 'push' || github.event_name == 'release'
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Use Python 3.10
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.10"
 
@@ -99,7 +99,7 @@ jobs:
                   python setup.py build
 
             - name: Upload distribution folder
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7
               with:
                   name: build
                   path: build
@@ -109,10 +109,10 @@ jobs:
         needs: [check, build]
         if: github.event_name == 'release'
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v6
 
             - name: Use Python 3.10
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v6
               with:
                   python-version: "3.10"
 
