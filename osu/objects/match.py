@@ -10,6 +10,7 @@ from ..bancho.constants import (
     SlotStatus,
     SlotTeam,
 )
+from ..bancho.streams import StreamIn, StreamOut
 
 if TYPE_CHECKING:
     from ..game import Game
@@ -112,3 +113,80 @@ class Match:
 
         while len(self.slots) < MATCH_SLOT_COUNT:
             self.slots.append(MatchSlot())
+
+    def encode(self) -> bytes:
+        self.normalize_slots()
+
+        stream = StreamOut()
+        stream.s16(self.id)
+        stream.bool(self.in_progress)
+        stream.u8(self.match_type.value)
+        stream.u32(self.mods.value)
+        stream.string(self.name)
+        stream.string(self.password)
+        stream.string(self.beatmap_text)
+        stream.s32(self.beatmap_id)
+        stream.string(self.beatmap_checksum)
+
+        for slot in self.slots:
+            stream.u8(slot.status.value)
+
+        for slot in self.slots:
+            stream.u8(slot.team.value)
+
+        for slot in self.slots:
+            if slot.has_player:
+                stream.s32(slot.player_id)
+
+        stream.s32(self.host_id)
+        stream.u8(self.mode.value)
+        stream.u8(self.scoring_type.value)
+        stream.u8(self.team_type.value)
+        stream.bool(self.freemod)
+
+        if self.freemod:
+            for slot in self.slots:
+                stream.s32(slot.mods.value)
+
+        stream.s32(self.seed)
+        return stream.get()
+
+    @classmethod
+    def decode(cls, stream: StreamIn, game: Optional["Game"] = None) -> "Match":
+        match = Match(
+            id=stream.s16(),
+            in_progress=stream.bool(),
+            match_type=MatchType(stream.u8()),
+            mods=Mods(stream.u32()),
+            name=stream.string(),
+            password=stream.string(),
+            beatmap_text=stream.string(),
+            beatmap_id=stream.s32(),
+            beatmap_checksum=stream.string(),
+            game=game,
+        )
+
+        match.slots = [
+            MatchSlot(status=SlotStatus(stream.u8()))
+            for _ in range(MATCH_SLOT_COUNT)
+        ]
+
+        for slot in match.slots:
+            slot.team = SlotTeam(stream.u8())
+
+        for slot in match.slots:
+            if slot.has_player:
+                slot.player_id = stream.s32()
+
+        match.host_id = stream.s32()
+        match.mode = Mode(max(0, min(3, stream.u8())))
+        match.scoring_type = MatchScoringType(stream.u8())
+        match.team_type = MatchTeamType(stream.u8())
+        match.freemod = stream.bool()
+
+        if match.freemod:
+            for slot in match.slots:
+                slot.mods = Mods(stream.s32())
+
+        match.seed = stream.s32()
+        return match
