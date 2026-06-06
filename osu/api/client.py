@@ -353,7 +353,7 @@ class WebAPI:
 
         response = self.session.post(
             f"{self.url}/web/osu-comment.php",
-            files={
+            files={  # type: ignore
                 "u": (None, self.game.username),
                 "p": (None, self.game.password_hash),
                 "b": (None, beatmap_id),
@@ -448,7 +448,7 @@ class WebAPI:
 
         if not response.ok:
             self.logger.error(f"Failed to fetch replay ({response.status_code})")
-            return
+            return None
 
         return response.content
 
@@ -497,12 +497,12 @@ class WebAPI:
             params={
                 "u": self.game.username,
                 "h": self.game.password_hash,
-                "vv": 2,  # what is this lol
+                "vv": 2,  # request version
             },
         )
 
         if not response.ok:
-            return
+            return None
 
         return response.iter_content(1024)
 

@@ -258,7 +258,7 @@ class StreamIn:
         empty = self.s8() == 0x00
 
         if empty:
-            return ""
+            return b""
 
         size = self.uleb128()
         return self.read(size)

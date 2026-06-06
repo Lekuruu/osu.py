@@ -164,7 +164,7 @@ class BanchoClient:
         if self.fast_read:
             return 0
 
-        interval = 1
+        interval: int | float = 1
 
         if not self.spectating:
             interval *= 1 + self.idle_time / 10
