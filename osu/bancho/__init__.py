@@ -1,3 +1,6 @@
+from .connector_http import HttpBanchoConnector
+from .connector_tcp import TcpBanchoConnector
+from .connector import BanchoConnector
 from .client import BanchoClient
 from .packets import Packets
 from .constants import (

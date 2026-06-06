@@ -1,8 +1,9 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
-from queue import Queue
 
 from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
+from .connector_http import HttpBanchoConnector
+from .connector import BanchoConnector
 from .streams import StreamOut
 
 from ..objects.replays import ReplayFrame, ScoreFrame
@@ -14,7 +15,6 @@ from ..objects.status import Status
 if TYPE_CHECKING:
     from ..game import Game
 
-import requests
 import logging
 import time
 
@@ -67,7 +67,11 @@ class BanchoClient:
 
         `max_idletime`: int (Maximum time between requests)
 
+        `connector`: osu.bancho.connectors.BanchoConnector
+
     Functions:
+        `set_connector`: Set the transport connector used by the client
+
         `enqueue`: Send a bancho packet to the server
 
         `ping`: Send a ping packet
@@ -105,23 +109,9 @@ class BanchoClient:
         self.logger = logging.getLogger(f"bancho-{game.version}")
         self.logger.disabled = game.logger.disabled
 
-        self.domain = f"c.{game.server}"
-        self.url = f"https://{self.domain}"
-
-        self.session = requests.Session()
-        self.session.headers.update(
-            {
-                "osu-version": self.game.version or "",
-                "Accept-Encoding": "gzip, deflate",
-                "User-Agent": "osu!",
-                "Host": self.domain,
-            }
-        )
-
         self.user_id = -1
         self.connected = False
         self.retry = True
-        self.token = ""
 
         self.player: Player
         self.match: Match | None = None
@@ -130,7 +120,6 @@ class BanchoClient:
         self.channels = Channels()
         self.matches = Matches(game)
         self.players = Players(game)
-        self.queue: Queue[bytes] = Queue()
 
         self.ping_count = 0
         self.protocol = 0
@@ -145,6 +134,8 @@ class BanchoClient:
 
         self.min_idletime = 1
         self.max_idletime = 2.5
+        self.connector: BanchoConnector
+        self.set_connector(HttpBanchoConnector())
 
     @property
     def status(self) -> Status:
@@ -178,7 +169,7 @@ class BanchoClient:
 
         while self.connected:
             try:
-                time.sleep(self.request_interval)
+                self.connector.wait()
                 self.dequeue()
                 self.game.tasks.execute()
             except KeyboardInterrupt:
@@ -192,73 +183,43 @@ class BanchoClient:
             self.game.run(retry=True)
 
     def connect(self) -> None:
-        """Perform the initial connection to the bancho server, to get a connection token"""
-        data = f"{self.game.username}\n{self.game.password_hash}\n{self.game.client}\n"
-
-        response = self.session.post(self.url, data=data)
-
-        if not response.ok:
-            self.connected = False
-            self.retry = True
-            self.logger.error(
-                f"[{response.url}]: Connection was refused ({response.status_code})"
-            )
-            return
-
-        if not (token := response.headers.get("cho-token")):
-            # Failed to get token
-            self.connected = False
-            self.retry = False
-            self.game.packets.data_received(response.content, self.game)
-            return
-
-        self.connected = True
-        self.token = token
-
-        self.session.headers["osu-token"] = self.token
-        self.game.packets.data_received(response.content, self.game)
+        """Perform the initial connection to the bancho server."""
+        self.connector.connect()
 
     def dequeue(self) -> None:
-        """Send a request to bancho, empty the queue and handle incoming packets"""
-
-        if not self.connected:
-            return
-
-        if self.queue.empty():
-            # Queue is empty, sending ping
-            self.ping_count += 1
-            return self.ping()
-
-        if self.queue.qsize() > 1:
-            self.ping_count = 0
-
-        data = b""
-
-        while not self.queue.empty():
-            data += self.queue.get()
-
-        response = self.session.post(self.url, data=data)
-
-        if not response.ok:
-            self.connected = False
-            self.retry = True
-            self.logger.error(
-                f"[{response.request.url}]: Connection was refused ({response.status_code})"
-            )
-            return
-
-        self.fast_read = False
-        self.game.packets.data_received(response.content, self.game)
-        self.last_action = datetime.now().timestamp()
+        """Receive packets and flush any connector-specific queue."""
+        self.connector.receive()
 
     def exit(self) -> None:
         """Send logout packet to bancho, and disconnect."""
-        self.enqueue(ClientPackets.LOGOUT, int(0).to_bytes(4, "little"))
+        if self.connected:
+            try:
+                self.enqueue(ClientPackets.LOGOUT, int(0).to_bytes(4, "little"))
+            except OSError:
+                pass
+
         self.connected = False
         self.retry = False
+        self.connector.close()
 
-    def enqueue(self, packet: ClientPackets, data: bytes = b"", dequeue=True) -> bytes:
-        """Send a packet to the queue and dequeue"""
+    def set_connector(self, connector: BanchoConnector) -> None:
+        """Set the connector used to communicate with bancho."""
+        if not isinstance(connector, BanchoConnector):
+            raise TypeError("connector must be an instance of BanchoConnector")
+
+        if self.connected:
+            raise RuntimeError("Cannot change connector while connected")
+
+        if hasattr(self, "connector"):
+            self.connector.close()
+
+        self.connector = connector
+        self.connector.bind(self)
+
+    def enqueue(
+        self, packet: ClientPackets, data: bytes = b"", dequeue: bool | None = None
+    ) -> bytes:
+        """Send a packet through the active connector."""
 
         stream = StreamOut()
 
@@ -270,13 +231,14 @@ class BanchoClient:
 
         self.logger.debug(f'Sending {packet.name} -> "%s"', data)
 
-        # Append to queue
-        self.queue.put(stream.get())
+        packet_data = stream.get()
 
-        if dequeue:
-            self.dequeue()
+        if dequeue is None:
+            dequeue = self.connector.dequeue_on_enqueue
 
-        return stream.get()
+        self.connector.send(packet_data, dequeue)
+
+        return packet_data
 
     def unsilence(self) -> None:
         """Will be called when the connected player gets unsilenced by the server"""
