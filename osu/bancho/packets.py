@@ -55,7 +55,7 @@ class PacketHandler:
                 # Compression was used in very early versions of bancho
                 data = zlib.decompress(data)
 
-            game.logger.debug(f'Received packet {packet.name} -> "{data}"')
+            game.logger.debug(f'Received packet {packet.name} -> "%s"', data)
 
             # Handling packet
             self.packet_received(packet, StreamIn(data), game)

@@ -266,7 +266,7 @@ class BanchoClient:
         stream.u32(len(data))
         stream.write(data)
 
-        self.logger.debug(f'Sending {packet.name} -> "{data}"')
+        self.logger.debug(f'Sending {packet.name} -> "%s"', data)
 
         # Append to queue
         self.queue.put(stream.get())

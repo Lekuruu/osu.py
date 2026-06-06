@@ -101,8 +101,8 @@ class TcpBanchoClient(HTTPBanchoClient):
 
         packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
 
-        self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
-        self.game.packets.packet_received(packet, stream, self.game)
+        self.logger.debug(f'Received packet {packet.name} -> "%s"', packet_data)
+        self.game.packets.packet_received(packet, stream, self.game) # type: ignore
 
     def enqueue(
         self, packet: ClientPackets, data: bytes = b"", dequeue: bool = False
@@ -116,7 +116,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         stream.u32(len(data))
         stream.write(data)
 
-        self.logger.debug(f'Sending {packet.name} -> "{data}"')
+        self.logger.debug(f'Sending {packet.name} -> "%s"', data)
         self.socket.send(stream.get())
         self.last_action = datetime.now().timestamp()
 
