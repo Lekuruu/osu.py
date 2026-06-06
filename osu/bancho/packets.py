@@ -78,7 +78,7 @@ class PacketHandler:
 Packets = PacketHandler()
 
 
-def _track_match(stream: StreamIn, game: "Game") -> Match:
+def resolve_match(stream: StreamIn, game: "Game") -> Match:
     match = Match.decode(stream, game)
     missing_players = []
 
@@ -99,37 +99,50 @@ def _track_match(stream: StreamIn, game: "Game") -> Match:
     return match
 
 
-def _read_message(stream: StreamIn, game: "Game"):
+def resolve_message(stream: StreamIn, game: "Game"):
     sender_name = stream.string()
     message = stream.string()
     target_name = stream.string()
     sender_id = stream.s32()
 
-    sender = None
+    # Find player
+    player = game.bancho.players.by_id(sender_id)
 
-    if sender_id:
-        sender = game.bancho.players.by_id(sender_id)
+    if not player:
+        # Try to find sender by name
+        player = game.bancho.players.by_name(sender_name)
 
-    if not sender:
-        sender = game.bancho.players.by_name(sender_name)
-
-    if not sender:
-        sender = Player(sender_id, sender_name, game)
+    if not player:
+        player = Player(sender_id, sender_name, game)
 
         if sender_id:
-            game.bancho.players.add(sender)
+            game.bancho.players.add(player)
             game.bancho.request_presence([sender_id])
 
+    if not player.loaded:
+        # Presence missing
+        player.request_presence()
+
+    sender = player
+
+    # Find target
     if target_name.startswith("#"):
+        # Public message
         target = game.bancho.channels.get(target_name) or Channel(target_name, game)
-    else:
-        target = game.bancho.players.by_name(target_name)
+        return sender, message, target
 
-        if not target and game.bancho.player and target_name == game.bancho.player.name:
-            target = game.bancho.player
+    # Private message
+    target = game.bancho.players.by_name(target_name)
 
-        if not target:
-            target = Player(0, target_name, game)
+    if not target and game.bancho.player and target_name == game.bancho.player.name:
+        target = game.bancho.player
+
+    if not target:
+        target = Player(0, target_name, game)
+
+    if not target.loaded:
+        # Presence missing
+        target.request_presence()
 
     return sender, message, target
 
@@ -339,44 +352,11 @@ def logout(stream: StreamIn, game: "Game"):
 
 @Packets.register(ServerPackets.SEND_MESSAGE)
 def message(stream: StreamIn, game: "Game"):
-    sender = stream.string()
-    message = stream.string()
-    target = stream.string()
-    sender_id = stream.s32()
-
-    # Find player
-    if not (player := game.bancho.players.by_id(sender_id)):
-        # Try to find sender by name
-        if not (player := game.bancho.players.by_name(sender)):
-            return
-
-    if not player.loaded:
-        # Presence missing
-        player.request_presence()
-
-    sender = player
-
-    # Find target
-    if target.startswith("#"):
-        # Public message
-        if not (channel := game.bancho.channels.get(target)):
-            return
-
-        target = channel
-    else:
-        # Private message
-        if not (player := game.bancho.players.by_name(target)):
-            return
-
-        if not player.loaded:
-            # Presence missing
-            player.request_presence()
-
-        target = player
+    sender, message, target = resolve_message(stream, game)
 
     if not game.disable_chat:
         target.logger.info(
-            f'<{sender.name}{f" ({sender_id})" if sender_id else ""}> [{target.name}]: "{message}"'
+            f'<{sender.name}{f" ({sender.id})" if sender.id else ""}> [{target.name}]: "{message}"'
         )
 
     game.bancho.fast_read = True
@@ -549,13 +529,13 @@ def beatmapinfo_reply(stream: StreamIn, game: "Game"):
 
 @Packets.register(ServerPackets.NEW_MATCH)
 def new_match(stream: StreamIn, game: "Game"):
-    match = _track_match(stream, game)
+    match = resolve_match(stream, game)
     game.events.call(ServerPackets.NEW_MATCH, match)
 
 
 @Packets.register(ServerPackets.UPDATE_MATCH)
 def update_match(stream: StreamIn, game: "Game"):
-    match = _track_match(stream, game)
+    match = resolve_match(stream, game)
 
     if game.bancho.match and game.bancho.match.id == match.id:
         game.bancho.match = match
@@ -578,7 +558,7 @@ def dispose_match(stream: StreamIn, game: "Game"):
 
 @Packets.register(ServerPackets.MATCH_JOIN_SUCCESS)
 def match_join_success(stream: StreamIn, game: "Game"):
-    match = _track_match(stream, game)
+    match = resolve_match(stream, game)
     game.bancho.match = match
     game.events.call(ServerPackets.MATCH_JOIN_SUCCESS, match)
 
@@ -590,7 +570,7 @@ def match_join_fail(stream: StreamIn, game: "Game"):
 
 @Packets.register(ServerPackets.MATCH_START)
 def match_start(stream: StreamIn, game: "Game"):
-    match = _track_match(stream, game)
+    match = resolve_match(stream, game)
     game.bancho.match = match
     game.events.call(ServerPackets.MATCH_START, match)
 
@@ -641,7 +621,13 @@ def match_player_skipped(stream: StreamIn, game: "Game"):
 
 @Packets.register(ServerPackets.MATCH_INVITE)
 def match_invite(stream: StreamIn, game: "Game"):
-    sender, message, target = _read_message(stream, game)
+    sender, message, target = resolve_message(stream, game)
+
+    if not game.disable_chat:
+        target.logger.info(
+            f'<{sender.name}{f" ({sender.id})" if sender.id else ""}> [{target.name}]: "{message}"'
+        )
+    
     game.events.call(ServerPackets.MATCH_INVITE, sender, message, target)
 
 
