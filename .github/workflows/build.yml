@@ -19,7 +19,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.10", "3.11", "3.12", "3.13"]
+                python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
         steps:
             - uses: actions/checkout@v6
@@ -36,43 +36,25 @@ jobs:
               id: depcache
               with:
                   path: deps
-                  key: requirements-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+                  key: requirements-pip-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'requirements.txt') }}
 
             - name: Download dependencies
               if: steps.depcache.outputs.cache-hit != 'true'
               run: |
                   pip download --dest=deps -r requirements.txt
+                  pip download --dest=deps setuptools wheel black build
 
             - name: Install dependencies
               run: |
-                  pip install -U --no-index --find-links=deps deps/*
+                  pip install -U --no-index --find-links=deps -r requirements.txt
+                  pip install -U --no-index --find-links=deps black build
+                  pip install -e . --no-index --find-links=deps
 
             - name: Run linters
               run: |
                   echo "Running linters"
 
-                  pip install black
                   black --check . 2>&1
-
-            - name: Install distribution dependencies
-              run: |
-                  rm -rf junit
-                  rm -rf deps
-                  pip install build
-              if: matrix.python-version == 3.11
-
-            - name: Create distribution package
-              run: |
-                  echo "include requirements.txt" > MANIFEST.in
-                  python -m build
-              if: matrix.python-version == 3.11
-
-            - name: Upload distribution package
-              uses: actions/upload-artifact@v7
-              with:
-                  name: dist
-                  path: dist
-              if: matrix.python-version == 3.11
 
             - name: Run test script
               run: |
@@ -92,17 +74,17 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  pip install setuptools
+                  pip install build
 
             - name: Create local build
               run: |
-                  python setup.py build
+                  python -m build
 
             - name: Upload distribution folder
               uses: actions/upload-artifact@v7
               with:
-                  name: build
-                  path: build
+                  name: dist
+                  path: dist
 
     publish:
         runs-on: ubuntu-latest
@@ -118,19 +100,11 @@ jobs:
 
             - name: Install dependencies
               run: |
-                  pip install build
+                  pip install build twine
 
             - name: Create local build
               run: |
-                  python -m build --sdist
-
-            - name: Create wheel
-              run: |
-                  python -m build --wheel
-
-            - name: Install dependencies
-              run: |
-                  pip install twine
+                  python -m build
 
             - name: Publish distribution to PyPI
               run: |
