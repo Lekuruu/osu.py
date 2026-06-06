@@ -173,7 +173,7 @@ class WebAPI:
         return None
 
     def get_menu_content(self) -> dict | None:
-        """This will perform a request on `/web/osu-getcurrent.php`.
+        """This will attempt to retrieve `menu-content.json`.
 
         Returns:
             dict | None: The menu content
