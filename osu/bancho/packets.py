@@ -123,7 +123,7 @@ def login_reply(stream: StreamIn, game: "Game"):
             game.bancho.retry = True
 
         elif error == LoginError.VERIFICATION_NEEDED:
-            game.api.verify(game.client.hash)
+            game.api.verify()
 
         return
 
