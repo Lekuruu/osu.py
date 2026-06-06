@@ -2,6 +2,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/Lekuruu/osu.py/blob/main/LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Lekuruu/osu.py/.github%2Fworkflows%2Fbuild.yml)](https://github.com/Lekuruu/osu.py/actions/workflows/build.yml)
 
 osu.py is a python library that emulates part of the online functionality of the osu! stable client.
 
@@ -19,8 +20,14 @@ Or build it manually:
 ```shell
 git clone https://github.com/Lekuruu/osu.py.git
 cd osu.py
-pip install setuptools
-python setup.py install
+pip install -e .
+```
+
+You can also build a source distribution and wheel locally:
+
+```shell
+pip install build
+python -m build
 ```
 
 ## Features
