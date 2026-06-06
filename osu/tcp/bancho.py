@@ -41,8 +41,8 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.player: Player | None = None
 
         self.channels = Channels()
-        self.matches = Matches(game)
-        self.players = Players(game)
+        self.matches = Matches(game) # type: ignore
+        self.players = Players(game) # type: ignore
         self.queue = Queue()
 
         self.ping_count = 0

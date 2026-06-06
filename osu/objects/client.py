@@ -84,17 +84,17 @@ class ClientHash:
 
         try:
             # Try to read the UninstallID from Registry
-            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg:
-                key = winreg.OpenKey(reg, "Software\\osu!")
+            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg: # type: ignore
+                key = winreg.OpenKey(reg, "Software\\osu!") # type: ignore
 
                 for i in range(1024):
-                    name, value, type = winreg.EnumValue(key, i)
+                    name, value, type = winreg.EnumValue(key, i) # type: ignore
 
                     if name != "UninstallID":
                         continue
 
                     return hashlib.md5(value.encode()).hexdigest()
-        except (FileNotFoundError, WindowsError, EnvironmentError):
+        except (FileNotFoundError, WindowsError, EnvironmentError): # type: ignore
             # Key was not found
             pass
 
@@ -184,5 +184,5 @@ class ClientInfo:
     def from_updates(cls, version: str, updates: dict) -> "ClientInfo":
         return cls(
             version,
-            cls.get_file_hash(updates),
+            cls.get_file_hash(updates) or "",
         )

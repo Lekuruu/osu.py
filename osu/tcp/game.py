@@ -28,7 +28,7 @@ class TcpGame:
         username: str,
         password: str,
         server: str,
-        version: int,
+        version: int | float,
         executable_hash: str,
         bancho_ip: str,
         bancho_port: int = 13381,
@@ -50,7 +50,7 @@ class TcpGame:
         `server`: str
             The server to connect to (e.g. `ppy.sh`)
 
-        `version`: int/float
+        `version`: int/float/str
             Set a custom version
             (b20130815 is the latest known version to work with this protocol)
 
@@ -76,27 +76,33 @@ class TcpGame:
             Disable the logging
         """
 
+        if type(version) not in (float, int):
+            raise ValueError("Invalid version number")
+
+        self.version = f"b{version}"
+        self.tourney = tournament
+
+        if self.tourney:
+            self.version = f"b{version}tourney"
+
         self.username = username
         self.password = password
         self.server = server
-        self.version = version
-        self.tourney = tournament
         self.disable_chat = disable_chat_logging
         self.version_number = version
 
         self.logger = logging.getLogger("osu!")
         self.logger.disabled = disable_logging
 
-        self.resolve_version()
         self.session = requests.Session()
-        self.session.headers = {"User-Agent": "osu!", "osu-version": self.version}
+        self.session.headers.update({"User-Agent": "osu!", "osu-version": self.version})
         self.logger.name = f"osu!-{self.version}"
 
         self.packets = copy(Packets)
         self.events = EventHandler()
         self.bancho = TcpBanchoClient(self, bancho_ip, bancho_port)
         self.tasks = TaskManager(self)
-        self.api = WebAPI(self)
+        self.api = WebAPI(self) # type: ignore
 
         if events:
             self.events.handlers = events
@@ -149,13 +155,3 @@ class TcpGame:
 
         if exit_on_interrupt:
             exit(0)
-
-    def resolve_version(self) -> None:
-        """Ensure a correct client version was set"""
-        if type(self.version) not in (float, int):
-            raise ValueError("Invalid version number")
-
-        self.version = f"b{self.version}"
-
-        if self.tourney:
-            self.version = f"{self.version}tourney"

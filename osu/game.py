@@ -78,12 +78,16 @@ class Game:
             Disables all logging entirely
         """
 
+        self.version = f"b{version}" if version else None
+        self.tourney = tournament
+
+        if self.version and self.tourney:
+            self.version = f"b{version}tourney"
+
         self.username = username
         self.password = password
         self.server = server
         self.stream = stream
-        self.version = version
-        self.tourney = tournament
         self.version_number = version
         self.disable_chat = disable_chat_logging
         self.force_linux_emulation = force_linux_emulation
@@ -92,9 +96,10 @@ class Game:
         self.logger.disabled = disable_logging
 
         self.resolve_version()
-        self.session = requests.Session()
-        self.session.headers = {"User-Agent": "osu!", "osu-version": self.version}
+        assert self.version is not None, "Failed to resolve client version"
 
+        self.session = requests.Session()
+        self.session.headers.update({"User-Agent": "osu!", "osu-version": self.version})
         self.logger.name = f"osu!-{self.version}"
 
         self.packets = copy(Packets)
@@ -182,19 +187,11 @@ class Game:
 
     def resolve_version(self) -> None:
         """Ensure the client version is set"""
-        if not self.version:
-            # Fetch latest client version
-            self.version = self.fetch_version(self.stream)
+        if self.version_number:
             return
 
-        if type(self.version) not in (float, int):
-            raise ValueError("Invalid version number")
-
-        # Custom client version was set
-        self.version = f"b{self.version}"
-
-        if self.tourney:
-            self.version = f"{self.version}tourney"
+        # Fetch latest client version
+        self.version = self.fetch_version(self.stream)
 
     def fetch_version(self, stream: str = "stable40") -> str | None:
         """
