@@ -47,6 +47,16 @@ class WebAPI:
         - `download_osz`
     """
 
+    # TODO: /web/coins.php
+    #       /web/osu-getbeatmapinfo.php
+    #       /web/osu-markasread.php
+    #       /web/osu-getchannelid.php
+    #       /web/osu-search-set.php
+    #       /web/osu-osz2-bmsubmit-getid.php
+    #       /web/osu-osz2-bmsubmit-upload.php
+    #       /web/osu-osz2-bmsubmit-post.php
+    #       /web/osu-gethelp.php
+
     def __init__(self, game: "Game") -> None:
         self.game = game
 
@@ -235,7 +245,7 @@ class WebAPI:
             "f": beatmap_file,
             "m": mode.value,
             "i": set_id,
-            "a": 0,  # ?
+            "a": 0,  # probably anti-cheat related
             "us": self.game.username,
             "ha": self.game.password_hash,
         }
@@ -257,7 +267,7 @@ class WebAPI:
     def get_star_rating(
         self, beatmap_id: int, mode: Mode = Mode.Osu, mods: Mods = Mods.NoMod
     ) -> float:
-        """Get star rating of a beatmap
+        """Get the star rating of a beatmap
 
         Args:
             beatmap_id (int): Beatmap ID
