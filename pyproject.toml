@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osu"
+version = "1.4.14"
+authors = [
+    { name = "Lekuru", email = "contact@lekuru.xyz" },
+]
+description = "A python library that emulates the osu! stable client"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["osu", "osugame", "python", "bancho"]
+license = "MIT"
+dependencies = [
+    "python-dateutil",
+    "requests",
+    "psutil",
+    "wmi; platform_system == 'Windows'",
+]
+
+[project.optional-dependencies]
+dev = ["black", "build"]
+
+[project.urls]
+Homepage = "https://github.com/Lekuruu/osu.py"
+
+[tool.setuptools.packages.find]
+include = ["osu", "osu.*"]
