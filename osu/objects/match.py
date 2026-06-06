@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Union
 
 from ..bancho.constants import (
+    ClientPackets,
     MatchScoringType,
     MatchTeamType,
     MatchType,
@@ -14,6 +15,8 @@ from ..bancho.streams import StreamIn, StreamOut
 
 if TYPE_CHECKING:
     from ..game import Game
+    from .player import Player
+    from .replays import ScoreFrame
 
 
 MATCH_SLOT_COUNT = 16
@@ -127,6 +130,111 @@ class Match:
             return
 
         self.game.bancho.leave_match()
+
+    def change_slot(self, slot_id: int) -> None:
+        """Change your slot in this multiplayer match"""
+        self._enqueue_slot(ClientPackets.MATCH_CHANGE_SLOT, slot_id)
+
+    def lock_slot(self, slot_id: int) -> None:
+        """Toggle the lock status for a slot in this multiplayer match"""
+        self._enqueue_slot(ClientPackets.MATCH_LOCK, slot_id)
+
+    def ready(self) -> None:
+        """Mark yourself as ready in this multiplayer match"""
+        self._enqueue(ClientPackets.MATCH_READY)
+
+    def not_ready(self) -> None:
+        """Mark yourself as not ready in this multiplayer match"""
+        self._enqueue(ClientPackets.MATCH_NOT_READY)
+
+    def change_settings(self) -> None:
+        """Change this multiplayer match's settings"""
+        self._enqueue(ClientPackets.MATCH_CHANGE_SETTINGS, self.encode())
+
+    def change_beatmap(self) -> None:
+        """Change this multiplayer match's beatmap"""
+        self._enqueue(ClientPackets.MATCH_CHANGE_BEATMAP, self.encode())
+
+    def change_mods(self, mods: Mods) -> None:
+        """Change your mods in this multiplayer match"""
+        self.mods = mods
+
+        if self.freemod and self.own_slot:
+            self.own_slot.mods = mods
+
+        stream = StreamOut()
+        stream.u32(mods.value)
+
+        self._enqueue(ClientPackets.MATCH_CHANGE_MODS, stream.get())
+
+    def change_password(self, password: str) -> None:
+        """Change this multiplayer match's password"""
+        self.password = password
+        self._enqueue(ClientPackets.MATCH_CHANGE_PASSWORD, self.encode())
+
+    def start(self) -> None:
+        """Start this multiplayer match"""
+        self._enqueue(ClientPackets.MATCH_START)
+
+    def load_complete(self) -> None:
+        """Signal that you finished loading the beatmap"""
+        self._enqueue(ClientPackets.MATCH_LOAD_COMPLETE)
+
+    def no_beatmap(self) -> None:
+        """Signal that you don't have this match's beatmap"""
+        self._enqueue(ClientPackets.MATCH_NO_BEATMAP)
+
+    def has_beatmap(self) -> None:
+        """Signal that you have this match's beatmap"""
+        self._enqueue(ClientPackets.MATCH_HAS_BEATMAP)
+
+    def send_score(self, score_frame: "ScoreFrame") -> None:
+        """Send a score update for this multiplayer match"""
+        self._enqueue(ClientPackets.MATCH_SCORE_UPDATE, score_frame.encode())
+
+    def complete(self) -> None:
+        """Signal that you finished playing"""
+        self._enqueue(ClientPackets.MATCH_COMPLETE)
+
+    def fail(self) -> None:
+        """Signal that you failed while playing"""
+        self._enqueue(ClientPackets.MATCH_FAILED)
+
+    def skip(self) -> None:
+        """Request to skip the beatmap intro"""
+        self._enqueue(ClientPackets.MATCH_SKIP_REQUEST)
+
+    def transfer_host(self, slot_id: int) -> None:
+        """Transfer host to another slot"""
+        self._enqueue_slot(ClientPackets.MATCH_TRANSFER_HOST, slot_id)
+
+    def change_team(self) -> None:
+        """Change your team in this multiplayer match"""
+        self._enqueue(ClientPackets.MATCH_CHANGE_TEAM)
+
+    def invite(self, player: Union["Player", int]) -> None:
+        """Invite a player to this multiplayer match"""
+        stream = StreamOut()
+        stream.s32(player if isinstance(player, int) else player.id)
+
+        self._enqueue(ClientPackets.MATCH_INVITE, stream.get())
+
+    def _enqueue(self, packet: ClientPackets, data: bytes = b"") -> None:
+        if not self.game:
+            return
+
+        self.game.bancho.enqueue(packet, data)
+
+    def _enqueue_slot(self, packet: ClientPackets, slot_id: int) -> None:
+        if slot_id < 0 or slot_id >= MATCH_SLOT_COUNT:
+            if self.game:
+                self.game.logger.warning(f"Invalid multiplayer slot: {slot_id}")
+            return
+
+        stream = StreamOut()
+        stream.s32(slot_id)
+
+        self._enqueue(packet, stream.get())
 
     def encode(self) -> bytes:
         self.normalize_slots()
