@@ -41,8 +41,8 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.player: Player | None = None
 
         self.channels = Channels()
-        self.matches = Matches(game) # type: ignore
-        self.players = Players(game) # type: ignore
+        self.matches = Matches(game)  # type: ignore
+        self.players = Players(game)  # type: ignore
         self.queue = Queue()
 
         self.ping_count = 0
@@ -102,7 +102,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
 
         self.logger.debug(f'Received packet {packet.name} -> "%s"', packet_data)
-        self.game.packets.packet_received(packet, stream, self.game) # type: ignore
+        self.game.packets.packet_received(packet, stream, self.game)  # type: ignore
 
     def enqueue(
         self, packet: ClientPackets, data: bytes = b"", dequeue: bool = False

@@ -102,7 +102,7 @@ class TcpGame:
         self.events = EventHandler()
         self.bancho = TcpBanchoClient(self, bancho_ip, bancho_port)
         self.tasks = TaskManager(self)
-        self.api = WebAPI(self) # type: ignore
+        self.api = WebAPI(self)  # type: ignore
 
         if events:
             self.events.handlers = events

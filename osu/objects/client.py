@@ -84,17 +84,17 @@ class ClientHash:
 
         try:
             # Try to read the UninstallID from Registry
-            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg: # type: ignore
-                key = winreg.OpenKey(reg, "Software\\osu!") # type: ignore
+            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg:  # type: ignore
+                key = winreg.OpenKey(reg, "Software\\osu!")  # type: ignore
 
                 for i in range(1024):
-                    name, value, type = winreg.EnumValue(key, i) # type: ignore
+                    name, value, type = winreg.EnumValue(key, i)  # type: ignore
 
                     if name != "UninstallID":
                         continue
 
                     return hashlib.md5(value.encode()).hexdigest()
-        except (FileNotFoundError, WindowsError, EnvironmentError): # type: ignore
+        except (FileNotFoundError, WindowsError, EnvironmentError):  # type: ignore
             # Key was not found
             pass
 

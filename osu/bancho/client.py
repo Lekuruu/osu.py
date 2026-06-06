@@ -109,12 +109,14 @@ class BanchoClient:
         self.url = f"https://{self.domain}"
 
         self.session = requests.Session()
-        self.session.headers = {
-            "osu-version": self.game.version,
-            "Accept-Encoding": "gzip, deflate",
-            "User-Agent": "osu!",
-            "Host": self.domain,
-        }
+        self.session.headers.update(
+            {
+                "osu-version": self.game.version or "",
+                "Accept-Encoding": "gzip, deflate",
+                "User-Agent": "osu!",
+                "Host": self.domain,
+            }
+        )
 
         self.user_id = -1
         self.connected = False
@@ -128,7 +130,7 @@ class BanchoClient:
         self.channels = Channels()
         self.matches = Matches(game)
         self.players = Players(game)
-        self.queue = Queue()
+        self.queue: Queue[bytes] = Queue()
 
         self.ping_count = 0
         self.protocol = 0
