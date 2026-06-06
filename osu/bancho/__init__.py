@@ -1,3 +1,4 @@
+from .connector_ws import WebsocketBanchoConnector
 from .connector_http import HttpBanchoConnector
 from .connector_tcp import TcpBanchoConnector
 from .connector import BanchoConnector
