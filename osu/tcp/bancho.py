@@ -23,7 +23,7 @@ import time
 
 class TcpBanchoClient(HTTPBanchoClient):
     def __init__(self, game: "TcpGame", ip: str, port: int) -> None:
-        self.game = game
+        self.game = game  # type: ignore
 
         self.logger = logging.getLogger(f"tcp-bancho-{game.version}")
         self.logger.disabled = game.logger.disabled
@@ -36,9 +36,9 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.connected = False
         self.retry = True
 
+        self.player: Player
+        self.match: Match | None
         self.spectating: Player | None = None
-        self.match: Match | None = None
-        self.player: Player | None = None
 
         self.channels = Channels()
         self.matches = Matches(game)  # type: ignore

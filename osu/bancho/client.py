@@ -123,9 +123,9 @@ class BanchoClient:
         self.retry = True
         self.token = ""
 
-        self.spectating: Player
-        self.match: Match
         self.player: Player
+        self.match: Match | None = None
+        self.spectating: Player | None = None
 
         self.channels = Channels()
         self.matches = Matches(game)
@@ -159,7 +159,7 @@ class BanchoClient:
         return datetime.now().timestamp() - self.last_action
 
     @property
-    def request_interval(self) -> int:
+    def request_interval(self) -> int | float:
         """Time between requests"""
         if self.fast_read:
             return 0
