@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["black", "mypy", "types-python-dateutil", "build"]
+dev = ["black", "mypy", "types-python-dateutil", "build", "websockets>=11.0"]
 websockets = ["websockets>=11.0"]
 
 [project.urls]
