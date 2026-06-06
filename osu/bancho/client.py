@@ -45,7 +45,11 @@ class BanchoClient:
 
         `spectating`: osu.objects.Player
 
+        `match`: osu.objects.Match
+
         `players`: osu.objects.Players
+
+        `matches`: osu.objects.Matches
 
         `channels`: osu.objects.Channels
 
@@ -87,6 +91,12 @@ class BanchoClient:
         `join_lobby`: Join the lobby
 
         `leave_lobby`: Leave the lobby
+
+        `create_match`: Create a multiplayer match
+
+        `join_match`: Join a multiplayer match
+
+        `leave_match`: Leave the current multiplayer match
     """
 
     def __init__(self, game: "Game") -> None:
