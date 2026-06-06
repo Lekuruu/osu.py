@@ -4,6 +4,7 @@ from copy import copy
 from ..objects.replays import ScoreFrame, ReplayFrame
 from ..objects.beatmap import BeatmapInfo
 from ..objects.channel import Channel
+from ..objects.match import Match
 from ..objects.player import Player
 
 if TYPE_CHECKING:
@@ -75,6 +76,62 @@ class PacketHandler:
 
 
 Packets = PacketHandler()
+
+
+def _track_match(stream: StreamIn, game: "Game") -> Match:
+    match = Match.decode(stream, game)
+    missing_players = []
+
+    for slot in match.used_slots:
+        if slot.player_id <= 0:
+            continue
+
+        if game.bancho.players.by_id(slot.player_id):
+            continue
+
+        game.bancho.players.add(Player(slot.player_id, game=game))
+        missing_players.append(slot.player_id)
+
+    if missing_players:
+        game.bancho.request_presence(missing_players)
+
+    game.bancho.matches.add(match)
+    return match
+
+
+def _read_message(stream: StreamIn, game: "Game"):
+    sender_name = stream.string()
+    message = stream.string()
+    target_name = stream.string()
+    sender_id = stream.s32()
+
+    sender = None
+
+    if sender_id:
+        sender = game.bancho.players.by_id(sender_id)
+
+    if not sender:
+        sender = game.bancho.players.by_name(sender_name)
+
+    if not sender:
+        sender = Player(sender_id, sender_name, game)
+
+        if sender_id:
+            game.bancho.players.add(sender)
+            game.bancho.request_presence([sender_id])
+
+    if target_name.startswith("#"):
+        target = game.bancho.channels.get(target_name) or Channel(target_name, game)
+    else:
+        target = game.bancho.players.by_name(target_name)
+
+        if not target and game.bancho.player and target_name == game.bancho.player.name:
+            target = game.bancho.player
+
+        if not target:
+            target = Player(0, target_name, game)
+
+    return sender, message, target
 
 
 @Packets.register(ServerPackets.PONG)
@@ -488,6 +545,122 @@ def channel_revoked(stream: StreamIn, game: "Game"):
 def beatmapinfo_reply(stream: StreamIn, game: "Game"):
     beatmaps = [BeatmapInfo.decode(stream) for beatmap in range(stream.s32())]
     game.events.call(ServerPackets.BEATMAP_INFO_REPLY, beatmaps)
+
+
+@Packets.register(ServerPackets.NEW_MATCH)
+def new_match(stream: StreamIn, game: "Game"):
+    match = _track_match(stream, game)
+    game.events.call(ServerPackets.NEW_MATCH, match)
+
+
+@Packets.register(ServerPackets.UPDATE_MATCH)
+def update_match(stream: StreamIn, game: "Game"):
+    match = _track_match(stream, game)
+
+    if game.bancho.match and game.bancho.match.id == match.id:
+        game.bancho.match = match
+
+    game.events.call(ServerPackets.UPDATE_MATCH, match)
+
+
+@Packets.register(ServerPackets.DISPOSE_MATCH)
+def dispose_match(stream: StreamIn, game: "Game"):
+    match_id = stream.s32()
+    match = game.bancho.matches.by_id(match_id) or Match(match_id, game=game)
+
+    game.bancho.matches.remove(match)
+
+    if game.bancho.match and game.bancho.match.id == match_id:
+        game.bancho.match = None
+
+    game.events.call(ServerPackets.DISPOSE_MATCH, match)
+
+
+@Packets.register(ServerPackets.MATCH_JOIN_SUCCESS)
+def match_join_success(stream: StreamIn, game: "Game"):
+    match = _track_match(stream, game)
+    game.bancho.match = match
+    game.events.call(ServerPackets.MATCH_JOIN_SUCCESS, match)
+
+
+@Packets.register(ServerPackets.MATCH_JOIN_FAIL)
+def match_join_fail(stream: StreamIn, game: "Game"):
+    game.events.call(ServerPackets.MATCH_JOIN_FAIL)
+
+
+@Packets.register(ServerPackets.MATCH_START)
+def match_start(stream: StreamIn, game: "Game"):
+    match = _track_match(stream, game)
+    game.bancho.match = match
+    game.events.call(ServerPackets.MATCH_START, match)
+
+
+@Packets.register(ServerPackets.MATCH_SCORE_UPDATE)
+def match_score_update(stream: StreamIn, game: "Game"):
+    score_frame = ScoreFrame.decode(stream)
+    game.events.call(ServerPackets.MATCH_SCORE_UPDATE, score_frame)
+
+
+@Packets.register(ServerPackets.MATCH_TRANSFER_HOST)
+def match_transfer_host(stream: StreamIn, game: "Game"):
+    if game.bancho.match:
+        game.bancho.match.host_id = game.bancho.user_id
+
+    game.events.call(ServerPackets.MATCH_TRANSFER_HOST, game.bancho.match)
+
+
+@Packets.register(ServerPackets.MATCH_ALL_PLAYERS_LOADED)
+def match_all_players_loaded(stream: StreamIn, game: "Game"):
+    game.events.call(ServerPackets.MATCH_ALL_PLAYERS_LOADED)
+
+
+@Packets.register(ServerPackets.MATCH_PLAYER_FAILED)
+def match_player_failed(stream: StreamIn, game: "Game"):
+    slot_id = stream.s32()
+    game.events.call(ServerPackets.MATCH_PLAYER_FAILED, slot_id)
+
+
+@Packets.register(ServerPackets.MATCH_COMPLETE)
+def match_complete(stream: StreamIn, game: "Game"):
+    if game.bancho.match:
+        game.bancho.match.in_progress = False
+
+    game.events.call(ServerPackets.MATCH_COMPLETE, game.bancho.match)
+
+
+@Packets.register(ServerPackets.MATCH_SKIP)
+def match_skip(stream: StreamIn, game: "Game"):
+    game.events.call(ServerPackets.MATCH_SKIP)
+
+
+@Packets.register(ServerPackets.MATCH_PLAYER_SKIPPED)
+def match_player_skipped(stream: StreamIn, game: "Game"):
+    slot_id = stream.s32()
+    game.events.call(ServerPackets.MATCH_PLAYER_SKIPPED, slot_id)
+
+
+@Packets.register(ServerPackets.MATCH_INVITE)
+def match_invite(stream: StreamIn, game: "Game"):
+    sender, message, target = _read_message(stream, game)
+    game.events.call(ServerPackets.MATCH_INVITE, sender, message, target)
+
+
+@Packets.register(ServerPackets.MATCH_CHANGE_PASSWORD)
+def match_change_password(stream: StreamIn, game: "Game"):
+    password = stream.string()
+
+    if game.bancho.match:
+        game.bancho.match.password = password
+
+    game.events.call(ServerPackets.MATCH_CHANGE_PASSWORD, password)
+
+
+@Packets.register(ServerPackets.MATCH_ABORT)
+def match_abort(stream: StreamIn, game: "Game"):
+    if game.bancho.match:
+        game.bancho.match.in_progress = False
+
+    game.events.call(ServerPackets.MATCH_ABORT, game.bancho.match)
 
 
 @Packets.register(ServerPackets.SILENCE_END)
