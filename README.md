@@ -63,15 +63,15 @@ logging.basicConfig(
 
 # Initialize the game class
 game = Game(
-  USERNAME,
-  PASSWORD
+    USERNAME,
+    PASSWORD
 )
 
 # Simple message handler
 @game.events.register(ServerPackets.SEND_MESSAGE)
 def on_message(sender: Player, message: str, target: Player):
-  if message.startswith('?ping'):
-    sender.send_message('pong!')
+    if message.startswith('?ping'):
+        sender.send_message('pong!')
 
 # Run the game
 game.run()
@@ -83,11 +83,7 @@ You can also run tasks, independent of server actions:
 # Example of a task, running every minute
 @game.tasks.register(minutes=1, loop=True)
 def example_task():
-  ...
+    ...
 ```
 
 For a more in-depth example, please view [this project](https://github.com/lekuruu/osu-recorder).
-
----
-
-If you have any questions, feel free to contact me on discord: `lekuru`
