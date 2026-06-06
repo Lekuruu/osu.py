@@ -22,6 +22,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["black", "mypy", "types-python-dateutil", "build"]
+websockets = ["websockets>=11.0"]
 
 [project.urls]
 Homepage = "https://github.com/Lekuruu/osu.py"
