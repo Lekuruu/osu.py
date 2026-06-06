@@ -421,4 +421,25 @@ class BanchoClient:
             return
 
         self.enqueue(ClientPackets.PART_LOBBY)
-        self.in_lobby = True
+        self.in_lobby = False
+
+    def create_match(self, match: Match) -> None:
+        """Create a multiplayer match"""
+        match.game = self.game
+        self.enqueue(ClientPackets.CREATE_MATCH, match.encode())
+
+    def join_match(self, match: Match | int, password: str = "") -> None:
+        """Join a multiplayer match"""
+        stream = StreamOut()
+        stream.s32(match.id if isinstance(match, Match) else match)
+        stream.string(password)
+
+        self.enqueue(ClientPackets.JOIN_MATCH, stream.get())
+
+    def leave_match(self) -> None:
+        """Leave the current multiplayer match"""
+        if not self.match:
+            return
+
+        self.enqueue(ClientPackets.PART_MATCH)
+        self.match = None

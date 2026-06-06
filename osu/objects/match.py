@@ -114,6 +114,20 @@ class Match:
         while len(self.slots) < MATCH_SLOT_COUNT:
             self.slots.append(MatchSlot())
 
+    def join(self, password: str = "") -> None:
+        """Join this multiplayer match"""
+        if not self.game:
+            return
+
+        self.game.bancho.join_match(self, password)
+
+    def leave(self) -> None:
+        """Leave this multiplayer match"""
+        if not self.game:
+            return
+
+        self.game.bancho.leave_match()
+
     def encode(self) -> bytes:
         self.normalize_slots()
 
