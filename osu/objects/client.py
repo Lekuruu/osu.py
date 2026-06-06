@@ -3,7 +3,7 @@ from dateutil.tz import tzlocal
 
 import platform
 import hashlib
-import psutil
+import psutil  # type: ignore
 
 
 class ClientHash:

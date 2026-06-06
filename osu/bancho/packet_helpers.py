@@ -59,13 +59,19 @@ def resolve_message(stream: StreamIn, game: "Game"):
     # Find target
     if target_name.startswith("#"):
         # Public message
-        target_channel = game.bancho.channels.get(target_name) or Channel(target_name, game)
+        target_channel = game.bancho.channels.get(target_name) or Channel(
+            target_name, game
+        )
         return sender, message, target_channel
 
     # Private message
     target_player = game.bancho.players.by_name(target_name)
 
-    if not target_player and game.bancho.player and target_name == game.bancho.player.name:
+    if (
+        not target_player
+        and game.bancho.player
+        and target_name == game.bancho.player.name
+    ):
         target_player = game.bancho.player
 
     if not target_player:
