@@ -42,7 +42,7 @@ jobs:
               if: steps.depcache.outputs.cache-hit != 'true'
               run: |
                   pip download --dest=deps -r requirements.txt
-                  pip download --dest=deps setuptools wheel black build
+                  pip download --dest=deps setuptools wheel black mypy build
 
             - name: Install dependencies
               run: |

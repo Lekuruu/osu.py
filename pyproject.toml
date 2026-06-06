@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["black", "build"]
+dev = ["black", "mypy", "build"]
 
 [project.urls]
 Homepage = "https://github.com/Lekuruu/osu.py"
