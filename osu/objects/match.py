@@ -151,10 +151,6 @@ class Match:
         """Change this multiplayer match's settings"""
         self._enqueue(ClientPackets.MATCH_CHANGE_SETTINGS, self.encode())
 
-    def change_beatmap(self) -> None:
-        """Change this multiplayer match's beatmap"""
-        self._enqueue(ClientPackets.MATCH_CHANGE_BEATMAP, self.encode())
-
     def change_mods(self, mods: Mods) -> None:
         """Change your mods in this multiplayer match"""
         self.mods = mods
