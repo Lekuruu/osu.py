@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["black", "mypy", "build"]
+dev = ["black", "mypy", "types-python-dateutil", "build"]
 
 [project.urls]
 Homepage = "https://github.com/Lekuruu/osu.py"
