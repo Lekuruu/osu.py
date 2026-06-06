@@ -49,6 +49,8 @@ class Player:
         return self.id
 
     def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Player):
+            return NotImplemented
         return self.id == other.id
 
     @property
@@ -125,7 +127,7 @@ class Player:
 
         self.game.logger.info(f"You are now friends with {self.name}.")
 
-        self.game.bancho.friends.add(self.id)
+        self.game.bancho.friends.append(self.id)
         self.game.bancho.enqueue(
             ClientPackets.FRIEND_ADD, int(self.id).to_bytes(4, "little")
         )

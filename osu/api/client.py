@@ -52,7 +52,9 @@ class WebAPI:
         self.game = game
 
         self.session = requests.Session()
-        self.session.headers = {"User-Agent": "osu!", "osu-version": self.game.version}
+        self.session.headers.update(
+            {"User-Agent": "osu!", "osu-version": self.game.version or ""}
+        )
 
         self.logger = logging.getLogger(f"osu!api-{game.version}")
         self.logger.disabled = game.logger.disabled
@@ -186,6 +188,8 @@ class WebAPI:
         if response.ok:
             return response.json()
 
+        return None
+
     def get_menu_content(self) -> dict | None:
         """This will perform a request on `/web/osu-getcurrent.php`.
 
@@ -197,6 +201,8 @@ class WebAPI:
 
         if response.ok:
             return response.json()
+
+        return None
 
     def get_friends(self) -> list[int]:
         """This will perform a request on `/web/osu-getfriends.php`.
@@ -239,26 +245,30 @@ class WebAPI:
             ScoreResponse | None
         """
 
+        params = {
+            "s": int(skip_scores),
+            "vv": 4,  # request version
+            "v": rank_type.value,
+            "c": beatmap_checksum,
+            "f": beatmap_file,
+            "m": mode.value,
+            "i": set_id,
+            "a": 0,  # ?
+            "us": self.game.username,
+            "ha": self.game.password_hash,
+        }
+
+        if mods is not None:
+            params["mods"] = mods.value
+
         response = self.session.get(
             f"{self.url}/web/osu-osz2-getscores.php",
-            params={
-                "s": int(skip_scores),
-                "vv": 4,  # ?
-                "v": rank_type.value,
-                "c": beatmap_checksum,
-                "f": beatmap_file,
-                "m": mode.value,
-                "i": set_id,
-                "mods": mods.value,
-                "a": 0,  # ?
-                "us": self.game.username,
-                "ha": self.game.password_hash,
-            },
+            params=params,
         )
 
         if not response.ok:
             self.logger.error(f"Failed to fetch scores ({response.status_code})")
-            return
+            return None
 
         return ScoreResponse.from_string(response.text, mode)
 
@@ -320,7 +330,7 @@ class WebAPI:
 
         response = self.session.get(
             f"{self.url}/web/osu-addfavourite.php",
-            params={
+            params={  # type: ignore
                 "u": self.game.username,
                 "h": self.game.password_hash,
                 "a": beatmapset_id,
@@ -409,7 +419,7 @@ class WebAPI:
 
         self.session.post(
             f"{self.url}/web/osu-comment.php",
-            files={
+            files={  # type: ignore
                 "u": (None, self.game.username),
                 "p": (None, self.game.password_hash),
                 "b": (None, beatmap_id),
@@ -494,7 +504,7 @@ class WebAPI:
             f"https://osu.ppy.sh/d/{beatmapset_id}{'n' if no_video else ''}",
             allow_redirects=True,
             stream=True,
-            params={
+            params={  # type: ignore
                 "u": self.game.username,
                 "h": self.game.password_hash,
                 "vv": 2,  # request version

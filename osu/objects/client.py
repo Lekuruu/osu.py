@@ -1,5 +1,5 @@
+from datetime import datetime, timedelta
 from dateutil.tz import tzlocal
-from datetime import datetime
 
 import platform
 import hashlib
@@ -114,7 +114,7 @@ class ClientHash:
             return hashlib.md5(b"unknown").hexdigest()
 
         try:
-            from wmi import WMI
+            from wmi import WMI  # type: ignore
 
             # Get serial number of first item
             for item in WMI().query("SELECT * FROM Win32_DiskDrive"):
@@ -166,9 +166,10 @@ class ClientInfo:
         self.friendonly_dms = False
         self.display_city = False
 
-        self.utc_offset = round(
-            datetime.now(tzlocal()).utcoffset().total_seconds() / 3600
-        )
+        utcoffset = datetime.now(tzlocal()).utcoffset()
+        utcoffset = utcoffset or timedelta(0)
+
+        self.utc_offset = round(utcoffset.total_seconds() / 3600)
 
     def __repr__(self) -> str:
         return f"{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}"

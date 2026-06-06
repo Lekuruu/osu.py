@@ -144,7 +144,7 @@ class Game:
     def run(self, retry=False, exit_on_interrupt=False) -> None:
         if retry:
             # Reinitialize game
-            self.__init__(
+            self.__init__(  # type: ignore
                 self.username,
                 self.password,
                 self.server,

@@ -75,11 +75,11 @@ class ScoreResponse:
     featured_artist_license_text: str | None = None
 
     @classmethod
-    def from_string(cls, string: str, mode: Mode) -> "ScoreResponse":
+    def from_string(cls, string: str, mode: Mode) -> "ScoreResponse | None":
         result = string.split("\n")
 
         if len(result) <= 0:
-            return
+            return None
 
         status_results = result[0].split("|")
         beatmap_status = {
