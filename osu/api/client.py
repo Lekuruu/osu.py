@@ -538,6 +538,6 @@ class WebAPI:
 
         if status < 0:
             self.logger.error(f'Failed to get beatmapsets: "{lines[1]}"')
-            return
+            return None
 
         return [OnlineBeatmap.parse(line) for line in lines[1:]]
