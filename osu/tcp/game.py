@@ -127,7 +127,7 @@ class TcpGame:
                 self.password,
                 self.server,
                 self.version_number,
-                self.client.hash,
+                self.client.hash.executable_hash,
                 self.bancho.ip,
                 self.bancho.port,
                 self.tourney,
