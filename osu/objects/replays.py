@@ -79,8 +79,8 @@ class ScoreFrame:
         stream.u8(self.tag_byte)
         stream.bool(self.score_v2)
         if self.score_v2:
-            stream.float(self.combo_portion)
-            stream.float(self.bonus_portion)
+            stream.double(self.combo_portion)
+            stream.double(self.bonus_portion)
         return stream.get()
 
     @classmethod
@@ -101,6 +101,6 @@ class ScoreFrame:
             stream.u8(),
             stream.u8(),
             v2 := stream.bool(),
-            stream.float() if v2 else 0.0,
-            stream.float() if v2 else 0.0,
+            stream.double() if v2 else 0.0,
+            stream.double() if v2 else 0.0,
         )

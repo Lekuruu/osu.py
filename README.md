@@ -42,7 +42,7 @@ python -m build
 - [x] Tournament client behaviour
 - [x] Direct Search
 - [x] Direct Download
-- [ ] Multiplayer
+- [x] Multiplayer
 - [ ] Documentation
 
 ## Example

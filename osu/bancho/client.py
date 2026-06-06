@@ -6,7 +6,8 @@ from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
 from .streams import StreamOut
 
 from ..objects.replays import ReplayFrame, ScoreFrame
-from ..objects.collections import Players, Channels
+from ..objects.collections import Players, Channels, Matches
+from ..objects.match import Match
 from ..objects.player import Player
 from ..objects.status import Status
 
@@ -44,7 +45,11 @@ class BanchoClient:
 
         `spectating`: osu.objects.Player
 
+        `match`: osu.objects.Match
+
         `players`: osu.objects.Players
+
+        `matches`: osu.objects.Matches
 
         `channels`: osu.objects.Channels
 
@@ -86,6 +91,12 @@ class BanchoClient:
         `join_lobby`: Join the lobby
 
         `leave_lobby`: Leave the lobby
+
+        `create_match`: Create a multiplayer match
+
+        `join_match`: Join a multiplayer match
+
+        `leave_match`: Leave the current multiplayer match
     """
 
     def __init__(self, game: "Game") -> None:
@@ -111,9 +122,11 @@ class BanchoClient:
         self.token = ""
 
         self.spectating: Optional[Player] = None
+        self.match: Optional[Match] = None
         self.player: Optional[Player] = None
 
         self.channels = Channels()
+        self.matches = Matches(game)
         self.players = Players(game)
         self.queue = Queue()
 
@@ -418,4 +431,25 @@ class BanchoClient:
             return
 
         self.enqueue(ClientPackets.PART_LOBBY)
-        self.in_lobby = True
+        self.in_lobby = False
+
+    def create_match(self, match: Match) -> None:
+        """Create a multiplayer match"""
+        match.game = self.game
+        self.enqueue(ClientPackets.CREATE_MATCH, match.encode())
+
+    def join_match(self, match: Match | int, password: str = "") -> None:
+        """Join a multiplayer match"""
+        stream = StreamOut()
+        stream.s32(match.id if isinstance(match, Match) else match)
+        stream.string(password)
+
+        self.enqueue(ClientPackets.JOIN_MATCH, stream.get())
+
+    def leave_match(self) -> None:
+        """Leave the current multiplayer match"""
+        if not self.match:
+            return
+
+        self.enqueue(ClientPackets.PART_MATCH)
+        self.match = None
