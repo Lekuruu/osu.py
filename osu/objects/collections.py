@@ -1,5 +1,5 @@
-from typing import List, Set, Iterator, Optional, TYPE_CHECKING
 from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets, PresenceFilter
 
@@ -21,32 +21,32 @@ class Players(LockedSet[Player]):
         return super().__iter__()
 
     @property
-    def ids(self) -> Set[int]:
+    def ids(self) -> set[int]:
         return {p.id for p in self}
 
     @property
-    def pending(self) -> List[Player]:
+    def pending(self) -> list[Player]:
         return [p for p in self if not p.name]
 
-    def add(self, player: Player) -> None:
+    def add(self, item: Player) -> None:
         """Add a player to the collection"""
-        return super().add(player)
+        return super().add(item)
 
-    def remove(self, player: Player) -> None:
+    def remove(self, item: Player) -> None:
         """Remove a player from the collection"""
-        if player in self:
-            return super().remove(player)
+        if item in self:
+            return super().remove(item)
 
-    def by_id(self, id: int) -> Optional[Player]:
+    def by_id(self, id: int) -> Player | None:
         """Get a player by id"""
-        for p in self.copy():
+        for p in self.snapshot_list():
             if p.id == id:
                 return p
         return None
 
-    def by_name(self, name: str) -> Optional[Player]:
+    def by_name(self, name: str) -> Player | None:
         """Get a player by name"""
-        for p in self.copy():
+        for p in self.snapshot_list():
             if p.name == name:
                 return p
         return None
@@ -72,21 +72,21 @@ class Channels(LockedSet[Channel]):
         return super().__iter__()
 
     @property
-    def joined(self) -> List[Channel]:
+    def joined(self) -> list[Channel]:
         return [c for c in self if c.joined]
 
-    def add(self, channel: Channel) -> None:
+    def add(self, item: Channel) -> None:
         """Add a channel to the collection"""
-        return super().add(channel)
+        return super().add(item)
 
-    def remove(self, channel: Channel) -> None:
+    def remove(self, item: Channel) -> None:
         """Remove a channel to the collection"""
-        if channel in self:
-            return super().remove(channel)
+        if item in self:
+            return super().remove(item)
 
-    def get(self, name: str) -> Optional[Channel]:
+    def get(self, name: str) -> Channel | None:
         """Get a channel by name"""
-        for c in self.copy():
+        for c in self.snapshot_list():
             if c.name == name:
                 return c
         return None
@@ -100,22 +100,22 @@ class Matches(LockedSet[Match]):
     def __iter__(self) -> Iterator[Match]:
         return super().__iter__()
 
-    def add(self, match: Match) -> None:
+    def add(self, item: Match) -> None:
         """Add a match to the collection"""
-        if existing := self.by_id(match.id):
+        if existing := self.by_id(item.id):
             super().remove(existing)
 
-        match.game = self.game
-        return super().add(match)
+        item.game = self.game
+        return super().add(item)
 
-    def remove(self, match: Match) -> None:
+    def remove(self, item: Match) -> None:
         """Remove a match from the collection"""
-        if match in self:
-            return super().remove(match)
+        if item in self:
+            return super().remove(item)
 
-    def by_id(self, id: int) -> Optional[Match]:
+    def by_id(self, id: int) -> Match | None:
         """Get a match by id"""
-        for match in self.copy():
+        for match in self.snapshot_list():
             if match.id == id:
                 return match
         return None

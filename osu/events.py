@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Dict, Callable
+from collections.abc import Callable
 
 from .bancho.constants import ServerPackets
 
@@ -22,7 +22,7 @@ class EventHandler:
     """
 
     def __init__(self) -> None:
-        self.handlers: Dict[ServerPackets, List[Callable]] = {}
+        self.handlers: dict[ServerPackets, list[Callable]] = {}
         self.executor = ThreadPoolExecutor(max_workers=10)
 
     def register(self, packet: ServerPackets, threaded: bool = False):

@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Callable
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 import logging
@@ -26,7 +26,7 @@ class TaskManager:
 
     def __init__(self, game) -> None:
         self.executor = ThreadPoolExecutor(max_workers=10)
-        self.tasks: List[Task] = []
+        self.tasks: list[Task] = []
         self.game = game
 
         self.logger = logging.getLogger("tasks")

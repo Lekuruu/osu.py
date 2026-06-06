@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets
 from ..bancho.streams import StreamOut
@@ -10,7 +10,7 @@ import logging
 
 
 class Channel:
-    def __init__(self, name: str, game: "Game", topic: Optional[str] = None) -> None:
+    def __init__(self, name: str, game: "Game", topic: str | None = None) -> None:
         self.name = name
         self.topic = topic
         self.game = game
@@ -26,6 +26,8 @@ class Channel:
         return hash(self.name)
 
     def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Channel):
+            return NotImplemented
         return self.name == other.name
 
     def join(self) -> None:

@@ -1,4 +1,4 @@
-from typing import Optional, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -23,8 +23,8 @@ class Score:
     perfect: bool
     mods: Mods
     user_id: int
-    rank: Optional[int]
-    date: Optional[datetime]
+    rank: int | None
+    date: datetime | None
     mode: Mode
     has_replay: bool
 
@@ -62,24 +62,24 @@ class Score:
 @dataclass
 class ScoreResponse:
     status: SubmissionStatus
-    beatmap_id: Optional[int]
-    set_id: Optional[int]
+    beatmap_id: int | None
+    set_id: int | None
     total_scores: int
     global_offset: int
-    beatmap_format: Optional[str]
+    beatmap_format: str | None
     rating: float
-    personal_best: Optional[Score]
-    scores: List[Score]
+    personal_best: Score | None
+    scores: list[Score]
     has_osz2: bool = False
-    featured_artist_track_id: Optional[int] = None
-    featured_artist_license_text: Optional[str] = None
+    featured_artist_track_id: int | None = None
+    featured_artist_license_text: str | None = None
 
     @classmethod
-    def from_string(cls, string: str, mode: Mode) -> "ScoreResponse":
+    def from_string(cls, string: str, mode: Mode) -> "ScoreResponse | None":
         result = string.split("\n")
 
         if len(result) <= 0:
-            return
+            return None
 
         status_results = result[0].split("|")
         beatmap_status = {

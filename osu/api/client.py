@@ -1,4 +1,5 @@
-from typing import Callable, Optional, Iterator, List, TYPE_CHECKING
+from collections.abc import Callable, Iterator
+from typing import TYPE_CHECKING
 
 from .constants import Mode, Mods, RankingType, CommentTarget, DisplayMode, ModeSelect
 from ..objects.beatmap import OnlineBeatmap
@@ -51,7 +52,9 @@ class WebAPI:
         self.game = game
 
         self.session = requests.Session()
-        self.session.headers = {"User-Agent": "osu!", "osu-version": self.game.version}
+        self.session.headers.update(
+            {"User-Agent": "osu!", "osu-version": self.game.version or ""}
+        )
 
         self.logger = logging.getLogger(f"osu!api-{game.version}")
         self.logger.disabled = game.logger.disabled
@@ -79,11 +82,11 @@ class WebAPI:
 
         return wrapper
 
-    def check_updates(self) -> Optional[List[dict]]:
+    def check_updates(self) -> list[dict] | None:
         """This will a request on `/web/check-updates.php`
 
         Returns:
-            Optional[list]: When the request was successful, it will return a list of dicts with the following attributes:
+            list[dict] | None: When the request was successful, it will return a list of dicts with the following attributes:
                             file_version, filename, file_hash, filesize, timestamp, patch_id, url_full
         """
         self.logger.info("Checking for updates...")
@@ -173,11 +176,11 @@ class WebAPI:
 
         return response
 
-    def get_backgrounds(self) -> Optional[list]:
+    def get_backgrounds(self) -> list | None:
         """This will perform a request on `/web/osu-getseasonal.php`.
 
         Returns:
-            Optional[list]: List of urls for the seasonal background images
+            list | None: list of urls for the seasonal background images
         """
 
         response = self.session.get(f"{self.url}/web/osu-getseasonal.php")
@@ -185,11 +188,13 @@ class WebAPI:
         if response.ok:
             return response.json()
 
-    def get_menu_content(self) -> Optional[dict]:
+        return None
+
+    def get_menu_content(self) -> dict | None:
         """This will perform a request on `/web/osu-getcurrent.php`.
 
         Returns:
-            Optional[dict]: The menu content
+            dict | None: The menu content
         """
 
         response = self.session.get(f"{self.asset_url}/menu-content.json")
@@ -197,11 +202,13 @@ class WebAPI:
         if response.ok:
             return response.json()
 
-    def get_friends(self) -> List[int]:
+        return None
+
+    def get_friends(self) -> list[int]:
         """This will perform a request on `/web/osu-getfriends.php`.
 
         Returns:
-            List[int]: The user ids of your friends
+            list[int]: The user ids of your friends
         """
 
         response = self.session.get(
@@ -220,10 +227,10 @@ class WebAPI:
         beatmap_file: str,
         set_id: int,
         mode: Mode = Mode.Osu,
-        mods: Optional[Mods] = Mods.NoMod,
+        mods: Mods | None = Mods.NoMod,
         rank_type=RankingType.Top,
         skip_scores: bool = False,
-    ) -> Optional[ScoreResponse]:
+    ) -> ScoreResponse | None:
         """Get top scores for a beatmap
 
         Args:
@@ -235,29 +242,33 @@ class WebAPI:
             rank_type (RankingType, optional): Select the leaderboard type
 
         Returns:
-            Optional[ScoreResponse]
+            ScoreResponse | None
         """
+
+        params = {
+            "s": int(skip_scores),
+            "vv": 4,  # request version
+            "v": rank_type.value,
+            "c": beatmap_checksum,
+            "f": beatmap_file,
+            "m": mode.value,
+            "i": set_id,
+            "a": 0,  # ?
+            "us": self.game.username,
+            "ha": self.game.password_hash,
+        }
+
+        if mods is not None:
+            params["mods"] = mods.value
 
         response = self.session.get(
             f"{self.url}/web/osu-osz2-getscores.php",
-            params={
-                "s": int(skip_scores),
-                "vv": 4,  # ?
-                "v": rank_type.value,
-                "c": beatmap_checksum,
-                "f": beatmap_file,
-                "m": mode.value,
-                "i": set_id,
-                "mods": mods.value,
-                "a": 0,  # ?
-                "us": self.game.username,
-                "ha": self.game.password_hash,
-            },
+            params=params,
         )
 
         if not response.ok:
             self.logger.error(f"Failed to fetch scores ({response.status_code})")
-            return
+            return None
 
         return ScoreResponse.from_string(response.text, mode)
 
@@ -288,11 +299,11 @@ class WebAPI:
 
         return float(response.text)
 
-    def get_favourites(self) -> List[int]:
+    def get_favourites(self) -> list[int]:
         """Get your beatmap favourites
 
         Returns:
-            List[int]: List of beatmapset ids
+            list[int]: list of beatmapset ids
         """
 
         response = self.session.get(
@@ -319,7 +330,7 @@ class WebAPI:
 
         response = self.session.get(
             f"{self.url}/web/osu-addfavourite.php",
-            params={
+            params={  # type: ignore
                 "u": self.game.username,
                 "h": self.game.password_hash,
                 "a": beatmapset_id,
@@ -330,11 +341,11 @@ class WebAPI:
 
     def get_comments(
         self,
-        beatmap_id: Optional[int] = None,
-        set_id: Optional[int] = None,
-        replay_id: Optional[int] = None,
+        beatmap_id: int | None = None,
+        set_id: int | None = None,
+        replay_id: int | None = None,
         mode: Mode = Mode.Osu,
-    ) -> List[Comment]:
+    ) -> list[Comment]:
         """Get comments for a beatmap, set or replay
 
         Args:
@@ -344,7 +355,7 @@ class WebAPI:
             mode (Mode, optional): Specify the mode
 
         Returns:
-            List[Comment]
+            list[Comment]
         """
 
         if all([beatmap_id is None, set_id is None, replay_id is None]):
@@ -352,7 +363,7 @@ class WebAPI:
 
         response = self.session.post(
             f"{self.url}/web/osu-comment.php",
-            files={
+            files={  # type: ignore
                 "u": (None, self.game.username),
                 "p": (None, self.game.password_hash),
                 "b": (None, beatmap_id),
@@ -377,9 +388,9 @@ class WebAPI:
         text: str,
         time: int,
         target: CommentTarget = CommentTarget.Map,
-        beatmap_id: Optional[int] = None,
-        replay_id: Optional[int] = None,
-        set_id: Optional[int] = None,
+        beatmap_id: int | None = None,
+        replay_id: int | None = None,
+        set_id: int | None = None,
         mode: Mode = Mode.Osu,
     ) -> None:
         """Post a comment to a map, song or replay
@@ -389,9 +400,9 @@ class WebAPI:
             time (int): The time you want this comment to appear inside the map
             target (CommentTarget): Specify where this comment should appear.
             mode (Mode, optional): Specify the mode
-            beatmap_id (Optional[int], optional): Set the beatmap id, if you set the target to "Map"
-            replay_id (Optional[int], optional): Set the replay id, if you set the target to "Replay"
-            set_id (Optional[int], optional): Set the set it, if you set the target to "Song"
+            beatmap_id (int | None, optional): Set the beatmap id, if you set the target to "Map"
+            replay_id (int | None, optional): Set the replay id, if you set the target to "Replay"
+            set_id (int | None, optional): Set the set it, if you set the target to "Song"
         """
 
         if all([beatmap_id is None, set_id is None, replay_id is None]):
@@ -408,7 +419,7 @@ class WebAPI:
 
         self.session.post(
             f"{self.url}/web/osu-comment.php",
-            files={
+            files={  # type: ignore
                 "u": (None, self.game.username),
                 "p": (None, self.game.password_hash),
                 "b": (None, beatmap_id),
@@ -422,7 +433,7 @@ class WebAPI:
             },
         )
 
-    def get_replay(self, replay_id: int, mode: Mode = Mode.Osu) -> Optional[bytes]:
+    def get_replay(self, replay_id: int, mode: Mode = Mode.Osu) -> bytes | None:
         """Get raw replay data by id (not osr!)
 
         Args:
@@ -430,7 +441,7 @@ class WebAPI:
             mode (Mode, optional): The mode of this score
 
         Returns:
-            Optional[bytes]: The raw replay data, compressed with lzma
+            bytes | None: The raw replay data, compressed with lzma
 
         Please view this page for more information: https://osu.ppy.sh/wiki/de/Client/File_formats/osr_%28file_format%29
         """
@@ -447,18 +458,18 @@ class WebAPI:
 
         if not response.ok:
             self.logger.error(f"Failed to fetch replay ({response.status_code})")
-            return
+            return None
 
         return response.content
 
-    def get_avatar(self, user_id: int) -> Optional[bytes]:
+    def get_avatar(self, user_id: int) -> bytes | None:
         """Get avatar by user id"""
 
         return self.session.get(f"https://a.{self.game.server}/{user_id}").content
 
     def get_beatmap_thumbnail(
         self, beatmapset_id: int, large: bool = False
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
         """Get the background thumbnail of a beatmap"""
 
         response = self.session.get(
@@ -467,7 +478,7 @@ class WebAPI:
 
         return response.content if response.ok else None
 
-    def get_beatmap_preview(self, beatmapset_id: int) -> Optional[bytes]:
+    def get_beatmap_preview(self, beatmapset_id: int) -> bytes | None:
         """Get the preview to a song of a beatmap"""
 
         response = self.session.get(
@@ -478,7 +489,7 @@ class WebAPI:
 
     def download_osz(
         self, beatmapset_id: int, no_video: bool = False
-    ) -> Optional[Iterator[bytes]]:
+    ) -> Iterator[bytes] | None:
         """Download an osz file
 
         Args:
@@ -486,28 +497,28 @@ class WebAPI:
             no_video (bool, optional): Specify if the osz should contain a video
 
         Returns:
-            Optional[Iterator[bytes]]: An iterator of bytes, which contains the osz
+            Iterator[bytes] | None: An iterator of bytes, which contains the osz
         """
 
         response = self.session.get(
             f"https://osu.ppy.sh/d/{beatmapset_id}{'n' if no_video else ''}",
             allow_redirects=True,
             stream=True,
-            params={
+            params={  # type: ignore
                 "u": self.game.username,
                 "h": self.game.password_hash,
-                "vv": 2,  # what is this lol
+                "vv": 2,  # request version
             },
         )
 
         if not response.ok:
-            return
+            return None
 
         return response.iter_content(1024)
 
     def search_beatmapsets(
         self, query: str, display_mode=DisplayMode.Ranked, mode=ModeSelect.All, page=0
-    ) -> Optional[List[OnlineBeatmap]]:
+    ) -> list[OnlineBeatmap] | None:
         """Get a list of beatmapsets, aka. osu! direct search
 
         Args:
@@ -517,7 +528,7 @@ class WebAPI:
             page (int): Specify an offset/page
 
         Returns:
-            Optional[List[OnlineBeatmap]]
+            list[OnlineBeatmap] | None
         """
 
         response = self.session.get(
@@ -537,6 +548,6 @@ class WebAPI:
 
         if status < 0:
             self.logger.error(f'Failed to get beatmapsets: "{lines[1]}"')
-            return
+            return None
 
         return [OnlineBeatmap.parse(line) for line in lines[1:]]

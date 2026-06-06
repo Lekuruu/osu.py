@@ -1,5 +1,3 @@
-from typing import List
-
 import struct
 
 
@@ -99,7 +97,7 @@ class StreamOut:
     def wchar(self, value):
         self.u16(ord(value))
 
-    def intlist(self, numbers: List[int]):
+    def intlist(self, numbers: list[int]):
         self.s16(len(numbers))
         [self.s32(num) for num in numbers]
 
@@ -135,7 +133,7 @@ class StreamIn:
         self.endian = endian
         self.data = data
         self.pos = 0
-        self.stack = []
+        self.stack: list[int] = []
 
     def push(self):
         self.stack.append(self.pos)
@@ -260,10 +258,10 @@ class StreamIn:
         empty = self.s8() == 0x00
 
         if empty:
-            return ""
+            return b""
 
         size = self.uleb128()
         return self.read(size)
 
-    def intlist(self) -> List[int]:
+    def intlist(self) -> list[int]:
         return [self.s32() for num in range(self.s16())]

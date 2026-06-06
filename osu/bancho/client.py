@@ -1,4 +1,4 @@
-from typing import Optional, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
@@ -109,32 +109,34 @@ class BanchoClient:
         self.url = f"https://{self.domain}"
 
         self.session = requests.Session()
-        self.session.headers = {
-            "osu-version": self.game.version,
-            "Accept-Encoding": "gzip, deflate",
-            "User-Agent": "osu!",
-            "Host": self.domain,
-        }
+        self.session.headers.update(
+            {
+                "osu-version": self.game.version or "",
+                "Accept-Encoding": "gzip, deflate",
+                "User-Agent": "osu!",
+                "Host": self.domain,
+            }
+        )
 
         self.user_id = -1
         self.connected = False
         self.retry = True
         self.token = ""
 
-        self.spectating: Optional[Player] = None
-        self.match: Optional[Match] = None
-        self.player: Optional[Player] = None
+        self.player: Player
+        self.match: Match | None = None
+        self.spectating: Player | None = None
 
         self.channels = Channels()
         self.matches = Matches(game)
         self.players = Players(game)
-        self.queue = Queue()
+        self.queue: Queue[bytes] = Queue()
 
         self.ping_count = 0
         self.protocol = 0
 
         self.privileges: Privileges = Privileges.Normal
-        self.friends: List[int] = []
+        self.friends: list[int] = []
 
         self.last_action = datetime.now().timestamp()
         self.fast_read = False
@@ -157,12 +159,12 @@ class BanchoClient:
         return datetime.now().timestamp() - self.last_action
 
     @property
-    def request_interval(self) -> int:
+    def request_interval(self) -> int | float:
         """Time between requests"""
         if self.fast_read:
             return 0
 
-        interval = 1
+        interval: int | float = 1
 
         if not self.spectating:
             interval *= 1 + self.idle_time / 10
@@ -266,7 +268,7 @@ class BanchoClient:
         stream.u32(len(data))
         stream.write(data)
 
-        self.logger.debug(f'Sending {packet.name} -> "{data}"')
+        self.logger.debug(f'Sending {packet.name} -> "%s"', data)
 
         # Append to queue
         self.queue.put(stream.get())
@@ -289,14 +291,14 @@ class BanchoClient:
         """Send a ping to the server"""
         self.enqueue(ClientPackets.PING)
 
-    def request_presence(self, ids: List[int]) -> None:
+    def request_presence(self, ids: list[int]) -> None:
         """Request the presence of a list of players"""
         stream = StreamOut()
         stream.intlist(ids)
 
         self.enqueue(ClientPackets.USER_PRESENCE_REQUEST, stream.get())
 
-    def request_stats(self, ids: List[int]) -> None:
+    def request_stats(self, ids: list[int]) -> None:
         """Request the stats of a list of players"""
         stream = StreamOut()
         stream.intlist(ids)
@@ -386,8 +388,8 @@ class BanchoClient:
     def send_frames(
         self,
         action: ReplayAction,
-        frames: List[ReplayFrame],
-        score_frame: Optional[ScoreFrame] = None,
+        frames: list[ReplayFrame],
+        score_frame: ScoreFrame | None = None,
         seed: int = 0,
     ) -> None:
         """

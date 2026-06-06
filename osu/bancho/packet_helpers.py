@@ -20,7 +20,7 @@ def resolve_match(stream: StreamIn, game: "Game") -> Match:
         if game.bancho.players.by_id(slot.player_id):
             continue
 
-        game.bancho.players.add(Player(slot.player_id, game=game))
+        game.bancho.players.add(Player(slot.player_id, name="", game=game))
         missing_players.append(slot.player_id)
 
     if missing_players:
@@ -59,20 +59,26 @@ def resolve_message(stream: StreamIn, game: "Game"):
     # Find target
     if target_name.startswith("#"):
         # Public message
-        target = game.bancho.channels.get(target_name) or Channel(target_name, game)
-        return sender, message, target
+        target_channel = game.bancho.channels.get(target_name) or Channel(
+            target_name, game
+        )
+        return sender, message, target_channel
 
     # Private message
-    target = game.bancho.players.by_name(target_name)
+    target_player = game.bancho.players.by_name(target_name)
 
-    if not target and game.bancho.player and target_name == game.bancho.player.name:
-        target = game.bancho.player
+    if (
+        not target_player
+        and game.bancho.player
+        and target_name == game.bancho.player.name
+    ):
+        target_player = game.bancho.player
 
-    if not target:
-        target = Player(0, target_name, game)
+    if not target_player:
+        target_player = Player(0, target_name, game)
 
-    if not target.loaded:
+    if not target_player.loaded:
         # Presence missing
-        target.request_presence()
+        target_player.request_presence()
 
-    return sender, message, target
+    return sender, message, target_player

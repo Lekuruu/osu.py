@@ -1,4 +1,4 @@
-from typing import Optional, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
@@ -23,7 +23,7 @@ import time
 
 class TcpBanchoClient(HTTPBanchoClient):
     def __init__(self, game: "TcpGame", ip: str, port: int) -> None:
-        self.game = game
+        self.game = game  # type: ignore
 
         self.logger = logging.getLogger(f"tcp-bancho-{game.version}")
         self.logger.disabled = game.logger.disabled
@@ -36,20 +36,20 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.connected = False
         self.retry = True
 
-        self.spectating: Optional[Player] = None
-        self.match: Optional[Match] = None
-        self.player: Optional[Player] = None
+        self.player: Player
+        self.match: Match | None
+        self.spectating: Player | None = None
 
         self.channels = Channels()
-        self.matches = Matches(game)
-        self.players = Players(game)
+        self.matches = Matches(game)  # type: ignore
+        self.players = Players(game)  # type: ignore
         self.queue = Queue()
 
         self.ping_count = 0
         self.protocol = 0
 
         self.privileges: Privileges = Privileges.Normal
-        self.friends: List[int] = []
+        self.friends: list[int] = []
 
         self.last_action = datetime.now().timestamp()
         self.silenced = False
@@ -101,8 +101,8 @@ class TcpBanchoClient(HTTPBanchoClient):
 
         packet, stream = ServerPackets(packet_id), StreamIn(packet_data)
 
-        self.logger.debug(f'Received packet {packet.name} -> "{stream.get()}"')
-        self.game.packets.packet_received(packet, stream, self.game)
+        self.logger.debug(f'Received packet {packet.name} -> "%s"', packet_data)
+        self.game.packets.packet_received(packet, stream, self.game)  # type: ignore
 
     def enqueue(
         self, packet: ClientPackets, data: bytes = b"", dequeue: bool = False
@@ -116,7 +116,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         stream.u32(len(data))
         stream.write(data)
 
-        self.logger.debug(f'Sending {packet.name} -> "{data}"')
+        self.logger.debug(f'Sending {packet.name} -> "%s"', data)
         self.socket.send(stream.get())
         self.last_action = datetime.now().timestamp()
 

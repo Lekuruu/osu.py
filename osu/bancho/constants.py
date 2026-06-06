@@ -1,5 +1,4 @@
 from enum import IntEnum, Enum, IntFlag
-from typing import List
 
 
 class ClientPackets(IntEnum):
@@ -321,7 +320,7 @@ class Mods(IntFlag):
         return [flag for flag in Mods if self & flag]
 
     @property
-    def acronyms(self) -> List[str]:
+    def acronyms(self) -> list[str]:
         return [
             {
                 Mods.NoFail: "NF",

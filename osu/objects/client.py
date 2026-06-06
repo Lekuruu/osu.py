@@ -1,10 +1,9 @@
-from typing import List, Optional
+from datetime import datetime, timedelta
 from dateutil.tz import tzlocal
-from datetime import datetime
 
 import platform
 import hashlib
-import psutil
+import psutil  # type: ignore
 
 
 class ClientHash:
@@ -13,7 +12,7 @@ class ClientHash:
     These are usually known as "Hardware IDs" or "Unique IDs".
 
     You can set custom hardware ids, by assigning custom values to these attributes:
-        - `adapters`: List[str]
+        - `adapters`: list[str]
         - `uninstall_id`: str
         - `disk_signature`: str
     """
@@ -31,15 +30,15 @@ class ClientHash:
         self.executable_hash = executable_hash
 
         # Custom properties
-        self._uninstall_id: Optional[str] = None
-        self._disk_signature: Optional[str] = None
-        self._adapters: Optional[List[str]] = None
+        self._uninstall_id: str | None = None
+        self._disk_signature: str | None = None
+        self._adapters: list[str] | None = None
 
     def __repr__(self) -> str:
         return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
 
     @property
-    def adapters(self) -> List[str]:
+    def adapters(self) -> list[str]:
         if self._adapters:
             return self._adapters
 
@@ -49,7 +48,7 @@ class ClientHash:
         ]
 
     @adapters.setter
-    def adapters(self, value: List[str]):
+    def adapters(self, value: list[str]):
         self._adapters = value
 
     @property
@@ -85,17 +84,17 @@ class ClientHash:
 
         try:
             # Try to read the UninstallID from Registry
-            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg:
-                key = winreg.OpenKey(reg, "Software\\osu!")
+            with winreg.ConnectRegistry(None, winreg.HKEY_CURRENT_USER) as reg:  # type: ignore
+                key = winreg.OpenKey(reg, "Software\\osu!")  # type: ignore
 
                 for i in range(1024):
-                    name, value, type = winreg.EnumValue(key, i)
+                    name, value, type = winreg.EnumValue(key, i)  # type: ignore
 
                     if name != "UninstallID":
                         continue
 
                     return hashlib.md5(value.encode()).hexdigest()
-        except (FileNotFoundError, WindowsError, EnvironmentError):
+        except (FileNotFoundError, WindowsError, EnvironmentError):  # type: ignore
             # Key was not found
             pass
 
@@ -115,7 +114,7 @@ class ClientHash:
             return hashlib.md5(b"unknown").hexdigest()
 
         try:
-            from wmi import WMI
+            from wmi import WMI  # type: ignore
 
             # Get serial number of first item
             for item in WMI().query("SELECT * FROM Win32_DiskDrive"):
@@ -167,23 +166,24 @@ class ClientInfo:
         self.friendonly_dms = False
         self.display_city = False
 
-        self.utc_offset = round(
-            datetime.now(tzlocal()).utcoffset().total_seconds() / 3600
-        )
+        utcoffset = datetime.now(tzlocal()).utcoffset()
+        utcoffset = utcoffset or timedelta(0)
+
+        self.utc_offset = round(utcoffset.total_seconds() / 3600)
 
     def __repr__(self) -> str:
         return f"{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}"
 
     @classmethod
-    def get_file_hash(cls, updates: dict) -> Optional[str]:
+    def get_file_hash(cls, updates: list[dict]) -> str | None:
         for file in updates:
             if file["filename"] == "osu!.exe":
                 return file["file_hash"]
         return None
 
     @classmethod
-    def from_updates(cls, version: str, updates: dict) -> "ClientInfo":
+    def from_updates(cls, version: str, updates: list[dict]) -> "ClientInfo":
         return cls(
             version,
-            cls.get_file_hash(updates),
+            cls.get_file_hash(updates) or "",
         )

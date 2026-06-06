@@ -1,4 +1,4 @@
-from typing import Set, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets, CountryCodes, LevelGraph, Privileges, Mode
 from ..bancho.streams import StreamOut
@@ -12,7 +12,7 @@ import logging
 
 
 class Player:
-    def __init__(self, id: int, name: str = "", game: Optional["Game"] = None) -> None:
+    def __init__(self, id: int, name: str, game: "Game") -> None:
         self.id = id
         self.name = name
         self.game = game
@@ -31,7 +31,7 @@ class Player:
         self.pp = 0
 
         self.privileges: Privileges = Privileges.Normal
-        self.spectators: Set[Player] = set()
+        self.spectators: set[Player] = set()
 
         self.cant_spectate = False
         self.silenced = False
@@ -49,6 +49,8 @@ class Player:
         return self.id
 
     def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Player):
+            return NotImplemented
         return self.id == other.id
 
     @property
@@ -89,7 +91,7 @@ class Player:
         """Request a stats update for this player"""
         self.game.bancho.request_stats([self.id])
 
-    def avatar(self) -> Optional[bytes]:
+    def avatar(self) -> bytes | None:
         """Get the avatar for this player"""
         return self.game.api.get_avatar(self.id)
 
@@ -125,7 +127,7 @@ class Player:
 
         self.game.logger.info(f"You are now friends with {self.name}.")
 
-        self.game.bancho.friends.add(self.id)
+        self.game.bancho.friends.append(self.id)
         self.game.bancho.enqueue(
             ClientPackets.FRIEND_ADD, int(self.id).to_bytes(4, "little")
         )
