@@ -31,7 +31,6 @@ class WebAPI:
         - `check_updates`
         - `connect`
         - `verify`
-        - `get_session`
         - `get_backgrounds`
         - `get_friends`
         - `get_scores`
@@ -158,23 +157,6 @@ class WebAPI:
 
         if exit_after:
             exit(0)
-
-    def get_session(self) -> requests.Response:
-        """Perform a request on `/web/osu-session.php`.\n
-        I don't know what this actually does.
-        My guess is that it checks, if somebody is already online with this account.
-        """  # TODO
-
-        response = self.session.post(
-            f"{self.url}/web/osu-session.php",
-            files={
-                "u": self.game.username,
-                "h": self.game.password_hash,
-                "action": "check",
-            },
-        )
-
-        return response
 
     def get_backgrounds(self) -> list | None:
         """This will perform a request on `/web/osu-getseasonal.php`.
