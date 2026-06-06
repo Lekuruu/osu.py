@@ -283,6 +283,18 @@ def logout(stream: StreamIn, game: "Game"):
     game.events.call(ServerPackets.USER_LOGOUT, player)
 
 
+@Packets.register(ServerPackets.HANDLE_IRC_CHANGE_USERNAME)
+def irc_change_username(stream: StreamIn, game: "Game"):
+    old_name, new_name = (stream.string().split(">>>>", 1) + [""])[:2]
+    player = game.bancho.players.by_name(old_name)
+
+    if player:
+        player.name = new_name
+        player.logger.name = new_name
+
+    game.events.call(ServerPackets.HANDLE_IRC_CHANGE_USERNAME, old_name, new_name)
+
+
 @Packets.register(ServerPackets.SEND_MESSAGE)
 def message(stream: StreamIn, game: "Game"):
     sender, message, target = resolve_message(stream, game)
@@ -643,3 +655,28 @@ def dms_blocked(stream: StreamIn, game: "Game"):
 
     game.logger.info(f"{player} blocked their dms.")
     game.events.call(ServerPackets.USER_DM_BLOCKED, player)
+
+
+@Packets.register(ServerPackets.MONITOR)
+def monitor(stream: StreamIn, game: "Game"):
+    game.events.call(ServerPackets.MONITOR)
+
+
+@Packets.register(ServerPackets.SWITCH_SERVER)
+def switch_server(stream: StreamIn, game: "Game"):
+    # TODO: Implement backup bancho logic
+    required_idle_time = stream.s32()
+    game.events.call(ServerPackets.SWITCH_SERVER, required_idle_time)
+
+
+@Packets.register(ServerPackets.RTX)
+def rtx(stream: StreamIn, game: "Game"):
+    message = stream.string()
+    game.events.call(ServerPackets.RTX, message)
+
+
+@Packets.register(ServerPackets.SWITCH_TOURNAMENT_SERVER)
+def switch_tournament_server(stream: StreamIn, game: "Game"):
+    # TODO: Connect to tourney server
+    domain = stream.string()
+    game.events.call(ServerPackets.SWITCH_TOURNAMENT_SERVER, domain)

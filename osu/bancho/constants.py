@@ -58,10 +58,11 @@ class ClientPackets(IntEnum):
 
 class ServerPackets(IntEnum):
     USER_ID = 5
+    COMMAND_ERROR = 6  # unused
     SEND_MESSAGE = 7
     PONG = 8
-    HANDLE_IRC_CHANGE_USERNAME = 9  # unused
-    HANDLE_IRC_QUIT = 10
+    HANDLE_IRC_CHANGE_USERNAME = 9
+    HANDLE_IRC_QUIT = 10  # unused
     USER_STATS = 11
     USER_LOGOUT = 12
     SPECTATOR_JOINED = 13
@@ -74,7 +75,8 @@ class ServerPackets(IntEnum):
     UPDATE_MATCH = 26
     NEW_MATCH = 27
     DISPOSE_MATCH = 28
-    TOGGLE_BLOCK_NON_FRIEND_DMS = 34
+    LOBBY_JOIN = 34  # unused
+    LOBBY_PART = 35  # unused
     MATCH_JOIN_SUCCESS = 36
     MATCH_JOIN_FAIL = 37
     FELLOW_SPECTATOR_JOINED = 42
@@ -100,6 +102,7 @@ class ServerPackets(IntEnum):
     MONITOR = 80  # unused
     MATCH_PLAYER_SKIPPED = 81
     USER_PRESENCE = 83
+    IRC_ONLY = 84  # unused
     RESTART = 86
     MATCH_INVITE = 88
     CHANNEL_INFO_END = 89
