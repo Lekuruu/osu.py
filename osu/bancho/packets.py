@@ -114,8 +114,8 @@ def login_reply(stream: StreamIn, game: "Game"):
         except ValueError:
             error = None
 
-        game.logger.error(f"Login error: {error.name}")
-        game.logger.error(error.description)
+        game.logger.error(f"Login error: {error.name if error else response}")
+        game.logger.error(error.description if error else "Unknown error")
         game.bancho.connected = False
         game.bancho.retry = False
 
