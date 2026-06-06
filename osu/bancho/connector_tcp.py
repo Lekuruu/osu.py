@@ -1,13 +1,12 @@
 from datetime import datetime
-from queue import Queue
 
 from .connector import BanchoConnector
 from .constants import ServerPackets
 from .streams import StreamIn
 
 import socket
+import select
 import gzip
-import time
 
 
 class TcpBanchoConnector(BanchoConnector):
@@ -51,6 +50,7 @@ class TcpBanchoConnector(BanchoConnector):
         packet_header = StreamIn(self.socket.recv(7, socket.MSG_WAITALL))
 
         if packet_header.eof():
+            self.bancho.connected = False
             return
 
         packet_id = packet_header.u16()
@@ -73,10 +73,17 @@ class TcpBanchoConnector(BanchoConnector):
 
         try:
             self.process_packets()
+
+            while self.bancho.connected and self.has_pending_data():
+                self.process_packets()
         except OverflowError as exc:
             self.bancho.logger.error(f'Failed to process packets: "{exc}"')
             self.bancho.connected = False
             self.bancho.retry = True
+
+    def has_pending_data(self) -> bool:
+        readable, _, _ = select.select([self.socket], [], [], 0)
+        return bool(readable)
 
     def close(self) -> None:
         try:
