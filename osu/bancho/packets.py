@@ -198,7 +198,7 @@ def presence(stream: StreamIn, game: "Game"):
 
     if not (player := game.bancho.players.by_id(user_id)):
         # Add new player, if not found in collection
-        game.bancho.players.add(player := Player(user_id, game=game))
+        game.bancho.players.add(player := Player(user_id, name="", game=game))
 
     player.name = stream.string()
     player.timezone = stream.u8() - 24
@@ -224,7 +224,7 @@ def stats(stream: StreamIn, game: "Game"):
     if not (player := game.bancho.players.by_id(user_id)):
         # Add new player, if not found in collection
         game.bancho.request_presence([user_id])
-        game.bancho.players.add(player := Player(user_id, game=game))
+        game.bancho.players.add(player := Player(user_id, name="", game=game))
 
     player.last_status = copy(player.status)
 
@@ -253,7 +253,7 @@ def presence_bundle(stream: StreamIn, game: "Game"):
     user_ids = stream.intlist()
 
     for id in user_ids:
-        game.bancho.players.add(Player(id, game=game))
+        game.bancho.players.add(Player(id, name="", game=game))
 
     game.bancho.fast_read = True
     game.events.call(ServerPackets.USER_PRESENCE_BUNDLE, user_ids)
@@ -265,7 +265,7 @@ def presence_single(stream: StreamIn, game: "Game"):
 
     if not (game.bancho.players.by_id(user_id)):
         # Add player if not found
-        game.bancho.players.add(Player(user_id, game=game))
+        game.bancho.players.add(Player(user_id, name="", game=game))
 
     game.events.call(ServerPackets.USER_PRESENCE_SINGLE, user_id)
 
@@ -618,6 +618,7 @@ def target_silenced(stream: StreamIn, game: "Game"):
 
     if not (player := game.bancho.players.by_id(user_id)):
         game.bancho.request_presence([user_id])
+        return
 
     if not player.loaded:
         game.bancho.request_presence([user_id])

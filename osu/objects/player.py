@@ -12,7 +12,7 @@ import logging
 
 
 class Player:
-    def __init__(self, id: int, name: str = "", game: "Game | None" = None) -> None:
+    def __init__(self, id: int, name: str, game: "Game") -> None:
         self.id = id
         self.name = name
         self.game = game

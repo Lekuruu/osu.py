@@ -20,7 +20,7 @@ def resolve_match(stream: StreamIn, game: "Game") -> Match:
         if game.bancho.players.by_id(slot.player_id):
             continue
 
-        game.bancho.players.add(Player(slot.player_id, game=game))
+        game.bancho.players.add(Player(slot.player_id, name="", game=game))
         missing_players.append(slot.player_id)
 
     if missing_players:

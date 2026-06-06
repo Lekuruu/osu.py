@@ -123,9 +123,9 @@ class BanchoClient:
         self.retry = True
         self.token = ""
 
-        self.spectating: Player | None = None
-        self.match: Match | None = None
-        self.player: Player | None = None
+        self.spectating: Player
+        self.match: Match
+        self.player: Player
 
         self.channels = Channels()
         self.matches = Matches(game)
