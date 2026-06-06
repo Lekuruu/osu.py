@@ -47,7 +47,7 @@ jobs:
             - name: Install dependencies
               run: |
                   pip install -U --no-index --find-links=deps -r requirements.txt
-                  pip install -U --no-index --find-links=deps black build
+                  pip install -U --no-index --find-links=deps black mypy build
                   pip install -e . --no-index --find-links=deps
 
             - name: Run linters
@@ -55,6 +55,10 @@ jobs:
                   echo "Running linters"
 
                   black --check . 2>&1
+
+            - name: Run type checker
+              run: |
+                  mypy . 2>&1
 
             - name: Run test script
               run: |
