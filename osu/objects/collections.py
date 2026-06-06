@@ -5,6 +5,7 @@ from ..bancho.constants import ClientPackets, PresenceFilter
 
 from .lists import LockedSet
 from .channel import Channel
+from .match import Match
 from .player import Player
 
 if TYPE_CHECKING:
@@ -88,4 +89,33 @@ class Channels(LockedSet[Channel]):
         for c in self.copy():
             if c.name == name:
                 return c
+        return None
+
+
+class Matches(LockedSet[Match]):
+    def __init__(self, game: "Game") -> None:
+        self.game = game
+        super().__init__()
+
+    def __iter__(self) -> Iterator[Match]:
+        return super().__iter__()
+
+    def add(self, match: Match) -> None:
+        """Add a match to the collection"""
+        if existing := self.by_id(match.id):
+            super().remove(existing)
+
+        match.game = self.game
+        return super().add(match)
+
+    def remove(self, match: Match) -> None:
+        """Remove a match from the collection"""
+        if match in self:
+            return super().remove(match)
+
+    def by_id(self, id: int) -> Optional[Match]:
+        """Get a match by id"""
+        for match in self.copy():
+            if match.id == id:
+                return match
         return None

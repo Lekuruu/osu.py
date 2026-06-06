@@ -6,7 +6,8 @@ from .constants import ClientPackets, ReplayAction, StatusAction, Privileges
 from .streams import StreamOut
 
 from ..objects.replays import ReplayFrame, ScoreFrame
-from ..objects.collections import Players, Channels
+from ..objects.collections import Players, Channels, Matches
+from ..objects.match import Match
 from ..objects.player import Player
 from ..objects.status import Status
 
@@ -111,9 +112,11 @@ class BanchoClient:
         self.token = ""
 
         self.spectating: Optional[Player] = None
+        self.match: Optional[Match] = None
         self.player: Optional[Player] = None
 
         self.channels = Channels()
+        self.matches = Matches(game)
         self.players = Players(game)
         self.queue = Queue()
 

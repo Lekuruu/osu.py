@@ -8,7 +8,8 @@ from ..bancho.streams import StreamIn, StreamOut
 from ..bancho.constants import ClientPackets
 from ..bancho.packets import Packets
 
-from ..objects.collections import Players, Channels
+from ..objects.collections import Players, Channels, Matches
+from ..objects.match import Match
 from ..objects.player import Player
 
 if TYPE_CHECKING:
@@ -36,9 +37,11 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.retry = True
 
         self.spectating: Optional[Player] = None
+        self.match: Optional[Match] = None
         self.player: Optional[Player] = None
 
         self.channels = Channels()
+        self.matches = Matches(game)
         self.players = Players(game)
         self.queue = Queue()
 
