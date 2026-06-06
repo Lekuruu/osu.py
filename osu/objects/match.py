@@ -289,8 +289,7 @@ class Match:
         )
 
         match.slots = [
-            MatchSlot(status=SlotStatus(stream.u8()))
-            for _ in range(MATCH_SLOT_COUNT)
+            MatchSlot(status=SlotStatus(stream.u8())) for _ in range(MATCH_SLOT_COUNT)
         ]
 
         for slot in match.slots:
