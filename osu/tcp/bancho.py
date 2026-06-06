@@ -1,4 +1,4 @@
-from typing import Optional, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from datetime import datetime
 from queue import Queue
 
@@ -36,9 +36,9 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.connected = False
         self.retry = True
 
-        self.spectating: Optional[Player] = None
-        self.match: Optional[Match] = None
-        self.player: Optional[Player] = None
+        self.spectating: Player | None = None
+        self.match: Match | None = None
+        self.player: Player | None = None
 
         self.channels = Channels()
         self.matches = Matches(game)
@@ -49,7 +49,7 @@ class TcpBanchoClient(HTTPBanchoClient):
         self.protocol = 0
 
         self.privileges: Privileges = Privileges.Normal
-        self.friends: List[int] = []
+        self.friends: list[int] = []
 
         self.last_action = datetime.now().timestamp()
         self.silenced = False

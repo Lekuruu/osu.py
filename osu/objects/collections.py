@@ -1,5 +1,5 @@
-from typing import List, Set, Iterator, Optional, TYPE_CHECKING
 from collections.abc import Iterator
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets, PresenceFilter
 
@@ -21,11 +21,11 @@ class Players(LockedSet[Player]):
         return super().__iter__()
 
     @property
-    def ids(self) -> Set[int]:
+    def ids(self) -> set[int]:
         return {p.id for p in self}
 
     @property
-    def pending(self) -> List[Player]:
+    def pending(self) -> list[Player]:
         return [p for p in self if not p.name]
 
     def add(self, player: Player) -> None:
@@ -37,14 +37,14 @@ class Players(LockedSet[Player]):
         if player in self:
             return super().remove(player)
 
-    def by_id(self, id: int) -> Optional[Player]:
+    def by_id(self, id: int) -> Player | None:
         """Get a player by id"""
         for p in self.copy():
             if p.id == id:
                 return p
         return None
 
-    def by_name(self, name: str) -> Optional[Player]:
+    def by_name(self, name: str) -> Player | None:
         """Get a player by name"""
         for p in self.copy():
             if p.name == name:
@@ -72,7 +72,7 @@ class Channels(LockedSet[Channel]):
         return super().__iter__()
 
     @property
-    def joined(self) -> List[Channel]:
+    def joined(self) -> list[Channel]:
         return [c for c in self if c.joined]
 
     def add(self, channel: Channel) -> None:
@@ -84,7 +84,7 @@ class Channels(LockedSet[Channel]):
         if channel in self:
             return super().remove(channel)
 
-    def get(self, name: str) -> Optional[Channel]:
+    def get(self, name: str) -> Channel | None:
         """Get a channel by name"""
         for c in self.copy():
             if c.name == name:
@@ -113,7 +113,7 @@ class Matches(LockedSet[Match]):
         if match in self:
             return super().remove(match)
 
-    def by_id(self, id: int) -> Optional[Match]:
+    def by_id(self, id: int) -> Match | None:
         """Get a match by id"""
         for match in self.copy():
             if match.id == id:

@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Dict, List
+from collections.abc import Callable
 from datetime import datetime
 from copy import copy
 
@@ -33,8 +33,8 @@ class TcpGame:
         bancho_ip: str,
         bancho_port: int = 13381,
         tournament: bool = False,
-        events: Optional[Dict[ServerPackets, List[Callable]]] = {},
-        tasks: Optional[List[Task]] = [],
+        events: dict[ServerPackets, list[Callable]] | None = {},
+        tasks: list[Task] | None = [],
         disable_chat_logging: bool = False,
         disable_logging: bool = False,
     ) -> None:

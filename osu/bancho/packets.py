@@ -1,4 +1,5 @@
-from typing import List, Dict, Callable, TYPE_CHECKING
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 from copy import copy
 
 from ..objects.replays import ScoreFrame, ReplayFrame
@@ -30,7 +31,7 @@ import time
 
 class PacketHandler:
     def __init__(self) -> None:
-        self.handlers: Dict[ServerPackets, List[Callable]] = {}
+        self.handlers: dict[ServerPackets, list[Callable]] = {}
 
     def register(self, packet: ServerPackets):
         def wrapper(f: Callable):

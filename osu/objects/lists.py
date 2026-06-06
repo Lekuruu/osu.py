@@ -1,4 +1,5 @@
-from typing import Iterable, Iterator, Set, Any
+from collections.abc import Iterable, Iterator
+from typing import Any
 from threading import Lock
 
 
@@ -17,7 +18,7 @@ class LockedSet(set):
         with self._lock:
             return super(LockedSet, self).__iter__()
 
-    def __or__(self, __value: Set) -> Set[Any]:
+    def __or__(self, __value: set) -> set[Any]:
         with self._lock:
             return super(LockedSet, self).__or__(__value)
 

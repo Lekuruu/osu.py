@@ -1,4 +1,3 @@
-from typing import List, Optional
 from dateutil.tz import tzlocal
 from datetime import datetime
 
@@ -13,7 +12,7 @@ class ClientHash:
     These are usually known as "Hardware IDs" or "Unique IDs".
 
     You can set custom hardware ids, by assigning custom values to these attributes:
-        - `adapters`: List[str]
+        - `adapters`: list[str]
         - `uninstall_id`: str
         - `disk_signature`: str
     """
@@ -31,15 +30,15 @@ class ClientHash:
         self.executable_hash = executable_hash
 
         # Custom properties
-        self._uninstall_id: Optional[str] = None
-        self._disk_signature: Optional[str] = None
-        self._adapters: Optional[List[str]] = None
+        self._uninstall_id: str | None = None
+        self._disk_signature: str | None = None
+        self._adapters: list[str] | None = None
 
     def __repr__(self) -> str:
         return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
 
     @property
-    def adapters(self) -> List[str]:
+    def adapters(self) -> list[str]:
         if self._adapters:
             return self._adapters
 
@@ -49,7 +48,7 @@ class ClientHash:
         ]
 
     @adapters.setter
-    def adapters(self, value: List[str]):
+    def adapters(self, value: list[str]):
         self._adapters = value
 
     @property
@@ -175,7 +174,7 @@ class ClientInfo:
         return f"{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}"
 
     @classmethod
-    def get_file_hash(cls, updates: dict) -> Optional[str]:
+    def get_file_hash(cls, updates: dict) -> str | None:
         for file in updates:
             if file["filename"] == "osu!.exe":
                 return file["file_hash"]

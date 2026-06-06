@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import (
     ClientPackets,
@@ -45,14 +45,14 @@ class Match:
     beatmap_text: str = ""
     beatmap_id: int = -1
     beatmap_checksum: str = ""
-    slots: List[MatchSlot] = field(default_factory=list)
+    slots: list[MatchSlot] = field(default_factory=list)
     host_id: int = 0
     mode: Mode = Mode.Osu
     scoring_type: MatchScoringType = MatchScoringType.Score
     team_type: MatchTeamType = MatchTeamType.HeadToHead
     freemod: bool = False
     seed: int = 0
-    game: Optional["Game"] = None
+    game: "Game | None" = None
 
     def __post_init__(self) -> None:
         self.normalize_slots()
@@ -75,14 +75,14 @@ class Match:
         return f"#multi_{self.id}"
 
     @property
-    def host_slot(self) -> Optional[MatchSlot]:
+    def host_slot(self) -> MatchSlot | None:
         for slot in self.slots:
             if slot.player_id == self.host_id:
                 return slot
         return None
 
     @property
-    def own_slot(self) -> Optional[MatchSlot]:
+    def own_slot(self) -> MatchSlot | None:
         if not self.game:
             return None
 
@@ -95,19 +95,19 @@ class Match:
         return None
 
     @property
-    def used_slots(self) -> List[MatchSlot]:
+    def used_slots(self) -> list[MatchSlot]:
         return [slot for slot in self.slots if slot.has_player]
 
     @property
-    def open_slots(self) -> List[MatchSlot]:
+    def open_slots(self) -> list[MatchSlot]:
         return [slot for slot in self.slots if slot.status == SlotStatus.Open]
 
     @property
-    def ready_slots(self) -> List[MatchSlot]:
+    def ready_slots(self) -> list[MatchSlot]:
         return [slot for slot in self.slots if slot.status == SlotStatus.Ready]
 
     @property
-    def playing_slots(self) -> List[MatchSlot]:
+    def playing_slots(self) -> list[MatchSlot]:
         return [slot for slot in self.slots if slot.status & SlotStatus.Playing]
 
     def normalize_slots(self) -> None:
@@ -212,7 +212,7 @@ class Match:
         """Change your team in this multiplayer match"""
         self._enqueue(ClientPackets.MATCH_CHANGE_TEAM)
 
-    def invite(self, player: Union["Player", int]) -> None:
+    def invite(self, player: "Player | int") -> None:
         """Invite a player to this multiplayer match"""
         stream = StreamOut()
         stream.s32(player if isinstance(player, int) else player.id)
@@ -274,7 +274,7 @@ class Match:
         return stream.get()
 
     @classmethod
-    def decode(cls, stream: StreamIn, game: Optional["Game"] = None) -> "Match":
+    def decode(cls, stream: StreamIn, game: "Game | None" = None) -> "Match":
         match = Match(
             id=stream.s16(),
             in_progress=stream.bool(),

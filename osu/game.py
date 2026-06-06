@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Dict, List
+from collections.abc import Callable
 from datetime import datetime
 from copy import copy
 
@@ -29,11 +29,11 @@ class Game:
         password: str,
         server="ppy.sh",
         stream="stable40",
-        version: Optional[int] = None,
-        executable_hash: Optional[str] = None,
+        version: int | float | None = None,
+        executable_hash: str | None = None,
         tournament: bool = False,
-        events: Optional[Dict[ServerPackets, List[Callable]]] = {},
-        tasks: Optional[List[Task]] = [],
+        events: dict[ServerPackets, list[Callable]] | None = {},
+        tasks: list[Task] | None = [],
         force_linux_emulation: bool = True,
         disable_chat_logging: bool = False,
         disable_logging: bool = False,
@@ -196,7 +196,7 @@ class Game:
         if self.tourney:
             self.version = f"{self.version}tourney"
 
-    def fetch_version(self, stream: str = "stable40") -> Optional[str]:
+    def fetch_version(self, stream: str = "stable40") -> str | None:
         """
         Fetch the latest version of the client from:
         <https://osu.ppy.sh/home/changelog>

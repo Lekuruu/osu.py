@@ -1,4 +1,4 @@
-from typing import Set, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from ..bancho.constants import ClientPackets, CountryCodes, LevelGraph, Privileges, Mode
 from ..bancho.streams import StreamOut
@@ -12,7 +12,7 @@ import logging
 
 
 class Player:
-    def __init__(self, id: int, name: str = "", game: Optional["Game"] = None) -> None:
+    def __init__(self, id: int, name: str = "", game: "Game | None" = None) -> None:
         self.id = id
         self.name = name
         self.game = game
@@ -31,7 +31,7 @@ class Player:
         self.pp = 0
 
         self.privileges: Privileges = Privileges.Normal
-        self.spectators: Set[Player] = set()
+        self.spectators: set[Player] = set()
 
         self.cant_spectate = False
         self.silenced = False
@@ -89,7 +89,7 @@ class Player:
         """Request a stats update for this player"""
         self.game.bancho.request_stats([self.id])
 
-    def avatar(self) -> Optional[bytes]:
+    def avatar(self) -> bytes | None:
         """Get the avatar for this player"""
         return self.game.api.get_avatar(self.id)
 

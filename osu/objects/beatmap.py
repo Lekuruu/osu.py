@@ -1,7 +1,6 @@
 from ..bancho.constants import Grade, Mode
 from ..bancho.streams import StreamIn
 
-from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -49,8 +48,8 @@ class OnlineBeatmap:
     has_video: bool
     has_storyboard: bool
     filesize: int
-    filesize_novideo: Optional[int]
-    difficulties: List[Tuple[str, Mode]]
+    filesize_novideo: int | None
+    difficulties: list[tuple[str, Mode]]
 
     @classmethod
     def parse(cls, string: str) -> "OnlineBeatmap":
