@@ -161,7 +161,7 @@ class Game:
 
         try:
             if self.force_linux_emulation:
-                self.client.hash.adapters = ["runningunderwine"]
+                self.client.hash.adapters = "runningunderwine"
 
             if not retry:
                 self.api.get_backgrounds()

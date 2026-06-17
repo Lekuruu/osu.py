@@ -32,7 +32,7 @@ class ClientHash:
         # Custom properties
         self._uninstall_id: str | None = None
         self._disk_signature: str | None = None
-        self._adapters: list[str] | None = None
+        self._adapters: list[str] | str | None = None
 
     def __repr__(self) -> str:
         return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
