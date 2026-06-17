@@ -6,6 +6,7 @@ from .bancho.constants import ServerPackets
 from .objects.client import ClientInfo
 from .tasks import Task
 
+from .exceptions import ClientInitializationError, ClientConnectionError
 from .bancho import BanchoClient, Packets
 from .events import EventHandler
 from .tasks import TaskManager
@@ -115,8 +116,7 @@ class Game:
             self.tasks.tasks = tasks
 
         if not self.version or not self.version_number:
-            # Failed to get version
-            exit(1)
+            raise ClientInitializationError("Failed to resolve client version")
 
         if executable_hash:
             self.client = ClientInfo(self.version, executable_hash)
@@ -124,7 +124,7 @@ class Game:
 
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
-            exit(1)
+            raise ClientInitializationError("Failed to receive latest executable checksum")
 
         self.client = ClientInfo.from_updates(self.version, updates)
 
@@ -168,7 +168,7 @@ class Game:
                 self.api.get_menu_content()
 
             if not self.api.connect(retry):
-                exit(1)
+                return
 
             self.bancho.run()
 

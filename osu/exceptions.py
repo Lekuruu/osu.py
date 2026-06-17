@@ -1,0 +1,9 @@
+
+class GameException(BaseException):
+    ...
+
+class ClientInitializationError(GameException):
+    ...
+
+class ClientConnectionError(GameException):
+    ...

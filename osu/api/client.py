@@ -141,11 +141,7 @@ class WebAPI:
         )
 
         if not response.ok:
-            if self.game.server == "ppy.sh":
-                self.logger.error(
-                    f"Error on login: {requests.status_codes._codes[response.status_code][0].upper()}"
-                )
-                self.logger.warning("Ignoring...")
+            # Assuming that we can still connect
             return True
 
         if "error" in response.text:
@@ -159,14 +155,11 @@ class WebAPI:
 
         return True
 
-    def verify(self, exit_after: bool = True) -> None:
+    def verify(self) -> None:
         """This will print out a url, where the user can verify this client."""
         self.logger.info("Verification required.")
         self.logger.info(self.verification_url)
         self.logger.info("You only need to do this once.")
-
-        if exit_after:
-            exit(0)
 
     def get_backgrounds(self) -> list | None:
         """This will perform a request on `/web/osu-getseasonal.php`.
