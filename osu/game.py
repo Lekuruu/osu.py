@@ -124,7 +124,9 @@ class Game:
 
         if not (updates := self.api.check_updates()):
             # Updates are required because of the executable hash
-            raise ClientInitializationError("Failed to receive latest executable checksum")
+            raise ClientInitializationError(
+                "Failed to receive latest executable checksum"
+            )
 
         self.client = ClientInfo.from_updates(self.version, updates)
 
