@@ -1,6 +1,6 @@
 __author__ = "Lekuru"
 __email__ = "contact@lekuru.xyz"
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 __license__ = "MIT"
 
 from .bancho.connector_ws import WebsocketBanchoConnector
