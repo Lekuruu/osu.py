@@ -175,15 +175,22 @@ class ClientInfo:
         return f"{self.version}|{self.utc_offset}|{int(self.display_city)}|{self.hash}|{int(self.friendonly_dms)}"
 
     @classmethod
-    def get_file_hash(cls, updates: list[dict]) -> str | None:
-        for file in updates:
-            if file["filename"] == "osu!.exe":
-                return file["file_hash"]
-        return None
-
-    @classmethod
     def from_updates(cls, version: str, updates: list[dict]) -> "ClientInfo":
         return cls(
             version,
             cls.get_file_hash(updates) or "",
         )
+
+    @staticmethod
+    def get_file_hash(updates: list[dict]) -> str | None:
+        if not isinstance(updates, list):
+            return None
+
+        for file in updates:
+            if not isinstance(updates, dict):
+                continue
+
+            if file.get("filename") == "osu!.exe":
+                return file["file_hash"]
+
+        return None
