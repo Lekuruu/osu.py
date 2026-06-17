@@ -58,11 +58,13 @@ class HttpBanchoConnector(BanchoConnector):
             return
 
         if not (token := response.headers.get("cho-token")):
+            self.bancho.logger.debug("Connection token missing from login response")
             self.bancho.connected = False
             self.bancho.retry = False
             self.game.packets.data_received(response.content, self.game)
             return
 
+        self.bancho.logger.debug(f"Received session token: {token}")
         self.bancho.connected = True
         self.token = token
 
