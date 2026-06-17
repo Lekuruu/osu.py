@@ -38,7 +38,7 @@ class ClientHash:
         return f"{self.executable_hash}:{self.adapter_string}:{self.adapter_hash}:{self.uninstall_id}:{self.disk_signature}:"
 
     @property
-    def adapters(self) -> list[str]:
+    def adapters(self) -> list[str] | str:
         if self._adapters:
             return self._adapters
 
@@ -48,7 +48,7 @@ class ClientHash:
         ]
 
     @adapters.setter
-    def adapters(self, value: list[str]):
+    def adapters(self, value: list[str] | str):
         self._adapters = value
 
     @property
