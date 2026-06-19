@@ -82,6 +82,7 @@ Packets = PacketHandler()
 
 @Packets.register(ServerPackets.PONG)
 def tcp_ping(stream: StreamIn, game: "Game"):
+    # TODO: this should not do anything for HTTP clients
     game.bancho.enqueue(ClientPackets.PING)
 
 
