@@ -62,6 +62,8 @@ class TaskManager:
         if not self.game.bancho.connected:
             return
 
+        completed = []
+
         for task in self.tasks:
             last_call = (datetime.now() - task.last_call).total_seconds()
 
@@ -71,7 +73,7 @@ class TaskManager:
             task.last_call = datetime.now()
 
             if not task.loop:
-                self.tasks.remove(task)
+                completed.append(task)
 
             try:
                 self.logger.debug(f"Trying to run task: '{task.function.__name__}'")
@@ -96,3 +98,6 @@ class TaskManager:
                     f"Failed to run '{task.function.__name__}' task: {exc}",
                     exc_info=exc,
                 )
+
+        for task in completed:
+            self.tasks.remove(task)
