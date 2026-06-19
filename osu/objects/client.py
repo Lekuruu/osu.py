@@ -187,7 +187,7 @@ class ClientInfo:
             return None
 
         for file in updates:
-            if not isinstance(updates, dict):
+            if not isinstance(file, dict):
                 continue
 
             if file.get("filename") == "osu!.exe":
