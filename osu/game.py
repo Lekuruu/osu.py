@@ -143,33 +143,15 @@ class Game:
         """Return current time as ticks"""
         return int((datetime.now() - datetime(1, 1, 1)).total_seconds() * 10000000)
 
-    def run(self, retry=False, exit_on_interrupt=False) -> None:
-        if retry:
-            # Reinitialize game
-            self.__init__(  # type: ignore
-                self.username,
-                self.password,
-                self.server,
-                self.stream,
-                self.version_number,
-                self.client.hash.executable_hash,
-                self.tourney,
-                self.events.handlers,
-                self.tasks.tasks,
-                self.force_linux_emulation,
-                self.disable_chat,
-                self.logger.disabled,
-            )
-
+    def run(self, exit_on_interrupt=False) -> None:
         try:
             if self.force_linux_emulation:
                 self.client.hash.adapters = "runningunderwine"
 
-            if not retry:
-                self.api.get_backgrounds()
-                self.api.get_menu_content()
+            self.api.get_backgrounds()
+            self.api.get_menu_content()
 
-            if not self.api.connect(retry):
+            if not self.api.connect():
                 return
 
             self.bancho.run()

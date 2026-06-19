@@ -119,7 +119,7 @@ class WebAPI:
 
         return response.json()
 
-    def connect(self, retry=False) -> bool:
+    def connect(self, retry: bool = False) -> bool:
         """This will perform a request on `/web/bancho_connect.php`.
 
         Returns:

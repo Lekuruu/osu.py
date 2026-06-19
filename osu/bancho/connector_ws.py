@@ -120,6 +120,9 @@ class WebsocketBanchoConnector(BanchoConnector):
 
         self.game.packets.data_received(data, self.game)
 
+    def reset(self) -> None:
+        self.close()
+
     def close(self) -> None:
         if not self.websocket:
             return

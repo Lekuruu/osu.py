@@ -85,6 +85,10 @@ class TcpBanchoConnector(BanchoConnector):
         readable, _, _ = select.select([self.socket], [], [], 0)
         return bool(readable)
 
+    def reset(self) -> None:
+        self.close()
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     def close(self) -> None:
         try:
             self.socket.close()

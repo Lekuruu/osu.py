@@ -52,5 +52,8 @@ class BanchoConnector(ABC):
     def receive(self) -> None:
         """Receive packets from bancho."""
 
+    def reset(self) -> None:
+        """Reset connector state so it can reconnect."""
+
     def close(self) -> None:
         """Close transport resources."""

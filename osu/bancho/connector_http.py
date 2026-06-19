@@ -108,5 +108,12 @@ class HttpBanchoConnector(BanchoConnector):
         self.game.packets.data_received(response.content, self.game)
         self.bancho.last_action = datetime.now().timestamp()
 
+    def reset(self) -> None:
+        self.token = ""
+        self.session.headers.pop("osu-token", None)
+
+        while not self.queue.empty():
+            self.queue.get()
+
     def close(self) -> None:
         self.session.close()

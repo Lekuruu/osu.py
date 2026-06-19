@@ -98,9 +98,9 @@ def server_restart(stream: StreamIn, game: "Game"):
     game.logger.warning(f"Bancho is restarting. Retrying in {timeout} seconds...")
     game.bancho.connected = False
     game.bancho.retry = True
+    game.bancho.retry_delay = max(timeout, game.bancho.retry_delay)
 
     game.events.call(ServerPackets.RESTART, game.bancho.protocol)
-    time.sleep(timeout)
 
 
 @Packets.register(ServerPackets.USER_ID)

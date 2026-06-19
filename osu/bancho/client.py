@@ -63,6 +63,8 @@ class BanchoClient:
 
         `retry`: bool
 
+        `retry_delay`: int (Seconds to wait between retry attempts)
+
         `min_idletime`: int (Minimum time between requests)
 
         `max_idletime`: int (Maximum time between requests)
@@ -134,6 +136,7 @@ class BanchoClient:
 
         self.min_idletime = 1
         self.max_idletime = 2.5
+        self.retry_delay = 15
         self.connector: BanchoConnector
         self.set_connector(HttpBanchoConnector())
 
@@ -165,22 +168,47 @@ class BanchoClient:
 
     def run(self) -> None:
         """Run the client loop"""
-        self.connect()
+        while True:
+            self.connect()
 
-        while self.connected:
-            try:
-                self.connector.wait()
-                self.dequeue()
-                self.game.tasks.execute()
-            except KeyboardInterrupt:
-                raise
-            except Exception as exc:
-                self.logger.fatal(f"Unhandled Exception: {exc}", exc_info=exc)
+            while self.connected:
+                try:
+                    self.connector.wait()
+                    self.dequeue()
+                    self.game.tasks.execute()
+                except KeyboardInterrupt:
+                    raise
+                except Exception as exc:
+                    self.logger.fatal(f"Unhandled Exception: {exc}", exc_info=exc)
 
-        if self.retry:
-            self.logger.error("Retrying in 15 seconds...")
-            time.sleep(15)
-            self.game.run(retry=True)
+            if not self.retry:
+                break
+
+            self.logger.error(f"Retrying in {self.retry_delay} seconds...")
+            time.sleep(self.retry_delay)
+            self.reset()
+
+    def reset(self) -> None:
+        """Reset client state for reconnection."""
+        self.user_id = -1
+        self.connected = False
+        self.retry = True
+
+        self.match = None
+        self.spectating = None
+
+        self.channels = Channels()
+        self.matches = Matches(self.game)
+        self.players = Players(self.game)
+
+        self.ping_count = 0
+        self.fast_read = False
+        self.silenced = False
+        self.in_lobby = False
+        self.last_action = datetime.now().timestamp()
+
+        self.connector.reset()
+        self.game.api.connect(retry=True)
 
     def connect(self) -> None:
         """Perform the initial connection to the bancho server."""
