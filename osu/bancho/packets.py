@@ -601,6 +601,9 @@ def silence_info(stream: StreamIn, game: "Game"):
         game.bancho.silenced = True
         game.logger.warning(f"You have been silenced for {remaining_silence} seconds.")
 
+        # TODO: make this timer work, actually... or rather, perhaps doing a timer is the wrong move here.
+        #       a lot of things could go wrong with this, such as the game being closed before the timer finishes,
+        #       or the player being silenced again before the timer finishes, etc.
         threading.Timer(remaining_silence, game.bancho.unsilence)
     else:
         game.bancho.unsilence()
