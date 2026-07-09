@@ -69,6 +69,8 @@ def resolve_message(stream: StreamIn, game: "Game"):
         )
         return sender, message, target_channel
 
+    target_player: Player | None
+
     # Private message
     if game.bancho.player and target_name == game.bancho.player.name:
         target_player = game.bancho.player
