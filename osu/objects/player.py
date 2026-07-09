@@ -101,8 +101,12 @@ class Player:
             return
 
         if not self.loaded:
-            # Presence missing
             self.request_presence()
+            self.game.logger.warning(
+                "Tried to send a private message before the target player's "
+                "presence was loaded."
+            )
+            # Attempting it anyway cuz idk
 
         stream = StreamOut()
         stream.string(player.name)

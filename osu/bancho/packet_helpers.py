@@ -50,6 +50,11 @@ def resolve_message(stream: StreamIn, game: "Game"):
             game.bancho.players.add(player)
             game.bancho.request_presence([sender_id])
 
+    elif not player.loaded and sender_name:
+        player.name = sender_name
+        player.logger.name = sender_name
+        player.request_presence()
+
     if not player.loaded:
         # Presence missing
         player.request_presence()
@@ -65,14 +70,10 @@ def resolve_message(stream: StreamIn, game: "Game"):
         return sender, message, target_channel
 
     # Private message
-    target_player = game.bancho.players.by_name(target_name)
-
-    if (
-        not target_player
-        and game.bancho.player
-        and target_name == game.bancho.player.name
-    ):
+    if game.bancho.player and target_name == game.bancho.player.name:
         target_player = game.bancho.player
+    else:
+        target_player = game.bancho.players.by_name(target_name)
 
     if not target_player:
         target_player = Player(0, target_name, game)
